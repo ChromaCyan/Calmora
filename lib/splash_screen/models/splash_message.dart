@@ -7,18 +7,18 @@ class OnBoards {
 List<OnBoards> onBoardData = [
   OnBoards(
     text: "Welcome to Armstrong!\nA dedicated app for men's mental health and well-being.",
-    image: "images/mens_mental_health.png",
+    image: "images/logo_placeholder.jpg",
   ),
   OnBoards(
-    text: "Discover Resources\nAccess articles, tools, and tips to help manage stress, anxiety, and mental health challenges.",
-    image: "images/resources.png",
+    text: "Discover Resources\nAccess articles, tools, and tips to help manage stress, \nanxiety, and mental health challenges.",
+    image: "images/image1.png",
   ),
   OnBoards(
-    text: "Connect with Specialists\nFind licensed therapists and mental health experts to guide you through your journey.",
-    image: "images/specialist.png",
+    text: "Connect with Specialists\nFind licensed therapists and mental health experts \nto guide you through your journey.",
+    image: "images/image2.jpeg",
   ),
   OnBoards(
-    text: "Join the Conversation\nChat with peers and share experiences in a safe, supportive community.",
-    image: "images/chat_community.png",
+    text: "Join the Conversation\nChat with peers and share experiences in a safe, \n supportive community.",
+    image: "images/image3.png",
   ),
 ];
