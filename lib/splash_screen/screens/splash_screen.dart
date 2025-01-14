@@ -3,14 +3,14 @@ import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/splash_screen/models/splash_message.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class PetsOnBoardingScreen extends StatefulWidget {
-  const PetsOnBoardingScreen({super.key});
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
 
   @override
-  State<PetsOnBoardingScreen> createState() => _PetsOnBoardingScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _PetsOnBoardingScreenState extends State<PetsOnBoardingScreen> {
+class _SplashScreenState extends State<SplashScreen> {
   final PageController _pageController = PageController();
   int currentPage = 0;
 
@@ -20,11 +20,10 @@ class _PetsOnBoardingScreenState extends State<PetsOnBoardingScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Full-screen background image
           Positioned.fill(
             child: Image.asset(
-              "images/wallpaper_2.jpg",  // Add your background image asset here
-              fit: BoxFit.cover,        // Ensures the image covers the full screen
+              "images/wallpaper_2.jpg",  
+              fit: BoxFit.cover,        
             ),
           ),
 
@@ -52,6 +51,7 @@ class _PetsOnBoardingScreenState extends State<PetsOnBoardingScreen> {
                     final storage = FlutterSecureStorage();
                     await storage.write(
                         key: 'onboarding_completed', value: 'true');
+                    // Naka comment muna to ta wala pa tayong path to Login
                     // Navigator.pushAndRemoveUntil(
                     //   context,
                     //   MaterialPageRoute(
@@ -157,7 +157,6 @@ class _PetsOnBoardingScreenState extends State<PetsOnBoardingScreen> {
         ),
         const SizedBox(height: 30),
 
-        // Conditionally display different text spans based on the index (page)
         if (index == 0)
           const Text.rich(
             TextSpan(
