@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/splash_screen/models/splash_message.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/authentication/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -51,14 +52,13 @@ class _SplashScreenState extends State<SplashScreen> {
                     final storage = FlutterSecureStorage();
                     await storage.write(
                         key: 'onboarding_completed', value: 'true');
-                    // Naka comment muna to ta wala pa tayong path to Login
-                    // Navigator.pushAndRemoveUntil(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (_) => LoginScreen(),
-                    //   ),
-                    //   (route) => false,
-                    // );
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoginScreen(),
+                      ),
+                      (route) => false,
+                    );
                   } else {
                     _pageController.nextPage(
                       duration: const Duration(milliseconds: 300),
