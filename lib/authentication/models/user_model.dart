@@ -100,7 +100,7 @@ class Patient extends User {
       dateOfBirth: DateTime.parse(json['dateOfBirth']),
       emergencyContact: json['emergencyContact'] != null 
           ? EmergencyContact.fromJson(json['emergencyContact']) 
-          : null, // optional
+          : null, 
       medicalHistory: json['medicalHistory'],
       therapyGoals: json['therapyGoals'] != null 
           ? List<String>.from(json['therapyGoals']) 

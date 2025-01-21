@@ -6,6 +6,7 @@ import 'package:armstrong/authentication/blocs/auth_event.dart';
 import 'package:armstrong/authentication/blocs/auth_state.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:intl/intl.dart';
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
 
@@ -47,52 +48,54 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void _onRegisterButtonPressed() {
-  if (_formKey.currentState!.validate()) {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
+    if (_formKey.currentState!.validate()) {
+      if (_passwordController.text != _confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')),
+        );
+        return;
+      }
+
+      final event = isPatient
+          ? RegisterEvent(
+              firstName: _firstNameController.text,
+              lastName: _lastNameController.text,
+              email: _emailController.text,
+              phoneNumber: _phoneNumberController.text,
+              password: _passwordController.text,
+              otherDetails: {
+                "dateOfBirth": _dateOfBirthController.text,
+                if (_emergencyContactNameController.text.isNotEmpty)
+                  "emergencyContactName": _emergencyContactNameController.text,
+                if (_emergencyContactPhoneController.text.isNotEmpty)
+                  "emergencyContactPhone":
+                      _emergencyContactPhoneController.text,
+                if (_emergencyContactRelationController.text.isNotEmpty)
+                  "emergencyContactRelation":
+                      _emergencyContactRelationController.text,
+                if (_medicalHistoryController.text.isNotEmpty)
+                  "medicalHistory": _medicalHistoryController.text,
+                if (_therapyGoalsController.text.isNotEmpty)
+                  "therapyGoals": _therapyGoalsController.text,
+              },
+              profileImage: '',
+            )
+          : RegisterEvent(
+              firstName: _firstNameController.text,
+              lastName: _lastNameController.text,
+              email: _emailController.text,
+              phoneNumber: _phoneNumberController.text,
+              password: _passwordController.text,
+              otherDetails: {
+                "specialization": _specializationController.text,
+                "licenseNumber": _licenseNumberController.text,
+              },
+              profileImage: '',
+            );
+
+      BlocProvider.of<AuthBloc>(context).add(event);
     }
-
-    final event = isPatient
-        ? RegisterEvent(
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            email: _emailController.text,
-            phoneNumber: _phoneNumberController.text,
-            password: _passwordController.text,
-            otherDetails: {
-              "dateOfBirth": _dateOfBirthController.text,
-              if (_emergencyContactNameController.text.isNotEmpty) 
-                "emergencyContactName": _emergencyContactNameController.text,
-              if (_emergencyContactPhoneController.text.isNotEmpty) 
-                "emergencyContactPhone": _emergencyContactPhoneController.text,
-              if (_emergencyContactRelationController.text.isNotEmpty) 
-                "emergencyContactRelation": _emergencyContactRelationController.text,
-              if (_medicalHistoryController.text.isNotEmpty)
-                "medicalHistory": _medicalHistoryController.text,
-              if (_therapyGoalsController.text.isNotEmpty)
-                "therapyGoals": _therapyGoalsController.text,
-            },
-            profileImage: '',
-          )
-        : RegisterEvent(
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            email: _emailController.text,
-            phoneNumber: _phoneNumberController.text,
-            password: _passwordController.text,
-            otherDetails: {
-              "specialization": _specializationController.text,
-              "licenseNumber": _licenseNumberController.text,
-            },
-            profileImage: '',
-          );
-
-    BlocProvider.of<AuthBloc>(context).add(event);
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -145,10 +148,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text(
-                                "Sign Up",
-                                style: TextStyle(fontSize: 24),
-                                textAlign: TextAlign.center,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back),
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context); 
+                                    },
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 40),
                               ToggleButtons(
@@ -160,11 +171,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 },
                                 children: const [
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
                                     child: Text("Patient"),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
                                     child: Text("Specialist"),
                                   ),
                                 ],
@@ -174,7 +187,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               const SizedBox(height: 20),
-                              _buildTextField("First Name", _firstNameController),
+                              _buildTextField(
+                                  "First Name", _firstNameController),
                               const SizedBox(height: 20),
                               _buildTextField("Last Name", _lastNameController),
                               const SizedBox(height: 20),
@@ -192,36 +206,44 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               const SizedBox(height: 20),
                               if (isPatient) ...[
                                 GestureDetector(
-                        onTap: () => _selectDate(context), // Open date picker when tapped
-                        child: AbsorbPointer( // This prevents the keyboard from showing
-                          child: _buildTextField(
-                            "Date of Birth", 
-                            _dateOfBirthController,
-                            isRequired: true, // Optional: Set to true if required
-                          ),
-                        ),
-                      ),
-                                const SizedBox(height: 20),
-                                _buildTextField("Emergency Contact Name (optional)",
-                                    _emergencyContactNameController, isRequired: false),
-                                const SizedBox(height: 20),
-                                _buildTextField("Emergency Contact Phone (optional)",
-                                    _emergencyContactPhoneController, isRequired: false),
-                                const SizedBox(height: 20),
-                                _buildTextField("Emergency Contact Relation (optional)",
-                                    _emergencyContactRelationController, isRequired: false),
-                                const SizedBox(height: 20),
-                                _buildTextField("Medical History (optional)",
-                                    _medicalHistoryController, isRequired: false),
+                                  onTap: () => _selectDate(context),
+                                  child: AbsorbPointer(
+                                    child: _buildTextField(
+                                      "Date of Birth",
+                                      _dateOfBirthController,
+                                      isRequired: true,
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 20),
                                 _buildTextField(
-                                    "Therapy Goals (optional)", _therapyGoalsController, isRequired: false),
+                                    "Emergency Contact Name (optional)",
+                                    _emergencyContactNameController,
+                                    isRequired: false),
+                                const SizedBox(height: 20),
+                                _buildTextField(
+                                    "Emergency Contact Phone (optional)",
+                                    _emergencyContactPhoneController,
+                                    isRequired: false),
+                                const SizedBox(height: 20),
+                                _buildTextField(
+                                    "Emergency Contact Relation (optional)",
+                                    _emergencyContactRelationController,
+                                    isRequired: false),
+                                const SizedBox(height: 20),
+                                _buildTextField("Medical History (optional)",
+                                    _medicalHistoryController,
+                                    isRequired: false),
+                                const SizedBox(height: 20),
+                                _buildTextField("Therapy Goals (optional)",
+                                    _therapyGoalsController,
+                                    isRequired: false),
                               ] else ...[
                                 _buildTextField("Specialization",
                                     _specializationController),
                                 const SizedBox(height: 20),
-                                _buildTextField("License Number",
-                                    _licenseNumberController),
+                                _buildTextField(
+                                    "License Number", _licenseNumberController),
                               ],
                               const SizedBox(height: 20),
                               ElevatedButton(

@@ -6,6 +6,9 @@ import 'package:armstrong/authentication/blocs/auth_state.dart';
 import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/authentication/screens/registration_screen.dart';
+import 'package:armstrong/widgets/forms/forget_password.dart';
+import 'package:armstrong/patient/screens/dashboard.dart' as patient;
+import 'package:armstrong/specialist/screens/dashboard.dart' as specialist;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,14 +36,19 @@ class _LoginScreenState extends State<LoginScreen> {
             listener: (context, state) {
               if (state is AuthSuccess) {
                 final userData = state.userData;
-                final userType = userData['userType']; // Extract userType
+                final userType = userData['userType'];
 
-                // Show a specific SnackBar message based on userType
                 if (userType == 'Patient') {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Welcome, Patient"),
+                      content: Text("Welcome, Patient!"),
                       duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => patient.LibraryScreen(),
                     ),
                   );
                 } else if (userType == 'Specialist') {
@@ -48,6 +56,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     SnackBar(
                       content: Text("Welcome, Specialist"),
                       duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => specialist.LibraryScreen(),
                     ),
                   );
                 } else {
@@ -93,7 +107,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 60),
                       const Text(
                         "Login",
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
                       TextField(
@@ -197,18 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text("Forgot Password"),
-          content: const Text("Feature not implemented yet."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Close"),
-            ),
-          ],
-        );
+        return ForgotPasswordDialog();
       },
     );
   }

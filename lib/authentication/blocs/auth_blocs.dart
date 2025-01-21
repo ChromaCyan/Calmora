@@ -34,6 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final userData = await apiRepository.loginUser(event.email, event.password);
+      print("Login successful: $userData");
       emit(AuthSuccess(userData: userData));
     } catch (error) {
       emit(AuthError(message: error.toString()));
@@ -46,6 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final verificationDetails = await apiRepository.verifyOTP(event.email, event.otp);
       emit(OtpVerified(verificationDetails: verificationDetails));
     } catch (e) {
+      print("Login failed with error: $e");
       emit(AuthError(message: e.toString()));
     }
   }
