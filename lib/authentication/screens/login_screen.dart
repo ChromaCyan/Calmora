@@ -7,9 +7,8 @@ import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/authentication/screens/registration_screen.dart';
 import 'package:armstrong/widgets/forms/forget_password.dart';
-import 'package:armstrong/patient/screens/dashboard.dart' as patient;
-import 'package:armstrong/specialist/screens/dashboard.dart' as specialist;
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
+import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -62,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => specialist.LibraryScreen(),
+                      builder: (context) => SpecialistHomeScreen(),
                     ),
                   );
                 } else {
