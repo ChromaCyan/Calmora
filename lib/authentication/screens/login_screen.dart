@@ -1,11 +1,11 @@
-import 'package:armstrong/authentication/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/config/colors.dart';
-import 'package:armstrong/authentication/blocs/auth_bloc.dart';
+import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/authentication/blocs/auth_event.dart';
 import 'package:armstrong/authentication/blocs/auth_state.dart';
+import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/authentication/screens/registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,8 +29,44 @@ class _LoginScreenState extends State<LoginScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          BlocProvider(
-            create: (context) => AuthBloc(apiRepository: ApiRepository()), 
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthSuccess) {
+                final userData = state.userData;
+                final userType = userData['userType']; // Extract userType
+
+                // Show a specific SnackBar message based on userType
+                if (userType == 'Patient') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Welcome, Patient"),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                } else if (userType == 'Specialist') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Welcome, Specialist"),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("You've successfully registered!"),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } else if (state is AuthError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message ?? "Login failed"),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
             child: Center(
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.75,
@@ -61,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: emailController, 
+                        controller: emailController,
                         decoration: InputDecoration(
                           hintText: "Enter your email:",
                           filled: true,
@@ -73,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: passwordController, 
+                        controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                           hintText: "Enter your password:",
@@ -92,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             _showForgotPasswordDialog(context);
                           },
                           child: const Text(
-                            "Forget Password",
+                            "Forgot Password?",
                             style: TextStyle(color: Colors.blue),
                           ),
                         ),
@@ -121,11 +157,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () {
+                          print("Login button clicked");
                           context.read<AuthBloc>().add(
-                                LoginUserEvent(
+                                LoginEvent(
                                   email: emailController.text,
                                   password: passwordController.text,
-                                  userType: 'user', 
                                 ),
                               );
                         },
@@ -156,163 +192,31 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-  @override
-  void dispose() {
-    super.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-  }
-
 
   void _showForgotPasswordDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
-        String currentStep = "verify";
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (currentStep == "verify") ...[
-                      const Text(
-                        "Change Password",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: "Enter your Email:",
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "New password:",
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "Confirm new password:",
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            currentStep = "enter_code";
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: orangeContainer,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 50,
-                          ),
-                        ),
-                        child: const Text(
-                          "Next",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ] else if (currentStep == "enter_code") ...[
-                      const Text(
-                        "We’ve sent you a confirmation code, please check your emails (including spams) and enter the code below.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: "Enter code:",
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            currentStep = "success";
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: orangeContainer,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 50,
-                          ),
-                        ),
-                        child: const Text("Next", style: TextStyle(fontSize: 18, color: Colors.white)),
-                      ),
-                    ] else if (currentStep == "success") ...[
-                      const Icon(Icons.check_circle,
-                          size: 80, color: Colors.green),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Your password has been reset successfully!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: orangeContainer,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 50,
-                          ),
-                        ),
-                        child: const Text("Close", style: TextStyle(fontSize: 18, color: Colors.white)),
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            },
-          ),
+        return AlertDialog(
+          title: const Text("Forgot Password"),
+          content: const Text("Feature not implemented yet."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Close"),
+            ),
+          ],
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
   }
 }

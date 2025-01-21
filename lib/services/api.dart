@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter/material.dart';
 
 class ApiRepository {
-  final String baseUrl = 'http://localhost:5000/api/';
+  final String baseUrl = 'http://localhost:5000/api';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   // Register User
@@ -13,21 +12,21 @@ class ApiRepository {
     String lastName,
     String email,
     String password,
-    String userType,
+    String phoneNumber,
+    String profileImage,
     Map<String, dynamic> otherDetails,
   ) async {
     final url = Uri.parse('$baseUrl/auth/register');
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'firstName': firstName,
         'lastName': lastName,
         'email': email,
         'password': password,
-        'userType': userType,
+        'phoneNumber': phoneNumber,
+        'profileImage': profileImage,
         ...otherDetails,
       }),
     );
@@ -40,42 +39,34 @@ class ApiRepository {
   }
 
   // Login User
-  Future<Map<String, dynamic>> loginUser(
-    String email,
-    String password,
-    String userType,
-  ) async {
-    final url = Uri.parse('$baseUrl/auth/login');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'email': email,
-        'password': password,
-        'userType': userType,
-      }),
-    );
+  Future<Map<String, dynamic>> loginUser(String email, String password) async {
+  final url = Uri.parse('$baseUrl/auth/login');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({'email': email.toLowerCase(), 'password': password}),
+  );
 
-    if (response.statusCode == 200) {
-      // Store the JWT token securely
-      final data = json.decode(response.body);
-      await _storage.write(key: 'token', value: data['token']);
-      return data;
-    } else {
-      throw Exception('Failed to login: ${response.body}');
-    }
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    await _storage.write(key: 'token', value: data['token']);
+
+    return data; 
+  } else {
+    throw Exception('Failed to login: ${response.body}');
   }
+}
 
   // Verify OTP
-  Future<Map<String, dynamic>> verifyOTP(String email, String otp) async {
+  Future<Map<String, dynamic>> verifyOTP(
+    String email,
+    String otp,
+  ) async {
     final url = Uri.parse('$baseUrl/auth/verify-otp');
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'otp': otp}),
     );
 
