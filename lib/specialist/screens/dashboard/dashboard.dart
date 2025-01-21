@@ -1,35 +1,9 @@
 import 'package:flutter/material.dart';
 
-class LibraryScreen extends StatelessWidget {
+class SpecialistDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.teal,
-        leading: Icon(Icons.menu),
-        title: Text('Library'),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Discover',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.checklist),
-            label: 'Checklist',
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -61,7 +35,7 @@ class LibraryScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       color: Colors.grey[200],
       child: const Text(
-        '*AUTO SWIPING BANNER*\nContains: Motivational and uplifting messages\n\nYou’re a disappointment\nYou’re like an Asian son, a failure',
+        'Graph Example about the number of people asking for appointment',
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 16),
       ),

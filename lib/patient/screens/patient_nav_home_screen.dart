@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/universal/blocs/nav_cubit.dart'; 
+import 'package:armstrong/universal/nav_cubit.dart'; 
 import 'package:armstrong/patient/screens/pages.dart'; 
 import 'package:armstrong/widgets/navigation/nav_bar.dart'; 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -52,7 +52,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(index);
             },
             children: [
-              LibraryScreen(),
+              DashboardScreen(),
               //SecondPage(),
               //ThirdPage(),
               //FourthPage(),
