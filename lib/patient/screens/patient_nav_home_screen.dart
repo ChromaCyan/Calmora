@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/nav_cubit.dart'; 
 import 'package:armstrong/patient/screens/pages.dart'; 
 import 'package:armstrong/widgets/navigation/nav_bar.dart'; 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class PatientHomeScreen extends StatefulWidget {
 class _PatientHomeScreenState extends State<PatientHomeScreen> {
   int _selectedIndex = 0;
   late PageController _pageController;
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   void _onTabSelected(int index) {
     setState(() {

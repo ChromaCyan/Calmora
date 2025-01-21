@@ -23,11 +23,10 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              "images/wallpaper.jpg",  
-              fit: BoxFit.cover,        
+              "images/wallpaper.jpg",
+              fit: BoxFit.cover,
             ),
           ),
-
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -156,7 +155,6 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         const SizedBox(height: 30),
-
         if (index == 0)
           const Text.rich(
             TextSpan(
@@ -206,7 +204,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             textAlign: TextAlign.center,
           )
-          else if (index == 3)
+        else if (index == 3)
           const Text.rich(
             TextSpan(
               style: TextStyle(
