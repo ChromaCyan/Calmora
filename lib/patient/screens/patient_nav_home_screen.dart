@@ -50,7 +50,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(index);
             },
             children: [
-              // Replace with actual page widgets
               LibraryScreen(),
               //SecondPage(),
               //ThirdPage(),

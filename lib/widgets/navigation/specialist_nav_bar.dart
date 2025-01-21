@@ -16,7 +16,6 @@ class SpecialistBottomNavBar extends StatelessWidget {
     this.chatNotificationCount = 0,
   }) : super(key: key);
 
-  // Badge widget for overlaying notifications
   Widget _buildBadge(int count) {
     return count > 0
         ? Positioned(

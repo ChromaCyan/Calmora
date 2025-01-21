@@ -19,7 +19,6 @@ class User {
     required this.userType,
   });
 
-  // Factory constructor to parse JSON into a User object
   factory User.fromJson(Map<String, dynamic> json) {
     if (json['userType'] == 'patient') {
       return Patient.fromJson(json);
@@ -39,7 +38,6 @@ class User {
     }
   }
 
-  // Convert a User object to JSON
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -104,7 +102,7 @@ class Patient extends User {
       medicalHistory: json['medicalHistory'],
       therapyGoals: json['therapyGoals'] != null 
           ? List<String>.from(json['therapyGoals']) 
-          : null, // optional
+          : null, 
     );
   }
 

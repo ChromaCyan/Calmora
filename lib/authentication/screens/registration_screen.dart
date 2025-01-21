@@ -36,14 +36,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1900), // You can adjust this range as needed
+      firstDate: DateTime(1900), 
       lastDate: DateTime.now(),
     );
 
     if (pickedDate != null) {
-      // Format the selected date to 'yyyy-MM-dd'
       String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-      _dateOfBirthController.text = formattedDate; // Update the controller
+      _dateOfBirthController.text = formattedDate; 
     }
   }
 

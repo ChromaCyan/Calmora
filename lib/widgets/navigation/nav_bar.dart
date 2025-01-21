@@ -16,7 +16,6 @@ class CustomBottomNavBar extends StatelessWidget {
     this.chatNotificationCount = 0,
   }) : super(key: key);
 
-  // Badge widget for overlaying notifications
   Widget _buildBadge(int count) {
     return count > 0
         ? Positioned(
@@ -55,19 +54,17 @@ class CustomBottomNavBar extends StatelessWidget {
 
         Icon(Icons.search, size: 30, color: Colors.white),
 
-        // Messages icon with badge overlay
         Stack(
           children: [
             Icon(Icons.message_outlined, size: 30, color: Colors.white),
-            _buildBadge(chatNotificationCount), // Use the badge method here
+            _buildBadge(chatNotificationCount), 
           ],
         ),
 
-        // Adoption Status icon with badge overlay
         Stack(
           children: [
             Icon(Icons.checklist, size: 30, color: Colors.white),
-            _buildBadge(notificationCount), // Use the badge method here
+            _buildBadge(notificationCount), 
           ],
         ),
       ],
