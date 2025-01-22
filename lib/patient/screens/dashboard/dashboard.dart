@@ -1,6 +1,14 @@
+import 'package:armstrong/widgets/buttons/survey_button.dart';
+import 'package:armstrong/widgets/cards/article_card.dart';
+import 'package:armstrong/widgets/cards/daily_advice_card.dart';
+import 'package:armstrong/widgets/cards/journal_card.dart';
+import 'package:armstrong/widgets/cards/mood_card.dart';
+import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,122 +18,67 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildBanner(),
+              const SizedBox(height: 10),
+              WelcomeSection(),
+              const SizedBox(height: 30),
+              MoodSection(),
               const SizedBox(height: 20),
-              const Text(
-                'Library',
+              Column(
+                mainAxisAlignment: MainAxisAlignment
+                    .center, 
+                crossAxisAlignment: CrossAxisAlignment
+                    .center,
+                children: [
+                  Center(
+                    child: QuickTestButton(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              JournalSection(),
+              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              Text(
+                'Articles For You.',
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 10),
-              _buildLibraryCards(),
+              SizedBox(
+                height: 200,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    ArticleCard(
+                      imagePath: 'assets/image1.jpg',
+                      title: 'Men’s Mental Health Matters!',
+                      author: 'Dr. Juan Joe Cruz',
+                    ),
+                    ArticleCard(
+                      imagePath: 'assets/image2.jpg',
+                      title: 'Reasons Why You Are Broken...',
+                      author: 'Dr. Leslie Ferrer',
+                    ),
+                    ArticleCard(
+                      imagePath: 'assets/image2.jpg',
+                      title: 'Reasons Why You Are Broken...',
+                      author: 'Dr. Leslie Ferrer',
+                    ),
+                    ArticleCard(
+                      imagePath: 'assets/image2.jpg',
+                      title: 'Reasons Why You Are Broken...',
+                      author: 'Dr. Leslie Ferrer',
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 20),
-              _buildJournalSection(),
+              HealthAdviceSection(),
+              const SizedBox(height: 20),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildBanner() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.grey[200],
-      child: const Text(
-        '*AUTO SWIPING BANNER*\nContains: Motivational and uplifting messages\n\nYou’re a disappointment\nYou’re like an Asian son, a failure',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 16),
-      ),
-    );
-  }
-
-  Widget _buildLibraryCards() {
-    return SizedBox(
-      height: 200,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildCard(
-            imagePath: 'assets/image1.jpg',
-            title: 'Discover why you’re a failure',
-            author: 'Dr. Juan Joe Cruz',
-          ),
-          _buildCard(
-            imagePath: 'assets/image2.jpg',
-            title: 'Reasons why you are a disappointment.',
-            author: 'Dr. Leslie Ferrer',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCard({required String imagePath, required String title, required String author}) {
-    return Container(
-      width: 150,
-      margin: const EdgeInsets.only(right: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 120,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            author,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJournalSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.green[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Daily check-in/Notes/Mood tracking',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Your Journal',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.brown,
-            ),
-          ),
-        ],
       ),
     );
   }

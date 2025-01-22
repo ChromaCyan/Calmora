@@ -9,6 +9,16 @@ class StorageHelper {
   }
 
   // Get userId
+  static Future<String?> getFirstname() async {
+    return await _storage.read(key: 'firstName');
+  }
+
+  // Save First Name
+  static Future<void> saveUser(String firstName) async {
+    await _storage.write(key: 'fisrtName', value: firstName);
+  }
+
+  // Get userId
   static Future<String?> getUserId() async {
     return await _storage.read(key: 'userId');
   }

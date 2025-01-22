@@ -10,6 +10,14 @@ List<OnBoards> onBoardData = [
     image: "images/logo_placeholder.png",
   ),
   OnBoards(
+    text: "It's okay to feel broken sometimes.\nShowing your vulnerable side is not a sign of weakness—\nit's a step toward true strength and healing.",
+    image: "images/image5.png",
+  ),
+  OnBoards(
+    text: "Life can feel overwhelming, like noise that won't quiet down.\nHere, you'll find tools to untangle your thoughts\nand move toward clarity and peace.",
+    image: "images/image7.png",
+  ),
+  OnBoards(
     text: "Discover Resources\nAccess articles, tools, and tips to help manage stress, \nanxiety, and mental health challenges.",
     image: "images/image1.png",
   ),

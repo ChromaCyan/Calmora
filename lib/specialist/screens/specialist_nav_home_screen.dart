@@ -1,5 +1,3 @@
-import 'package:armstrong/specialist/screens/chat/chat_list_screen.dart';
-import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart'; 
@@ -47,6 +45,34 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80), 
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0), 
+            child: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(
+                color: Colors.black, 
+                size: 28.0,
+              ),
+              title: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _getDynamicTitle(),
+                  key: ValueKey<int>(_selectedIndex),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              centerTitle: true,
+            ),
+          ),
+        ),
+        drawer: SpecialistAppDrawer(), 
         body: SafeArea(
           child: PageView(
             controller: _pageController,
@@ -55,8 +81,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             },
             children: [
               SpecialistDashboardScreen(),
-              ChatListScreen(),
-              AppointmentsScreen(),
+              //SecondPage(),
               //ThirdPage(),
               //FourthPage(),
             ],
@@ -68,5 +93,14 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         ),
       ),
     );
+  }
+
+  String _getDynamicTitle() {
+    switch (_selectedIndex) {
+      case 0:
+        return 'Dashboard';
+      default:
+        return 'Home';
+    }
   }
 }
