@@ -57,20 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     final userType = userData['userType'];
                     final token = userData['token'];
 
-                    // Save the token securely
                     await StorageHelper.saveToken(token);
-
-                    User user;
-
-                    if (userType == 'Patient') {
-                      user = Patient.fromJson(
-                          userData); 
-                    } else if (userType == 'Specialist') {
-                      user = Specialist.fromJson(
-                          userData); 
-                    } else {
-                      user = User.fromJson(userData);
-                    }
 
                     if (userType == 'Patient') {
                       final firstName = userData['firstName'];

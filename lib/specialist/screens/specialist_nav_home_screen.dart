@@ -1,3 +1,5 @@
+import 'package:armstrong/widgets/navigation/drawer.dart';
+import 'package:armstrong/widgets/navigation/specialist_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart'; 
@@ -45,6 +47,34 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80), 
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0), 
+            child: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(
+                color: Colors.black, 
+                size: 28.0,
+              ),
+              title: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _getDynamicTitle(),
+                  key: ValueKey<int>(_selectedIndex),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              centerTitle: true,
+            ),
+          ),
+        ),
+        drawer: SpecialistAppDrawer(), 
         body: SafeArea(
           child: PageView(
             controller: _pageController,
@@ -52,10 +82,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
               BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(index);
             },
             children: [
-              SpecialistDashboardScreen(),
-              //SecondPage(),
-              //ThirdPage(),
-              //FourthPage(),
+              SpecialistDashboardScreen(), 
             ],
           ),
         ),
@@ -65,5 +92,14 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         ),
       ),
     );
+  }
+
+  String _getDynamicTitle() {
+    switch (_selectedIndex) {
+      case 0:
+        return 'Dashboard';
+      default:
+        return 'Home';
+    }
   }
 }
