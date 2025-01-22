@@ -1,3 +1,5 @@
+import 'package:armstrong/specialist/screens/chat/chat_list_screen.dart';
+import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart'; 
@@ -53,7 +55,8 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             },
             children: [
               SpecialistDashboardScreen(),
-              //SecondPage(),
+              ChatListScreen(),
+              AppointmentsScreen(),
               //ThirdPage(),
               //FourthPage(),
             ],
