@@ -2,37 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'chat_screen.dart';
+import 'package:intl/intl.dart';
+import 'package:armstrong/config/colors.dart'; // Import your color config
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
+  final String recipientName;
   final String recipientId;
 
-  ChatScreen({required this.chatId, required this.recipientId});
+  ChatScreen({
+    required this.chatId,
+    required this.recipientName,
+    required this.recipientId,
+  });
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _controller = TextEditingController();
   final ApiRepository _apiRepository = ApiRepository();
   final SocketService _socketService = SocketService();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   List<Map<String, dynamic>> _messages = [];
   String _messageContent = '';
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
+    _initializeUserIdAndLoadData();
+  }
+
+  void _initializeUserIdAndLoadData() async {
+    _userId = await _storage.read(key: 'userId');
+    if (_userId != null) {
+      setState(() {});
+    }
+
     _initializeSocket();
     _loadMessages();
   }
 
-  // Connect to Socket.IO
   void _initializeSocket() async {
     final token = await _storage.read(key: 'token');
     if (token != null) {
-      _socketService.connect(token);  
+      _socketService.connect(token);
       _socketService.onMessageReceived = (message) {
         setState(() {
           _messages.add(message);
@@ -41,50 +57,49 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // Load chat history from the API
   void _loadMessages() async {
-  final token = await _storage.read(key: 'token');
-  if (token != null) {
-    try {
-      final messages = await _apiRepository.getChatHistory(widget.chatId, token);
-      setState(() {
-        _messages = messages.map((message) {
-          // Ensure that the sender details are correctly mapped
-          return {
-            'senderId': message['sender']['_id'],
-            'firstName': message['sender']['firstName'],
-            'lastName': message['sender']['lastName'],
-            'content': message['content'],
-            'timestamp': message['timestamp'],
-          };
-        }).toList();
-      });
-    } catch (e) {
-      print("Error loading messages: $e");
-    }
-  }
-}
-
-  // Send message via API and Socket.IO
-  void _sendMessage() async {
     final token = await _storage.read(key: 'token');
     if (token != null) {
-      await _apiRepository.sendMessage(widget.chatId, _messageContent, token);
+      try {
+        final messages =
+            await _apiRepository.getChatHistory(widget.chatId, token);
+        setState(() {
+          _messages = messages.map((message) {
+            return {
+              'senderId': message['sender']['_id'],
+              'content': message['content'],
+              'timestamp': message['timestamp'],
+            };
+          }).toList();
+        });
+      } catch (e) {
+        print("Error loading messages: $e");
+      }
+    }
+  }
 
-      // Send message via socket
-      _socketService.sendMessage(token, widget.recipientId, _messageContent, widget.chatId);
+  void _sendMessage() async {
+    final token = await _storage.read(key: 'token');
+    if (token != null && _controller.text.trim().isNotEmpty) {
+      final messageContent = _controller.text.trim();
+
+      await _apiRepository.sendMessage(widget.chatId, messageContent, token);
+      _socketService.sendMessage(token, widget.recipientId, messageContent, widget.chatId);
 
       setState(() {
         _messages.add({
-          'senderId': token,
-          'firstName': 'Your', // Replace this with your actual first name if available
-          'lastName': 'Name', // Replace this with your actual last name if available
-          'content': _messageContent,
-          'timestamp': DateTime.now().toString(),
+          'senderId': _userId,
+          'content': messageContent,
+          'timestamp': DateTime.now().toIso8601String(),
         });
-        _messageContent = ''; 
+        _controller.clear(); 
       });
     }
+  }
+
+  String _formatTimestamp(String timestamp) {
+    final dateTime = DateTime.parse(timestamp);
+    return DateFormat('hh:mm a, MMM d').format(dateTime);
   }
 
   @override
@@ -97,7 +112,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.recipientId}'),
+        title: Text('Chat with ${widget.recipientName}'),
+        backgroundColor: orangeContainer,
       ),
       body: Column(
         children: <Widget>[
@@ -106,9 +122,57 @@ class _ChatScreenState extends State<ChatScreen> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                return ListTile(
-                  title: Text('${message['firstName']} ${message['lastName']}: ${message['content']}'),
-                  subtitle: Text(message['timestamp']),
+                final isSender = message['senderId'] == _userId;
+
+                return Align(
+                  alignment:
+                      isSender ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    padding: const EdgeInsets.all(12),
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75),
+                    decoration: BoxDecoration(
+                      color:
+                          isSender ? Colors.green.shade100 : Colors.grey[300],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                        bottomLeft:
+                            isSender ? Radius.circular(12) : Radius.zero,
+                        bottomRight:
+                            isSender ? Radius.zero : Radius.circular(12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isSender)
+                          Text(
+                            widget.recipientName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        Text(
+                          message['content'],
+                          style: TextStyle(
+                            color: isSender ? Colors.black87 : Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          _formatTimestamp(message['timestamp']),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isSender ? Colors.black54 : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
@@ -119,16 +183,18 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        _messageContent = value;
-                      });
-                    },
-                    decoration: InputDecoration(hintText: 'Type a message'),
+                    controller: _controller, // Use the persistent controller
+                    decoration: InputDecoration(
+                      hintText: 'Type a message',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
                   ),
                 ),
+                SizedBox(width: 8),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: Colors.blue),
                   onPressed: _sendMessage,
                 ),
               ],

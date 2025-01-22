@@ -56,6 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     final userData = state.userData;
                     final userType = userData['userType'];
                     final token = userData['token'];
+                    final userId = userData['userId'];
+
+                    await StorageHelper.saveUserId(userId);
 
                     await StorageHelper.saveToken(token);
 

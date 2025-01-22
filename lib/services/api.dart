@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiRepository {
-  final String baseUrl = 'http://192.168.0.6:5000/api';
+  final String baseUrl = 'http://localhost:5000/api';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /////////////////////////////////////////////////////////////////////////////////

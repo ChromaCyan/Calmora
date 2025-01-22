@@ -102,6 +102,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return 'Dashboard';
       case 1:
         return 'Discover';
+      case 2:
+        return 'Chat';
       default:
         return 'Home';
     }
