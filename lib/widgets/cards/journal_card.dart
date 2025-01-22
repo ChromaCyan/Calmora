@@ -1,5 +1,6 @@
-import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:armstrong/patient/screens/dashboard/journal_page/journal_page.dart';
+import 'package:armstrong/config/colors.dart';
 
 class JournalSection extends StatelessWidget {
   const JournalSection({Key? key}) : super(key: key);
@@ -7,30 +8,48 @@ class JournalSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity, 
+      height: 120, 
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: orangeContainer,
+        color: Color.fromARGB(255, 15, 100, 70),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
             'Daily Journal',
             style: TextStyle(
+              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 10),
-          TextField(
-            maxLength: 100,
-            decoration: InputDecoration(
-              hintText: 'Write two sentences about your day...',
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          const SizedBox(height: 15),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => JournalPage()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 197, 164, 121),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            maxLines: 3,
+            child: Text(
+              'Log Your Mood',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold
+              ),
+            ),
+              
           ),
         ],
       ),

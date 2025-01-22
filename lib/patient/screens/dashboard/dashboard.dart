@@ -21,20 +21,20 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 10),
               WelcomeSection(),
               const SizedBox(height: 30),
-              MoodSection(),
-              const SizedBox(height: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment
-                    .center, 
-                crossAxisAlignment: CrossAxisAlignment
-                    .center,
-                children: [
-                  Center(
-                    child: QuickTestButton(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
+              // MoodSection(),
+              // const SizedBox(height: 20),
+              // Column(
+              //   mainAxisAlignment: MainAxisAlignment
+              //       .center, 
+              //   crossAxisAlignment: CrossAxisAlignment
+              //       .center,
+              //   children: [
+              //     Center(
+              //       child: QuickTestButton(),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 20),
               JournalSection(),
               const SizedBox(height: 20),
               const SizedBox(height: 10),

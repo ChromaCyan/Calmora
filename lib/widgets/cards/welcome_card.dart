@@ -21,14 +21,14 @@ class WelcomeSection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
-              Text(
-                'How are you feeling today?',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
+              // SizedBox(height: 10),
+              // Text(
+              //   'How are you feeling today?',
+              //   style: TextStyle(
+              //     fontSize: 16,
+              //     color: Colors.grey,
+              //   ),
+              // ),
             ],
           ),
           CircleAvatar(
