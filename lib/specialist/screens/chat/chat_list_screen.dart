@@ -50,18 +50,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chat'),
-        backgroundColor: orangeContainer,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              // Handle additional options
-            },
-          ),
-        ],
-      ),
       body: Column(
         children: [
           // Search bar
@@ -78,18 +66,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 ),
               ),
               onChanged: _filterChats, // Call _filterChats whenever the input changes
-            ),
-          ),
-          // Display Chat History label
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Chat History',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color: orangeContainer,
-              ),
             ),
           ),
           // Chat list after filtering (filtered results based on search query)

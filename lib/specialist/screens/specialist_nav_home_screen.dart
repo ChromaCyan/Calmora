@@ -1,3 +1,6 @@
+import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
+import 'package:armstrong/specialist/screens/chat/chat_list_screen.dart';
+import 'package:armstrong/widgets/navigation/specialist_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart'; 
@@ -81,8 +84,8 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             },
             children: [
               SpecialistDashboardScreen(),
-              //SecondPage(),
-              //ThirdPage(),
+              ChatListScreen(),
+              AppointmentsScreen(),
               //FourthPage(),
             ],
           ),
@@ -99,6 +102,10 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     switch (_selectedIndex) {
       case 0:
         return 'Dashboard';
+      case 1:
+        return 'Chat';
+      case 2:
+        return 'Appointment';
       default:
         return 'Home';
     }
