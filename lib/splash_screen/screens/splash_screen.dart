@@ -75,11 +75,11 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Center(
                     child: Text(
                       currentPage == onBoardData.length - 1
-                          ? "Get Started!"
+                          ? "Get started!"
                           : "Continue",
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 35,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -111,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen> {
       margin: const EdgeInsets.only(right: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: currentPage == index ? Colors.orange : black.withOpacity(0.2),
+        color: currentPage == index ? orangeContainer : black.withOpacity(0.2),
       ),
     );
   }
@@ -171,6 +171,38 @@ class _SplashScreenState extends State<SplashScreen> {
             textAlign: TextAlign.center,
           )
         else if (index == 1)
+        const Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: black,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            children: [
+              TextSpan(text: "It's Okay Not to Be Okay"),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        )
+        else if (index == 2)
+        const Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: black,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            children: [
+              TextSpan(
+                text: "Sorting through the Noise",
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        )
+        else if (index == 3)
           const Text.rich(
             TextSpan(
               style: TextStyle(
@@ -187,7 +219,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             textAlign: TextAlign.center,
           )
-        else if (index == 2)
+        else if (index == 4)
           const Text.rich(
             TextSpan(
               style: TextStyle(
@@ -204,7 +236,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             textAlign: TextAlign.center,
           )
-        else if (index == 3)
+        else if (index == 5)
           const Text.rich(
             TextSpan(
               style: TextStyle(

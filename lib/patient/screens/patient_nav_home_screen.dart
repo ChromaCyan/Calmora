@@ -7,6 +7,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
+  
+
+  
 
   @override
   _PatientHomeScreenState createState() => _PatientHomeScreenState();
@@ -53,7 +56,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             },
             children: [
               DashboardScreen(),
-              //SecondPage(),
+              DiscoverScreen()
               //ThirdPage(),
               //FourthPage(),
             ],

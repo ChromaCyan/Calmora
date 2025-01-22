@@ -71,7 +71,7 @@ class CustomBottomNavBar extends StatelessWidget {
       index: selectedIndex,
       color: orangeContainer,
       buttonBackgroundColor: buttonColor,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       animationCurve: Curves.easeInOut,
       animationDuration: const Duration(milliseconds: 300),
       onTap: (index) {

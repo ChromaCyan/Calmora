@@ -61,7 +61,7 @@ class SpecialistBottomNavBar extends StatelessWidget {
 
         Stack(
           children: [
-            Icon(Icons.check_box_outline_blank, size: 30, color: Colors.white),
+            Icon(Icons.edit_calendar, size: 30, color: Colors.white),
             _buildBadge(notificationCount), 
           ],
         ),
