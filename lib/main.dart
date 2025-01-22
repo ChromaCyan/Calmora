@@ -20,7 +20,7 @@ void main() async {
 
   if (token != null) {
     try {
-      final jwt = JWT.verify(token, SecretKey('123_123'));
+      final jwt = JWT.verify(token, SecretKey('your_jwt_secret_key'));
       role = jwt.payload['userType']; 
     } catch (e) {
       print('Invalid token: $e');

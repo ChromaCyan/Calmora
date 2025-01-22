@@ -84,6 +84,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             children: [
               DashboardScreen(), 
               DiscoverScreen(), 
+              ChatListScreen(),
             ],
           ),
         ),

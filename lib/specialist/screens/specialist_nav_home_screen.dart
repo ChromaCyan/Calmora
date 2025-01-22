@@ -1,5 +1,5 @@
 import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
-import 'package:armstrong/specialist/screens/chat/chat_list_screen.dart';
+import 'package:armstrong/universal/chat/screen/chat_list_screen.dart';
 import 'package:armstrong/widgets/navigation/specialist_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
