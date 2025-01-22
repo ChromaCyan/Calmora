@@ -1,3 +1,4 @@
+import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
 
 class JournalSection extends StatelessWidget {
@@ -8,7 +9,7 @@ class JournalSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green[200],
+        color: orangeContainer,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

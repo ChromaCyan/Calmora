@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/buttons/survey_button.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:armstrong/widgets/cards/daily_advice_card.dart';
 import 'package:armstrong/widgets/cards/journal_card.dart';
@@ -21,6 +22,18 @@ class DashboardScreen extends StatelessWidget {
               WelcomeSection(),
               const SizedBox(height: 30),
               MoodSection(),
+              const SizedBox(height: 20),
+              Column(
+                mainAxisAlignment: MainAxisAlignment
+                    .center, 
+                crossAxisAlignment: CrossAxisAlignment
+                    .center,
+                children: [
+                  Center(
+                    child: QuickTestButton(),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
               JournalSection(),
               const SizedBox(height: 20),
