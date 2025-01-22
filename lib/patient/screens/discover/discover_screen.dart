@@ -26,18 +26,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Discover'),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            // Placeholder Drawer (No functions yet)
-          },
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 80,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),

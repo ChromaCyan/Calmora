@@ -1,3 +1,5 @@
+import 'package:armstrong/config/colors.dart';
+import 'package:armstrong/widgets/navigation/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart'; 
@@ -7,9 +9,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
-  
-
-  
 
   @override
   _PatientHomeScreenState createState() => _PatientHomeScreenState();
@@ -48,6 +47,34 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80), 
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0), 
+            child: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(
+                color: Colors.black, 
+                size: 28.0,
+              ),
+              title: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _getDynamicTitle(),
+                  key: ValueKey<int>(_selectedIndex),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              centerTitle: true,
+            ),
+          ),
+        ),
+        drawer: AppDrawer(), 
         body: SafeArea(
           child: PageView(
             controller: _pageController,
@@ -55,10 +82,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(index);
             },
             children: [
-              DashboardScreen(),
-              DiscoverScreen()
-              //ThirdPage(),
-              //FourthPage(),
+              DashboardScreen(), 
+              DiscoverScreen(), 
             ],
           ),
         ),
@@ -68,5 +93,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         ),
       ),
     );
+  }
+
+  String _getDynamicTitle() {
+    switch (_selectedIndex) {
+      case 0:
+        return 'Dashboard';
+      case 1:
+        return 'Discover';
+      default:
+        return 'Home';
+    }
   }
 }

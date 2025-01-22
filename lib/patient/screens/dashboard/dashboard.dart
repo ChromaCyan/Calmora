@@ -11,18 +11,6 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            // Placeholder Drawer (No functions yet)
-          },
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 80,
-      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -53,11 +41,6 @@ class DashboardScreen extends StatelessWidget {
                       imagePath: 'assets/image1.jpg',
                       title: 'Men’s Mental Health Matters!',
                       author: 'Dr. Juan Joe Cruz',
-                    ),
-                    ArticleCard(
-                      imagePath: 'assets/image2.jpg',
-                      title: 'Reasons Why You Are Broken...',
-                      author: 'Dr. Leslie Ferrer',
                     ),
                     ArticleCard(
                       imagePath: 'assets/image2.jpg',
