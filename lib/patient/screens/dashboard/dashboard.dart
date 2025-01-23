@@ -51,24 +51,19 @@ class DashboardScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   children: [
                     ArticleCard(
-                      imagePath: 'assets/image1.jpg',
+                      imagePath: 'images/splash/image7.png',
                       title: 'Men’s Mental Health Matters!',
                       author: 'Dr. Juan Joe Cruz',
                     ),
                     ArticleCard(
-                      imagePath: 'assets/image2.jpg',
+                      imagePath: 'images/splash/image6.png',
                       title: 'Reasons Why You Are Broken...',
                       author: 'Dr. Leslie Ferrer',
                     ),
                     ArticleCard(
-                      imagePath: 'assets/image2.jpg',
-                      title: 'Reasons Why You Are Broken...',
-                      author: 'Dr. Leslie Ferrer',
-                    ),
-                    ArticleCard(
-                      imagePath: 'assets/image2.jpg',
-                      title: 'Reasons Why You Are Broken...',
-                      author: 'Dr. Leslie Ferrer',
+                      imagePath: 'images/splash/image4.png',
+                      title: 'Men have problem too...',
+                      author: 'Dr. Jocelyn Bugarin',
                     ),
                   ],
                 ),

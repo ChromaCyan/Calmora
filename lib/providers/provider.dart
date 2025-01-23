@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
+import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
 import 'package:armstrong/services/api.dart';
 
 class AppProviders {
@@ -9,7 +10,11 @@ class AppProviders {
     return [
       // Authentication
       BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(apiRepository: apiRepository),  
+        create: (context) => AuthBloc(apiRepository: apiRepository),
+      ),
+      // Profile
+      BlocProvider<ProfileBloc>(
+        create: (context) => ProfileBloc(apiRepository: apiRepository),
       ),
     ];
   }

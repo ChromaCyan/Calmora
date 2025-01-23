@@ -84,7 +84,8 @@ class _ChatScreenState extends State<ChatScreen> {
       final messageContent = _controller.text.trim();
 
       await _apiRepository.sendMessage(widget.chatId, messageContent, token);
-      _socketService.sendMessage(token, widget.recipientId, messageContent, widget.chatId);
+      _socketService.sendMessage(
+          token, widget.recipientId, messageContent, widget.chatId);
 
       setState(() {
         _messages.add({
@@ -92,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
           'content': messageContent,
           'timestamp': DateTime.now().toIso8601String(),
         });
-        _controller.clear(); 
+        _controller.clear();
       });
     }
   }

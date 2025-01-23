@@ -111,8 +111,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatScreen(
-                                // userId: chat['id']!,
-                                // userName: chat['name']!,
                                 chatId: chatId,
                                 recipientId: recipientId,
                                 recipientName: recipientName, 

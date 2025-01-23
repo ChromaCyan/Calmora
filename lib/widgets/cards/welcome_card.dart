@@ -33,7 +33,7 @@ class WelcomeSection extends StatelessWidget {
           ),
           CircleAvatar(
             radius: 30,
-            backgroundImage: AssetImage('images/logo_placeholder.png'),
+            backgroundImage: AssetImage('images/splash/logo_placeholder.png'),
           ),
         ],
       ),

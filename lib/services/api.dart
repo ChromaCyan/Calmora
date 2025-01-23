@@ -79,6 +79,76 @@ class ApiRepository {
       throw Exception('Failed to verify OTP: ${response.body}');
     }
   }
+    /////////////////////////////////////////////////////////////////////////////////
+  // Profile (API)
+
+  // Get Profile
+  Future<Map<String, dynamic>> getProfile() async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/auth/profile');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch profile: ${response.body}');
+    }
+  }
+
+  // Edit Profile
+  Future<Map<String, dynamic>> editProfile(Map<String, dynamic> updateData) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/auth/profile');
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(updateData),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to edit profile: ${response.body}');
+    }
+  }
+
+  // Get Specialist List
+  Future<List<dynamic>> getSpecialistList() async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/auth/specialists');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body)['data'];
+    } else {
+      throw Exception('Failed to fetch specialists: ${response.body}');
+    }
+  }
+
+  // Get Patient Data
+  Future<Map<String, dynamic>> getPatientData() async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/auth/patient-data');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body)['data'];
+    } else {
+      throw Exception('Failed to fetch patient data: ${response.body}');
+    }
+  }
   /////////////////////////////////////////////////////////////////////////////////
   //Chat (API)
 
