@@ -6,43 +6,30 @@ import 'package:flutter/material.dart';
 class AppointmentsScreen extends StatelessWidget {
   final List<Map<String, String?>> requestAppointments = [
     {
-      "name": "Jane Doe",
-      "specialty": "Patient",
-      "location": "St. Bronxlyn 212",
-      "date": "Monday, 28 April 2018",
+      "fullName": "John Kevin",
+      "specialty": "General Checkup",
+      "reason": "Routine Examination",
+      "phoneNumber": "123-456-7890",
+      "email": "john@gmail.com",
+      "address": "123 Main St, Springfield",
+      "time": "10:00 AM",
+      "date": "Saturday, 25 January 2025",
       "color": "0xFFFFCCBC",
-      "rating": "4.5",
-      "time": "10:00 AM", 
-    },
-    {
-      "name": "John Smith",
-      "specialty": "Patient",
-      "location": "St. Bronxlyn 212",
-      "date": "Monday, 29 April 2018",
-      "color": "0xFFB3E5FC",
-      "rating": "4.4",
-      "time": "3:00 PM", 
     },
   ];
 
   final List<Map<String, String?>> acceptedAppointments = [
     {
-      "name": "Dudung Sokmati",
-      "specialty": "Patient",
-      "location": "St. Bronxlyn 212",
-      "date": "Monday, 26 April 2018",
+      "fullName": "Dudung Sokmati",
+      "specialty": "Cardiology",
+      "reason": "Follow-up Visit",
+      "phoneNumber": "111-222-3333",
+      "email": "dudung@gmail.com",
+      "address": "789 Oak St, Springfield",
+      "time": "11:00 AM",
+      "date": "Monday, 20 Januarary 2025",
       "color": "0xFFB2DFDB",
-      "rating": "4.9",
-      "time": "11:00 AM", 
-    },
-    {
-      "name": "Nunung Brandon",
-      "specialty": "Patient",
-      "location": "St. Bronxlyn 212",
-      "date": "Monday, 26 April 2018",
-      "color": "0xFFB2EBF2",
-      "rating": "4.8",
-      "time": "2:00 PM", 
+      "rating": "5",
     },
   ];
 
@@ -73,11 +60,12 @@ class AppointmentsScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AppointmentDetailScreen(
-                              name: appointment["name"]!,
+                              fullName: appointment["fullName"]!,
                               specialty: appointment["specialty"]!,
-                              color: Color(int.parse(appointment["color"]!)),
-                              rating: appointment["rating"]!,
-                              location: appointment["location"]!,
+                              reason: appointment["reason"]!,
+                              phoneNumber: appointment["phoneNumber"]!,
+                              email: appointment["email"]!,
+                              address: appointment["address"]!,
                               time: appointment["time"]!,
                               date: appointment["date"]!,
                             ),
@@ -94,12 +82,15 @@ class AppointmentsScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => CompletedAppointmentDetail(
-                              name: appointment["name"]!,
+                              fullName: appointment["fullName"]!,
                               specialty: appointment["specialty"]!,
-                              color: Color(int.parse(appointment["color"]!)),
-                              rating: appointment["rating"]!,
+                              reason: appointment["reason"]!,
+                              phoneNumber: appointment["phoneNumber"]!,
+                              email: appointment["email"]!,
+                              address: appointment["address"]!,
+                              time: appointment["time"]!,
                               date: appointment["date"]!,
-                              location: appointment["location"]!,
+                              rating: appointment["rating"]!,
                             ),
                           ),
                         );
@@ -144,7 +135,7 @@ class AppointmentList extends StatelessWidget {
                     : Colors.grey,
                 radius: 30.0,
                 child: Text(
-                  appointment["name"]?[0] ?? "",
+                  appointment["fullName"]?[0] ?? "",
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -152,7 +143,7 @@ class AppointmentList extends StatelessWidget {
                 ),
               ),
               title: Text(
-                appointment["name"] ?? "",
+                appointment["fullName"] ?? "",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Column(
@@ -161,15 +152,6 @@ class AppointmentList extends StatelessWidget {
                   Text(
                     appointment["specialty"] ?? "",
                     style: const TextStyle(color: orangeContainer),
-                  ),
-                  const SizedBox(height: 4.0),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on,
-                          size: 16.0, color: Colors.grey),
-                      const SizedBox(width: 4.0),
-                      Text(appointment["location"] ?? ""),
-                    ],
                   ),
                   const SizedBox(height: 4.0),
                   Text(appointment["date"] ?? ""),

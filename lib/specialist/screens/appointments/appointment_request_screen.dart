@@ -2,21 +2,23 @@ import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentDetailScreen extends StatelessWidget {
-  final String name;
+  final String fullName;
   final String specialty;
-  final Color color;
-  final String rating;
-  final String location;
+  final String reason;
+  final String phoneNumber;
+  final String email;
+  final String address;
   final String time;
   final String date;
 
   const AppointmentDetailScreen({
     super.key,
-    required this.name,
+    required this.fullName,
     required this.specialty,
-    required this.color,
-    required this.rating,
-    required this.location,
+    required this.reason,
+    required this.phoneNumber,
+    required this.email,
+    required this.address,
     required this.time,
     required this.date,
   });
@@ -35,7 +37,7 @@ class AppointmentDetailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "You received an appointment for a consultation about: 'details stuff etc'",
+                "You received an appointment for a consultation:",
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -43,12 +45,12 @@ class AppointmentDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               const Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
+                "Below are the details provided by the patient:",
                 style: TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 16.0),
               const Text(
-                "Patient",
+                "Patient Information",
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
@@ -57,54 +59,66 @@ class AppointmentDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: color,
-                    radius: 30.0,
-                    child: Text(
-                      name[0],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                     children: [
-                      Text(
-                        specialty,
-                        style: const TextStyle(color: orangeContainer),
-                      ),
-                      const SizedBox(height: 4.0),
-                      Row(
+                      Column(
                         children: [
-                          const Icon(Icons.location_on,
-                              size: 16.0, color: Colors.grey),
-                          const SizedBox(width: 4.0),
-                          Text(location),
+                          Icon(
+                            Icons.person,
+                            size: 48.0,
+                            color: orangeContainer,
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            fullName,
+                            style: const TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 4.0),
-                      Row(
+                      const SizedBox(height: 16.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.access_time,
-                              size: 16.0, color: Colors.grey),
-                          const SizedBox(width: 4.0),
-                          Text(time),
-                        ],
-                      ),
-                      const SizedBox(height: 4.0),
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_today,
-                              size: 16.0, color: Colors.grey),
-                          const SizedBox(width: 4.0),
-                          Text(date),
+                          Text(
+                            "Specialty: $specialty",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "Reason for Appointment: $reason",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "Phone Number: $phoneNumber",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "Email: $email",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "Address: $address",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "Date: $date",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "Time: $time",
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
                         ],
                       ),
                     ],
@@ -124,7 +138,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
-                    child: Text(
+                    child: const Text(
                       "Reject",
                       style: TextStyle(color: Colors.black),
                     ),
@@ -138,7 +152,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: orangeContainer,
                     ),
-                    child: Text(
+                    child: const Text(
                       "Accept",
                       style: TextStyle(color: Colors.black),
                     ),

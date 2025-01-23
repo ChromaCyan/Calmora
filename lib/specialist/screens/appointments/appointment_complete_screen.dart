@@ -2,21 +2,27 @@ import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
 
 class CompletedAppointmentDetail extends StatelessWidget {
-  final String name;
+  final String fullName;
   final String specialty;
-  final Color color;
-  final String rating;
+  final String reason;
+  final String phoneNumber;
+  final String email;
+  final String address;
+  final String time;
   final String date;
-  final String location;
+  final String rating;
 
   const CompletedAppointmentDetail({
     Key? key,
-    required this.name,
+    required this.fullName,
     required this.specialty,
-    required this.color,
-    required this.rating,
+    required this.reason,
+    required this.phoneNumber,
+    required this.email,
+    required this.address,
+    required this.time,
     required this.date,
-    required this.location,
+    required this.rating,
   }) : super(key: key);
 
   @override
@@ -26,13 +32,13 @@ class CompletedAppointmentDetail extends StatelessWidget {
         title: const Text("Appointment"),
         backgroundColor: orangeContainer,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Appointment Details",
+              "You received an appointment for a consultation:",
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
@@ -40,7 +46,7 @@ class CompletedAppointmentDetail extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              "Here are the details of your completed appointment.",
+              "Below are the details provided by the patient:",
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16.0),
@@ -54,70 +60,92 @@ class CompletedAppointmentDetail extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             Card(
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: color,
-                  radius: 30.0,
-                  child: Text(
-                    name[0],
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Column(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      specialty,
-                      style: const TextStyle(color: orangeContainer),
-                    ),
-                    const SizedBox(height: 4.0),
-                    Row(
-                      children: List.generate(
-                        5,
-                        (index) => const Icon(
-                          Icons.star,
-                          size: 16.0,
-                          color: Colors.amber,
-                        ),
+                      "Full Name: $fullName",
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Text(rating),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Specialty: $specialty",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Reason for Appointment: $reason",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Phone Number: $phoneNumber",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Email: $email",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Address: $address",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Date: $date",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      "Time: $time",
+                      style: const TextStyle(fontSize: 14.0),
+                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 24.0),
             const Text(
-              "Appointment Details",
+              "Rating",
               style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.teal,
               ),
             ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, color: Colors.grey),
-                const SizedBox(width: 8.0),
-                Text(date),
-              ],
+            const SizedBox(height: 16.0),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                  5,
+                  (index) => Icon(
+                    Icons.star,
+                    size: 32.0,
+                    color: index < double.parse(rating).round()
+                        ? Colors.amber
+                        : Colors.grey.shade300,
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                const Icon(Icons.location_on, color: Colors.grey),
-                const SizedBox(width: 8.0),
-                Text(location),
-              ],
-            ),
+            Center(
+              child: const Text(
+                "5.0",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
+              ),
+            )
           ],
         ),
       ),
