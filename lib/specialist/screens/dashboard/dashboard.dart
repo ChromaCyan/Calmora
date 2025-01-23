@@ -20,9 +20,6 @@ class SpecialistDashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              _buildLibraryCards(),
-              const SizedBox(height: 20),
-              _buildJournalSection(),
             ],
           ),
         ),
@@ -42,26 +39,6 @@ class SpecialistDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLibraryCards() {
-    return SizedBox(
-      height: 200,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildCard(
-            imagePath: 'assets/image1.jpg',
-            title: 'Discover why you’re a failure',
-            author: 'Dr. Juan Joe Cruz',
-          ),
-          _buildCard(
-            imagePath: 'assets/image2.jpg',
-            title: 'Reasons why you are a disappointment.',
-            author: 'Dr. Leslie Ferrer',
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildCard({required String imagePath, required String title, required String author}) {
     return Container(
@@ -93,36 +70,6 @@ class SpecialistDashboardScreen extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJournalSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.green[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Daily check-in/Notes/Mood tracking',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Your Journal',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.brown,
             ),
           ),
         ],
