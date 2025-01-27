@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/cards/appbar.dart';
 
 class JournalPage extends StatelessWidget {
   const JournalPage({Key? key}) : super(key: key);
@@ -6,9 +7,12 @@ class JournalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Your Mood'),
-        backgroundColor: Colors.teal,
+      appBar: CustomAppBar(
+        title: "Log Your Mood",
+        hasBackButton: true,
+        onBackButtonPressed: () {
+          Navigator.of(context).pop();
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
