@@ -1,48 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:armstrong/patient/models/widgets/banner_model.dart';
 
 class BannerCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String backgroundImage;
+  final CarouselItem item;
 
-  const BannerCard({
-    required this.title,
-    required this.subtitle,
-    required this.backgroundImage,
-    Key? key,
-  }) : super(key: key);
+  const BannerCard({required this.item, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      padding: const EdgeInsets.all(16.0),
-      height: 200,
+      key: key, // Key to identify each unique card
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        image: DecorationImage(
-          image: AssetImage(backgroundImage),
-          fit: BoxFit.cover,
-        ),
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(screenWidth * 0.05), // 5% of screen width for corner radius
+        image: item.image.isNotEmpty
+            ? DecorationImage(
+                image: NetworkImage(item.image),
+                fit: BoxFit.cover,
+              )
+            : null,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Center(
+        child: Text(
+          item.text,
+          style: TextStyle(
+            fontSize: screenWidth * 0.06, // Responsive font size (6% of screen width)
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white70,
-                ),
-          ),
-        ],
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

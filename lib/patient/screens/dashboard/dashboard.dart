@@ -6,6 +6,8 @@ import 'package:armstrong/widgets/cards/mood_card.dart';
 import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
+import 'package:armstrong/widgets/banners/patient_banner_card.dart';
+import 'package:armstrong/patient/models/widgets/banner_model.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -22,43 +24,19 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 10),
               WelcomeSection(),
               const SizedBox(height: 30),
-              HealthAdviceSection(),
+              Center(
+                child: HealthAdviceSection(
+                  items: carouselData
+                )
+              ),
               const SizedBox(height: 30),
-              JournalSection(),
+              Center(
+                child: JournalSection()
+              ),
               const SizedBox(height: 30),
-              ArticleList(),
-              // Text(
-              //   'Articles For You.',
-              //   style: TextStyle(
-              //     fontSize: 20,
-              //     color: Colors.black,
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 200,
-              //   child: ListView(
-              //     scrollDirection: Axis.horizontal,
-              //     children: [
-              //       ArticleCard(
-              //         imagePath: 'images/splash/image7.png',
-              //         title: 'Men’s Mental Health Matters!',
-              //         author: 'Dr. Juan Joe Cruz',
-              //       ),
-              //       ArticleCard(
-              //         imagePath: 'images/splash/image6.png',
-              //         title: 'Reasons Why You Are Broken...',
-              //         author: 'Dr. Leslie Ferrer',
-              //       ),
-              //       ArticleCard(
-              //         imagePath: 'images/splash/image4.png',
-              //         title: 'Men have problem too...',
-              //         author: 'Dr. Jocelyn Bugarin',
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              // ArticleListScreen(),
+              Center(
+                child: ArticleList()
+              ),
               const SizedBox(height: 30),
               Column(
                 mainAxisAlignment: MainAxisAlignment

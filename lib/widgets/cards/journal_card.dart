@@ -9,7 +9,7 @@ class JournalSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity, 
-      height: 120, 
+      height: 140, 
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 15, 100, 70),
