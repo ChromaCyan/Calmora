@@ -1,8 +1,11 @@
+import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
 import 'package:armstrong/patient/blocs/profile/profile_event.dart';
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
+import 'package:armstrong/services/api.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SpecialistDetailScreen extends StatefulWidget {
   final String specialistId;
@@ -15,6 +18,9 @@ class SpecialistDetailScreen extends StatefulWidget {
 }
 
 class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
+  final ApiRepository _apiRepository = ApiRepository();
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+
   @override
   void initState() {
     super.initState();
@@ -39,18 +45,21 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
             final specialist = state.specialistDetails;
 
             // Extract specialist details
-            final firstName = specialist['firstName'] ?? 'No first name available';
+            final firstName =
+                specialist['firstName'] ?? 'No first name available';
             final lastName = specialist['lastName'] ?? 'No last name available';
             final name = '$firstName $lastName';
             final specialization = specialist['specialization'] ?? 'Unknown';
             final bio = specialist['bio'] ?? 'No bio available.';
             final profileImage = specialist['profileImage'] ?? '';
             final email = specialist['email'] ?? 'No email available';
-            final phoneNumber = specialist['phoneNumber'] ?? 'No phone number available';
+            final phoneNumber =
+                specialist['phoneNumber'] ?? 'No phone number available';
             final availability = specialist['availability'] ?? 'Unknown';
             final yearsOfExperience = specialist['yearsOfExperience'] ?? 0;
             final languagesSpoken = specialist['languagesSpoken'] ?? [];
-            final licenseNumber = specialist['licenseNumber'] ?? 'Not available';
+            final licenseNumber =
+                specialist['licenseNumber'] ?? 'Not available';
             final reviews = specialist['reviews'] ?? [];
 
             return SingleChildScrollView(
@@ -106,9 +115,12 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
 
                   // Professional Details
                   _buildSectionTitle('Professional Details'),
-                  _buildInfoRow(Icons.work, 'Years of Experience: $yearsOfExperience'),
-                  _buildInfoRow(Icons.language, 'Languages Spoken: ${languagesSpoken.join(", ")}'),
-                  _buildInfoRow(Icons.assignment, 'License Number: $licenseNumber'),
+                  _buildInfoRow(
+                      Icons.work, 'Years of Experience: $yearsOfExperience'),
+                  _buildInfoRow(Icons.language,
+                      'Languages Spoken: ${languagesSpoken.join(", ")}'),
+                  _buildInfoRow(
+                      Icons.assignment, 'License Number: $licenseNumber'),
                   const SizedBox(height: 16),
 
                   // Availability
@@ -118,16 +130,14 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       availability,
                       style: const TextStyle(color: Colors.white),
                     ),
-                    backgroundColor: availability == 'Available'
-                        ? Colors.green
-                        : Colors.red,
+                    backgroundColor:
+                        availability == 'Available' ? Colors.green : Colors.red,
                   ),
                   const SizedBox(height: 24),
 
                   // Reviews
                   _buildSectionTitle('Reviews'),
-                  if (reviews.isEmpty)
-                    const Text('No reviews yet.'),
+                  if (reviews.isEmpty) const Text('No reviews yet.'),
                   if (reviews.isNotEmpty)
                     Column(
                       children: reviews.map<Widget>((review) {
@@ -171,8 +181,49 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          print("Start chat with the specialist");
+                        onPressed: () async {
+                          final token = await _storage.read(key: 'token');
+                          if (token != null) {
+                            try {
+                              // Check if a chat already exists
+                              final existingChatId =
+                                  await _apiRepository.getExistingChatId(
+                                      widget.specialistId, token);
+
+                              if (existingChatId != null) {
+                                // Navigate to the existing chat
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      chatId: existingChatId,
+                                      recipientId: widget.specialistId,
+                                      recipientName:
+                                          name, 
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Create a new chat
+                                final newChatId = await _apiRepository
+                                    .createChat(widget.specialistId, token);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      chatId: existingChatId ??
+                                          newChatId, 
+                                      recipientId: widget.specialistId,
+                                      recipientName:
+                                          name, 
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              print('Error starting chat: $e');
+                            }
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,

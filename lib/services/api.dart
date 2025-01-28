@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/helpers/storage_helpers.dart';
 
 class ApiRepository {
   final String baseUrl = 'http://localhost:5000/api';
@@ -55,7 +56,7 @@ class ApiRepository {
 
       await _storage.write(key: 'token', value: data['token']);
 
-      return data; 
+      return data;
     } else {
       throw Exception('Failed to login: ${response.body}');
     }
@@ -79,7 +80,7 @@ class ApiRepository {
       throw Exception('Failed to verify OTP: ${response.body}');
     }
   }
-    /////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////
   // Profile (API)
 
   // Get Profile
@@ -99,7 +100,8 @@ class ApiRepository {
   }
 
   // Edit Profile
-  Future<Map<String, dynamic>> editProfile(Map<String, dynamic> updateData) async {
+  Future<Map<String, dynamic>> editProfile(
+      Map<String, dynamic> updateData) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/auth/profile');
     final response = await http.put(
@@ -117,20 +119,21 @@ class ApiRepository {
       throw Exception('Failed to edit profile: ${response.body}');
     }
   }
-  Future<Map<String, dynamic>> getSpecialistById(String specialistId) async {
-  final token = await _storage.read(key: 'token');
-  final url = Uri.parse('$baseUrl/auth/specialists/$specialistId');
-  final response = await http.get(
-    url,
-    headers: {'Authorization': 'Bearer $token'},
-  );
 
-  if (response.statusCode == 200) {
-    return json.decode(response.body)['data'];
-  } else {
-    throw Exception('Failed to fetch specialist details: ${response.body}');
+  Future<Map<String, dynamic>> getSpecialistById(String specialistId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/auth/specialists/$specialistId');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body)['data'];
+    } else {
+      throw Exception('Failed to fetch specialist details: ${response.body}');
+    }
   }
-}
 
   // Get Specialist List
   Future<List<dynamic>> getSpecialistList() async {
@@ -165,6 +168,38 @@ class ApiRepository {
   }
   /////////////////////////////////////////////////////////////////////////////////
   //Chat (API)
+
+  Future<String?> getExistingChatId(String recipientId, String token) async {
+  final chatList = await getChatList(token);
+  for (var chat in chatList) {
+    final participants = chat['participants'] as List<dynamic>;
+    if (participants.any((participant) => participant['_id'] == recipientId)) {
+      return chat['chatId']; 
+    }
+  }
+  return null; 
+}
+
+  Future<String> createChat(String recipientId, String token) async {
+    final url = Uri.parse('$baseUrl/chat/create-chat');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'recipientId': recipientId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      return responseData['chatId']; // Return the chatId for the new chat
+    } else {
+      throw Exception('Failed to create a new chat: ${response.body}');
+    }
+  }
 
   // Send message API
   Future<void> sendMessage(String chatId, String content, String token) async {
@@ -207,7 +242,8 @@ class ApiRepository {
   }
 
   // Get chat history API
-  Future<List<Map<String, dynamic>>> getChatHistory(String chatId, String token) async {
+  Future<List<Map<String, dynamic>>> getChatHistory(
+      String chatId, String token) async {
     final url = Uri.parse('$baseUrl/chat/chat-history/$chatId');
     final response = await http.get(
       url,
@@ -218,7 +254,9 @@ class ApiRepository {
 
     if (response.statusCode == 200) {
       List<dynamic> chatHistory = json.decode(response.body);
-      return chatHistory.map((message) => Map<String, dynamic>.from(message)).toList();
+      return chatHistory
+          .map((message) => Map<String, dynamic>.from(message))
+          .toList();
     } else {
       throw Exception('Failed to fetch chat history: ${response.body}');
     }
