@@ -3,7 +3,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:armstrong/config/colors.dart'; // Import your color config
+import 'package:armstrong/config/colors.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
