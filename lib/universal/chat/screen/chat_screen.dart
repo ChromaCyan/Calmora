@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
@@ -112,9 +113,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat with ${widget.recipientName}'),
-        backgroundColor: orangeContainer,
+      appBar: UniversalAppBar(
+        title: "Chat with ${widget.recipientName}",
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: Column(
         children: <Widget>[

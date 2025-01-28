@@ -261,4 +261,106 @@ class ApiRepository {
       throw Exception('Failed to fetch chat history: ${response.body}');
     }
   }
+   /////////////////////////////////////////////////////////////////////////////////
+  // Appointments (API)
+
+  // Create a new appointment
+  Future<Map<String, dynamic>> createAppointment(
+    String patientId,
+    String specialistId,
+    DateTime startTime,
+    String message,
+  ) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/create-appointment');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'patientId': patientId,
+        'specialistId': specialistId,
+        'startTime': startTime.toIso8601String(),
+        'message': message,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to create appointment: ${response.body}');
+    }
+  }
+
+  // Get all appointments for a patient
+  Future<List<dynamic>> getPatientAppointments(String patientId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/patient/$patientId');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch patient appointments: ${response.body}');
+    }
+  }
+
+  // Get all appointments for a specialist
+  Future<List<dynamic>> getSpecialistAppointments(String specialistId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/specialist/$specialistId');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch specialist appointments: ${response.body}');
+    }
+  }
+
+  // Specialist accepts an appointment
+  Future<Map<String, dynamic>> acceptAppointment(String appointmentId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/$appointmentId/accept');
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to accept appointment: ${response.body}');
+    }
+  }
+
+  // Specialist declines an appointment
+  Future<Map<String, dynamic>> declineAppointment(String appointmentId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/$appointmentId/decline');
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to decline appointment: ${response.body}');
+    }
+  }
 }

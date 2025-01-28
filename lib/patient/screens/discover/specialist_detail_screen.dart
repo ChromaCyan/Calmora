@@ -1,4 +1,8 @@
+import 'package:armstrong/patient/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/patient/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/universal/chat/screen/chat_screen.dart';
+import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
@@ -28,14 +32,26 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
     profileBloc.add(FetchSpecialistDetailsEvent(widget.specialistId));
   }
 
+  void _bookAppointment(BuildContext context, String specialistId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocProvider.value(
+          value: BlocProvider.of<AppointmentBloc>(context),
+          child: AppointmentBookingForm(specialistId: specialistId),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Specialist Details'),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      appBar: UniversalAppBar(
+        title: "Specialist Details",
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
@@ -62,182 +78,195 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                 specialist['licenseNumber'] ?? 'Not available';
             final reviews = specialist['reviews'] ?? [];
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile Image and Name
-                  Center(
-                    child: Column(
+            return BlocListener<AppointmentBloc, AppointmentState>(
+              listener: (context, state) {
+                if (state is AppointmentBooked) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Appointment booked successfully!'),
+                    ),
+                  );
+                } else if (state is AppointmentError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error: ${state.message}'),
+                    ),
+                  );
+                }
+              },
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Profile Image and Name
+                    Center(
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundImage: profileImage.isNotEmpty
+                                ? NetworkImage(profileImage)
+                                : const AssetImage('assets/default_profile.png')
+                                    as ImageProvider,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            specialization,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Bio
+                    _buildSectionTitle('Bio'),
+                    Text(
+                      bio,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Contact Information
+                    _buildSectionTitle('Contact Information'),
+                    _buildInfoRow(Icons.email, email),
+                    _buildInfoRow(Icons.phone, phoneNumber),
+                    const SizedBox(height: 16),
+
+                    // Professional Details
+                    _buildSectionTitle('Professional Details'),
+                    _buildInfoRow(
+                        Icons.work, 'Years of Experience: $yearsOfExperience'),
+                    _buildInfoRow(Icons.language,
+                        'Languages Spoken: ${languagesSpoken.join(", ")}'),
+                    _buildInfoRow(
+                        Icons.assignment, 'License Number: $licenseNumber'),
+                    const SizedBox(height: 16),
+
+                    // Availability
+                    _buildSectionTitle('Availability'),
+                    Chip(
+                      label: Text(
+                        availability,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor:
+                          availability == 'Available' ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Reviews
+                    _buildSectionTitle('Reviews'),
+                    if (reviews.isEmpty) const Text('No reviews yet.'),
+                    if (reviews.isNotEmpty)
+                      Column(
+                        children: reviews.map<Widget>((review) {
+                          return ListTile(
+                            leading: const Icon(Icons.person, color: Colors.blue),
+                            title: Text(review['reviewerName'] ?? 'Anonymous'),
+                            subtitle: Text(review['comment'] ?? 'No comment'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(
+                                5,
+                                (index) => Icon(
+                                  Icons.star,
+                                  color: index < (review['rating'] ?? 0)
+                                      ? Colors.amber
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    const SizedBox(height: 24),
+
+                    // Action Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundImage: profileImage.isNotEmpty
-                              ? NetworkImage(profileImage)
-                              : const AssetImage('assets/default_profile.png')
-                                  as ImageProvider,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                        ElevatedButton(
+                          onPressed: () =>
+                              _bookAppointment(context, widget.specialistId),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                          child: const Text(
+                            'Book Appointment',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          specialization,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[600],
+                        ElevatedButton(
+                          onPressed: () async {
+                            final token = await _storage.read(key: 'token');
+                            if (token != null) {
+                              try {
+                                // Check if a chat already exists
+                                final existingChatId =
+                                    await _apiRepository.getExistingChatId(
+                                        widget.specialistId, token);
+
+                                if (existingChatId != null) {
+                                  // Navigate to the existing chat
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatScreen(
+                                        chatId: existingChatId,
+                                        recipientId: widget.specialistId,
+                                        recipientName: name,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  // Create a new chat
+                                  final newChatId = await _apiRepository
+                                      .createChat(widget.specialistId, token);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatScreen(
+                                        chatId: existingChatId ?? newChatId,
+                                        recipientId: widget.specialistId,
+                                        recipientName: name,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                print('Error starting chat: $e');
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                          child: const Text(
+                            'Chat with Specialist',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Bio
-                  _buildSectionTitle('Bio'),
-                  Text(
-                    bio,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Contact Information
-                  _buildSectionTitle('Contact Information'),
-                  _buildInfoRow(Icons.email, email),
-                  _buildInfoRow(Icons.phone, phoneNumber),
-                  const SizedBox(height: 16),
-
-                  // Professional Details
-                  _buildSectionTitle('Professional Details'),
-                  _buildInfoRow(
-                      Icons.work, 'Years of Experience: $yearsOfExperience'),
-                  _buildInfoRow(Icons.language,
-                      'Languages Spoken: ${languagesSpoken.join(", ")}'),
-                  _buildInfoRow(
-                      Icons.assignment, 'License Number: $licenseNumber'),
-                  const SizedBox(height: 16),
-
-                  // Availability
-                  _buildSectionTitle('Availability'),
-                  Chip(
-                    label: Text(
-                      availability,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor:
-                        availability == 'Available' ? Colors.green : Colors.red,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Reviews
-                  _buildSectionTitle('Reviews'),
-                  if (reviews.isEmpty) const Text('No reviews yet.'),
-                  if (reviews.isNotEmpty)
-                    Column(
-                      children: reviews.map<Widget>((review) {
-                        return ListTile(
-                          leading: const Icon(Icons.person, color: Colors.blue),
-                          title: Text(review['reviewerName'] ?? 'Anonymous'),
-                          subtitle: Text(review['comment'] ?? 'No comment'),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: List.generate(
-                              5,
-                              (index) => Icon(
-                                Icons.star,
-                                color: index < (review['rating'] ?? 0)
-                                    ? Colors.amber
-                                    : Colors.grey,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  const SizedBox(height: 24),
-
-                  // Action Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          print("Navigate to appointment booking screen");
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                        ),
-                        child: const Text(
-                          'Book Appointment',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final token = await _storage.read(key: 'token');
-                          if (token != null) {
-                            try {
-                              // Check if a chat already exists
-                              final existingChatId =
-                                  await _apiRepository.getExistingChatId(
-                                      widget.specialistId, token);
-
-                              if (existingChatId != null) {
-                                // Navigate to the existing chat
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatScreen(
-                                      chatId: existingChatId,
-                                      recipientId: widget.specialistId,
-                                      recipientName:
-                                          name, 
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                // Create a new chat
-                                final newChatId = await _apiRepository
-                                    .createChat(widget.specialistId, token);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatScreen(
-                                      chatId: existingChatId ??
-                                          newChatId, 
-                                      recipientId: widget.specialistId,
-                                      recipientName:
-                                          name, 
-                                    ),
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              print('Error starting chat: $e');
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                        ),
-                        child: const Text(
-                          'Chat with Specialist',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           } else if (state is ProfileError) {

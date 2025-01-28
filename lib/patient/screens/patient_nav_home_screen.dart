@@ -18,6 +18,22 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   int _selectedIndex = 0;
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
+  String? _userId; // Add this variable to store the userId
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    _loadUserId(); // Call a method to load the userId
+  }
+
+  // Method to load the userId from secure storage
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+  }
 
   void _onTabSelected(int index) {
     setState(() {
@@ -28,12 +44,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         curve: Curves.easeInOut,
       );
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
   }
 
   @override
@@ -85,6 +95,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               DashboardScreen(), 
               DiscoverScreen(), 
               ChatListScreen(),
+              _userId != null
+                  ? AppointmentListScreen(patientId: _userId!)
+                  : Center(child: CircularProgressIndicator()), 
             ],
           ),
         ),
@@ -104,6 +117,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return 'Discover';
       case 2:
         return 'Chat';
+      case 3:
+        return 'Your Appointments';
       default:
         return 'Home';
     }

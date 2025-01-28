@@ -132,15 +132,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 ),
                 child: InkWell(
                   onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => SpecialistDetailScreen(
-        specialistId: specialist['_id'], // Pass the specialist ID
-      ),
-    ),
-  );
-},
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SpecialistDetailScreen(
+                          specialistId:
+                              specialist['_id'], // Pass the specialist ID
+                        ),
+                      ),
+                    );
+                  },
                   child: Column(
                     children: [
                       Image.network(
