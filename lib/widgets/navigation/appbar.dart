@@ -5,11 +5,13 @@ import 'package:armstrong/config/colors.dart';
 class UniversalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBackPressed;
+  final List<Widget>? actions;
 
   const UniversalAppBar({
     Key? key,
     required this.title,
     this.onBackPressed,
+    this.actions,
   }) : super(key: key);
 
   @override
@@ -29,7 +31,8 @@ class UniversalAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       elevation: 0,
-      backgroundColor: orangeContainer, 
+      backgroundColor: orangeContainer,
+      actions: actions,
     );
   }
 

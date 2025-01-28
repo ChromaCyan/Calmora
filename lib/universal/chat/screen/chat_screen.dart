@@ -1,10 +1,14 @@
-import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/config/colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:armstrong/patient/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/patient/blocs/appointment/appointment_event.dart';
+import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -104,6 +108,18 @@ class _ChatScreenState extends State<ChatScreen> {
     return DateFormat('hh:mm a, MMM d').format(dateTime);
   }
 
+  void _bookAppointment(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocProvider.value(
+          value: BlocProvider.of<AppointmentBloc>(context),
+          child: AppointmentBookingForm(specialistId: widget.recipientId),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _socketService.disconnect();
@@ -118,6 +134,12 @@ class _ChatScreenState extends State<ChatScreen> {
         onBackPressed: () {
           Navigator.pop(context);
         },
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today, color: Colors.white),
+            onPressed: () => _bookAppointment(context),
+          ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -187,7 +209,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
-                    controller: _controller, // Use the persistent controller
+                    controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'Type a message',
                       border: OutlineInputBorder(
