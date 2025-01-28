@@ -26,15 +26,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   Future<void> _onFetchSpecialistDetails(
-    FetchSpecialistDetailsEvent event,
-    Emitter<ProfileState> emit,
-  ) async {
-    emit(ProfileLoading());
-    try {
-      final specialistDetails = await apiRepository.getProfile();
-      emit(SpecialistDetailsLoaded(specialistDetails));
-    } catch (e) {
-      emit(ProfileError(e.toString()));
-    }
+  FetchSpecialistDetailsEvent event,
+  Emitter<ProfileState> emit,
+) async {
+  emit(ProfileLoading());
+  try {
+    final specialistDetails = await apiRepository.getSpecialistById(event.specialistId);
+    emit(SpecialistDetailsLoaded(specialistDetails));
+  } catch (e) {
+    emit(ProfileError(e.toString()));
   }
+}
 }

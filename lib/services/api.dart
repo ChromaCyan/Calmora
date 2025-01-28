@@ -117,6 +117,20 @@ class ApiRepository {
       throw Exception('Failed to edit profile: ${response.body}');
     }
   }
+  Future<Map<String, dynamic>> getSpecialistById(String specialistId) async {
+  final token = await _storage.read(key: 'token');
+  final url = Uri.parse('$baseUrl/auth/specialists/$specialistId');
+  final response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body)['data'];
+  } else {
+    throw Exception('Failed to fetch specialist details: ${response.body}');
+  }
+}
 
   // Get Specialist List
   Future<List<dynamic>> getSpecialistList() async {
