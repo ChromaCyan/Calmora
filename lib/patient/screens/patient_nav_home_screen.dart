@@ -18,13 +18,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   int _selectedIndex = 0;
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-  String? _userId; // Add this variable to store the userId
+  String? _userId; 
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-    _loadUserId(); // Call a method to load the userId
+    _loadUserId(); 
   }
 
   // Method to load the userId from secure storage

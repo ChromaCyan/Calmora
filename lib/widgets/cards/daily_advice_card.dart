@@ -36,19 +36,17 @@ class _HealthAdviceSectionState extends State<HealthAdviceSection> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Define responsive sizes
-    final bannerHeight = screenHeight * 0.20; // 25% of screen height
-    final bannerWidth = screenWidth * 0.60;   // 85% of screen width
+    final bannerHeight = screenHeight * 0.20; 
+    final bannerWidth = screenWidth * 0.60;   
 
     return Container(
-      margin: EdgeInsets.all(screenWidth * 0.02), // Responsive margin (2% of width)
-      padding: EdgeInsets.all(screenWidth * 0.05), // Responsive padding (5% of width)
+      margin: EdgeInsets.all(screenWidth * 0.02), 
+      padding: EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16), // Rounded corners
+        borderRadius: BorderRadius.circular(16), 
         color: const Color.fromARGB(255, 15, 100, 70),
         boxShadow: [
           BoxShadow(
@@ -59,14 +57,14 @@ class _HealthAdviceSectionState extends State<HealthAdviceSection> {
         ],
       ),
       child: SizedBox(
-        height: bannerHeight, // Responsive height
-        width: bannerWidth,   // Responsive width
+        height: bannerHeight, 
+        width: bannerWidth,  
         child: AnimatedSwitcher(
           duration: const Duration(seconds: 1),
           switchInCurve: Curves.easeInOut,
           switchOutCurve: Curves.easeInOut,
           child: BannerCard(
-            key: ValueKey<int>(_currentIndex), // Unique key for each banner
+            key: ValueKey<int>(_currentIndex), 
             item: widget.items[_currentIndex],
           ),
         ),

@@ -8,14 +8,13 @@ class BannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      key: key, // Key to identify each unique card
+      key: key, 
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(screenWidth * 0.05), // 5% of screen width for corner radius
+        borderRadius: BorderRadius.circular(screenWidth * 0.05), 
         image: item.image.isNotEmpty
             ? DecorationImage(
                 image: NetworkImage(item.image),
@@ -27,7 +26,7 @@ class BannerCard extends StatelessWidget {
         child: Text(
           item.text,
           style: TextStyle(
-            fontSize: screenWidth * 0.06, // Responsive font size (6% of screen width)
+            fontSize: screenWidth * 0.06, 
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
