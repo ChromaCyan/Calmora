@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date and time formatting
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/config/colors.dart'; // Assuming you have a colors file for your app's color scheme
 
 class AppointmentListScreen extends StatefulWidget {
   final String patientId;
@@ -53,8 +54,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   // Format date and time
   String _formatDateTime(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('MMM d, y h:mm a')
-        .format(dateTime); 
+    return DateFormat('MMM d, y h:mm a').format(dateTime);
   }
 
   @override
@@ -79,8 +79,13 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                         final status = appointment['status'];
 
                         return Card(
-                          margin: EdgeInsets.all(8.0),
-                          elevation: 4.0,
+                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          elevation: 8.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Colors.grey.shade200, width: 1),
+                          ),
+                          shadowColor: Colors.black.withOpacity(0.1),
                           child: Padding(
                             padding: EdgeInsets.all(16.0),
                             child: Column(
@@ -91,22 +96,45 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 SizedBox(height: 8.0),
-                                Text(
-                                  'Start: $startTime',
-                                  style: TextStyle(fontSize: 16.0),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today,
+                                      color: Colors.orange,
+                                      size: 18.0,
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Text(
+                                      'Start: $startTime',
+                                      style: TextStyle(fontSize: 16.0, color: Colors.black54),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  'End: $endTime',
-                                  style: TextStyle(fontSize: 16.0),
+                                SizedBox(height: 8.0),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      color: Colors.green,
+                                      size: 18.0,
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Text(
+                                      'End: $endTime',
+                                      style: TextStyle(fontSize: 16.0, color: Colors.black54),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
                                   'Status: $status',
                                   style: TextStyle(
                                     fontSize: 16.0,
+                                    fontWeight: FontWeight.w500,
                                     color: status == 'pending'
                                         ? Colors.orange
                                         : Colors.green,

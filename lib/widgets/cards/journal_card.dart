@@ -12,12 +12,20 @@ class JournalSection extends StatelessWidget {
       height: 140, 
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 15, 100, 70),
+        color: orangeContainer,  
+        image: DecorationImage(
+          image: AssetImage('images/splash/image1.png'), 
+          fit: BoxFit.cover,  
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.3), 
+            BlendMode.darken,
+          ),
+        ),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,  
+        crossAxisAlignment: CrossAxisAlignment.center,  
         children: [
           const Text(
             'Daily Journal',
@@ -36,20 +44,19 @@ class JournalSection extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 197, 164, 121),
+              backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Log Your Mood',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontWeight: FontWeight.bold
+                fontWeight: FontWeight.bold,
               ),
             ),
-              
           ),
         ],
       ),

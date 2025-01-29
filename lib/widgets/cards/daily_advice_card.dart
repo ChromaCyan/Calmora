@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/banners/patient_banner_card.dart';
 import 'package:armstrong/patient/models/widgets/banner_model.dart';
+import 'package:armstrong/config/colors.dart';
 
 class HealthAdviceSection extends StatefulWidget {
   final List<CarouselItem> items;
@@ -19,10 +20,9 @@ class _HealthAdviceSectionState extends State<HealthAdviceSection> {
   @override
   void initState() {
     super.initState();
-    // Start the timer to update the banner index periodically
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    // Auto-switch banners every 6 seconds
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       setState(() {
-        // Increment index and loop back to the first banner
         _currentIndex = (_currentIndex + 1) % widget.items.length;
       });
     });
@@ -38,36 +38,43 @@ class _HealthAdviceSectionState extends State<HealthAdviceSection> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     final bannerHeight = screenHeight * 0.20; 
-    final bannerWidth = screenWidth * 0.60;   
+
+    final currentItem = widget.items[_currentIndex];
 
     return Container(
-      margin: EdgeInsets.all(screenWidth * 0.02), 
-      padding: EdgeInsets.all(screenWidth * 0.05), 
+      width: double.infinity,
+      height: bannerHeight,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16), 
-        color: const Color.fromARGB(255, 15, 100, 70),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        color: orangeContainer,
+        borderRadius: BorderRadius.circular(8),
+        image: currentItem.image.isNotEmpty
+            ? DecorationImage(
+                image: AssetImage(currentItem.image), 
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.3), 
+                  BlendMode.darken,
+                ),
+              )
+            : null,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            currentItem.text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: screenWidth * 0.035, 
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
           ),
         ],
-      ),
-      child: SizedBox(
-        height: bannerHeight, 
-        width: bannerWidth,  
-        child: AnimatedSwitcher(
-          duration: const Duration(seconds: 1),
-          switchInCurve: Curves.easeInOut,
-          switchOutCurve: Curves.easeInOut,
-          child: BannerCard(
-            key: ValueKey<int>(_currentIndex), 
-            item: widget.items[_currentIndex],
-          ),
-        ),
       ),
     );
   }

@@ -20,41 +20,54 @@ class CategoryChip extends StatefulWidget {
 class _CategoryChipState extends State<CategoryChip> {
   @override
   Widget build(BuildContext context) {
-    return Center( 
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, 
-          children: widget.categories.map((category) {
-            bool isSelected = widget.selectedCategory == category;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0), 
-              child: ChoiceChip(
-                label: Text(
-                  category,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: isSelected ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: widget.categories.map((category) {
+          bool isSelected = widget.selectedCategory == category;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0), 
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250), 
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                color: isSelected ? orangeContainer : Colors.transparent,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFFE9879) : buttonColor,
+                  width: 1.5,
                 ),
-                selected: isSelected,
-                onSelected: (bool selected) {
-                  if (selected) widget.onSelected(category);
-                },
-                selectedColor: orangeContainer,
-                backgroundColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: isSelected ? const Color(0xFFFE9879) : buttonColor,
-                    width: 1.5,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: orangeContainer.withOpacity(0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ]
+                    : [],
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(30),
+                onTap: () => widget.onSelected(category),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10.0),
+                  child: Text(
+                    category,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isSelected ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  borderRadius: const BorderRadius.all(Radius.circular(50.0)),
                 ),
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

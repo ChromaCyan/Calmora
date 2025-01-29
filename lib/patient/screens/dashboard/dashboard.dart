@@ -1,14 +1,15 @@
+import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:armstrong/widgets/buttons/survey_button.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
 import 'package:armstrong/widgets/cards/journal_card.dart';
 import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:armstrong/widgets/cards/daily_advice_card.dart';
-import 'package:armstrong/widgets/banners/patient_banner_card.dart'; // New import
-import 'package:armstrong/patient/models/widgets/banner_model.dart'; // New import
+import 'package:armstrong/widgets/banners/patient_banner_card.dart';
+import 'package:armstrong/patient/models/widgets/banner_model.dart';
 import 'package:armstrong/helpers/onboard_helper.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -32,13 +33,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _checkOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
-    bool hasCompletedOnboarding = prefs.getBool('hasCompletedOnboarding') ?? false;
+    bool hasCompletedOnboarding =
+        prefs.getBool('hasCompletedOnboarding') ?? false;
 
     if (!hasCompletedOnboarding) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context).startShowCase([
-          _welcomeKey,
-          _adviceKey,
+          //_welcomeKey,
+          //_adviceKey,
           _journalKey,
           _articleKey,
           _quickTestKey,
@@ -52,67 +54,88 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ShowCaseWidget(  // Wrap with ShowCaseWidget for onboarding
-      builder: (context) => Scaffold(
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
 
-                // Highlight Welcome Section
-                Showcase(
-                  key: _welcomeKey,
-                  description: "This is your welcome section where you get personalized greetings.",
-                  child: WelcomeSection(),
-                ),
-                const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-                // Highlight Carousel Banner Section (new addition)
-                Showcase(
-                  key: _adviceKey,
-                  description: "Here is the carousel banner displaying important info.",
-                  child: HealthAdviceSection(
-                  items: carouselData
-                )
-                ),
-                const SizedBox(height: 30),
+              // Highlight Welcome Section
+              // Showcase(
+              //   key: _welcomeKey,
+              //   description:
+              //       "This is your welcome section where you get personalized greetings.",
+              //   textColor: Colors.white,
+              //   tooltipBackgroundColor: buttonColor,
+              //   targetPadding: EdgeInsets.all(10),
+              //   targetShapeBorder: RoundedRectangleBorder(
+              //     borderRadius: BorderRadius.circular(20),
+              //   ),
+              //   child: WelcomeSection(),
+              // ),
+              // const SizedBox(height: 30),
 
-                // Highlight Health Advice Section
-                Showcase(
-                  key: _adviceKey,
-                  description: "Here, you'll find daily advice to improve your well-being.",
-                  child: HealthAdviceSection(items: carouselData),
+              // Highlight Quick Test Button
+              Showcase(
+                key: _quickTestKey,
+                description:
+                    "Tap here to take a quick mental health assessment.",
+                textColor: Colors.white,
+                tooltipBackgroundColor: buttonColor,
+                targetPadding: EdgeInsets.all(12),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 30),
+                child: Center(child: QuickTestButton()),
+              ),
+              const SizedBox(height: 30),
 
-                // Highlight Journal Section
-                Showcase(
-                  key: _journalKey,
-                  description: "Write your thoughts and feelings in your personal journal.",
-                  child: JournalSection(),
+              // Highlight Journal Section
+              Showcase(
+                key: _journalKey,
+                description:
+                    "Write your thoughts and feelings in your personal journal.",
+                textColor: Colors.white,
+                tooltipBackgroundColor: buttonColor,
+                targetPadding: EdgeInsets.all(10),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 30),
+                child: JournalSection(),
+              ),
+              const SizedBox(height: 30),
 
-                // Highlight Article List
-                Showcase(
-                  key: _articleKey,
-                  description: "Check out the latest articles recommended for you.",
-                  child: ArticleList(),
+              Center(
+                child: const Text(
+                  'Articles',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 30),
+              ),
 
-                // Highlight Quick Test Button
-                Showcase(
-                  key: _quickTestKey,
-                  description: "Tap here to take a quick mental health assessment.",
-                  child: Center(child: QuickTestButton()),
+              // Highlight Article List
+              Showcase(
+                key: _articleKey,
+                description:
+                    "Check out the latest articles recommended for you.",
+                textColor: Colors.white,
+                tooltipBackgroundColor: buttonColor,
+                targetPadding: EdgeInsets.all(10),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 30),
-              ],
-            ),
+                child: ArticleList(),
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),

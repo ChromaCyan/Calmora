@@ -13,9 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
 
-  String? onboardingCompleted = await storage.read(key: 'onboarding_completed');
-  bool hasCompletedOnboarding = onboardingCompleted == 'true';
-
   String? token = await storage.read(key: 'jwt');
   String? role;
 
@@ -30,20 +27,17 @@ void main() async {
   }
 
   runApp(MyApp(
-    hasCompletedOnboarding: hasCompletedOnboarding,
     isLoggedIn: token != null,
     role: role,
   ));
 }
 
 class MyApp extends StatelessWidget {
-  final bool hasCompletedOnboarding;
   final bool isLoggedIn;
   final String? role;
 
   const MyApp({
     super.key,
-    required this.hasCompletedOnboarding,
     required this.isLoggedIn,
     this.role,
   });
@@ -67,9 +61,7 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _getInitialScreen() {
-    if (!hasCompletedOnboarding) {
-      return const SplashScreen();
-    } else if (!isLoggedIn) {
+    if (!isLoggedIn) {
       return const LoginScreen();
     } else {
       return _getHomeScreen(role);

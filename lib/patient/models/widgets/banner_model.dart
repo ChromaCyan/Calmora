@@ -10,15 +10,23 @@ class CarouselItem {
 
 List<CarouselItem> carouselData = [
   CarouselItem(
-    text: "Banner 1",
-    image: "",
+    text: "It's okay to feel broken sometimes.\nShowing your vulnerable side is not a sign of weakness—\nit's a step toward true strength and healing.",
+    image: "images/splash/image5.png",
   ),
   CarouselItem(
-    text: "Banner 2",
-    image: "",
+    text: "Life can feel overwhelming, like noise that won't quiet down.\nHere, you'll find tools to untangle your thoughts\nand move toward clarity and peace.",
+    image: "images/splash/image7.png",
   ),
   CarouselItem(
-    text: "Banner 3",
-    image: "",
+    text: "Discover Resources\nAccess articles, tools, and tips to help manage stress, \nanxiety, and mental health challenges.",
+    image: "images/splash/image1.png",
+  ),
+  CarouselItem(
+    text: "Connect with Specialists\nFind licensed therapists and mental health experts \nto guide you through your journey.",
+    image: "images/splash/image2.png",
+  ),
+  CarouselItem(
+    text: "Join the Conversation\nChat with a professional and share experiences in a safe, \nsupportive community.",
+    image: "images/splash/image3.png",
   ),
 ];

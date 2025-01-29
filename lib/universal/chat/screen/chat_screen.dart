@@ -134,15 +134,46 @@ class _ChatScreenState extends State<ChatScreen> {
         onBackPressed: () {
           Navigator.pop(context);
         },
-        actions: [
-          IconButton(
-            icon: Icon(Icons.calendar_today, color: Colors.white),
-            onPressed: () => _bookAppointment(context),
-          ),
-        ],
+        actions: [],
       ),
       body: Column(
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => _bookAppointment(context),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16, horizontal: 30), 
+                backgroundColor: orangeContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), 
+                ),
+                shadowColor: Colors.black.withOpacity(0.2),
+                elevation: 5,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize
+                    .min, 
+                children: [
+                  Icon(
+                    Icons.calendar_today, 
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  SizedBox(width: 10), 
+                  Text(
+                    "Create Appointment Now",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: _messages.length,

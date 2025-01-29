@@ -1,8 +1,10 @@
 import 'package:armstrong/specialist/screens/chat/chat_screen.dart';
+import 'package:armstrong/universal/chat/screen/chat_screen.dart';
+import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'chat_screen.dart';
+import 'package:armstrong/config/colors.dart';
 
 class ChatListScreen extends StatefulWidget {
   @override
@@ -30,7 +32,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         final chats = await _apiRepository.getChatList(token);
         setState(() {
           _chats = chats;
-          _filteredChats = chats; 
+          _filteredChats = chats;
         });
       } catch (e) {
         print("Error loading chats: $e");
@@ -42,16 +44,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
   void _filterChats(String query) {
     if (query.isEmpty) {
       setState(() {
-        _filteredChats = List.from(_chats); 
+        _filteredChats = List.from(_chats);
       });
     } else {
       setState(() {
-        _filteredChats = _chats
-            .where((chat) {
-              final recipientName = chat['participants'][0]['firstName'] ?? '';
-              return recipientName.toLowerCase().contains(query.toLowerCase());
-            })
-            .toList();
+        _filteredChats = _chats.where((chat) {
+          final recipientName = chat['participants'][0]['firstName'] ?? '';
+          return recipientName.toLowerCase().contains(query.toLowerCase());
+        }).toList();
       });
     }
   }
@@ -61,21 +61,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-              ),
-              onChanged: _filterChats, 
-            ),
+          CustomSearchBar(
+            hintText: 'Search chats...',
+            searchController: _searchController,
+            onChanged: _filterChats,
+            onClear: () {
+              _searchController.clear();
+              _filterChats('');
+            },
           ),
           Expanded(
             child: _filteredChats.isEmpty
@@ -93,31 +86,65 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       // Add null checks for all required properties
                       final participants = chat['participants'] ?? [];
                       final chatId = chat['chatId'] ?? '';
-                      final recipient = participants.isNotEmpty ? participants[0] : {};
+                      final recipient =
+                          participants.isNotEmpty ? participants[0] : {};
                       final recipientId = recipient['_id'] ?? '';
                       final recipientName = recipient['firstName'] ?? 'No Name';
                       final lastMessage = chat['lastMessage'] ?? {};
-                      final messageContent = lastMessage['content'] ?? 'No message';
+                      final messageContent =
+                          lastMessage['content'] ?? 'No message';
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.grey.shade300,
-                          child: const Icon(Icons.person, color: Colors.black),
-                        ),
-                        title: Text(recipientName),
-                        subtitle: Text(messageContent),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatScreen(
-                                chatId: chatId,
-                                recipientId: recipientId,
-                                recipientName: recipientName, 
-                              ),
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.15),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 2),
                             ),
-                          );
-                        },
+                          ],
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          leading: CircleAvatar(
+                            radius: 24,
+                            backgroundColor: orangeContainer.withOpacity(0.3),
+                            child:
+                                const Icon(Icons.person, color: Colors.white),
+                          ),
+                          title: Text(
+                            recipientName,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            messageContent,
+                            style: TextStyle(
+                                color: Colors.grey.shade600, fontSize: 14),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: const Icon(Icons.arrow_forward_ios,
+                              size: 16, color: Colors.grey),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                  chatId: chatId,
+                                  recipientId: recipientId,
+                                  recipientName: recipientName,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
                   ),

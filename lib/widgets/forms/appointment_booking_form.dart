@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/patient/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/patient/blocs/appointment/appointment_event.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/config/colors.dart'; // Assuming you have a color configuration file
 
 class AppointmentBookingForm extends StatefulWidget {
   final String specialistId;
@@ -81,7 +82,6 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
               ),
             );
 
-        // Close the form after submission
         Navigator.pop(context);
       }
     }
@@ -90,7 +90,15 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Book Appointment'),
+      backgroundColor: Colors.white,
+      title: const Text(
+        'Book Appointment',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -98,28 +106,44 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
           children: [
             // Date Picker
             ListTile(
-              leading: const Icon(Icons.calendar_today),
+              leading: Icon(
+                Icons.calendar_today,
+                color: orangeContainer,
+              ),
               title: Text(
                 _selectedDate == null
                     ? 'Select Date'
                     : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+                style: TextStyle(color: Colors.black87),
               ),
               onTap: () => _selectDate(context),
             ),
             // Time Picker
             ListTile(
-              leading: const Icon(Icons.access_time),
+              leading: Icon(
+                Icons.access_time,
+                color: orangeContainer,
+              ),
               title: Text(
                 _selectedTime == null
                     ? 'Select Time'
                     : 'Time: ${_selectedTime!.format(context)}',
+                style: TextStyle(color: Colors.black87),
               ),
               onTap: () => _selectTime(context),
             ),
+            // Message Input
             TextFormField(
               controller: _messageController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Message (Optional)',
+                labelStyle: TextStyle(color: Colors.black54),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: orangeContainer),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
               ),
             ),
           ],
@@ -128,11 +152,20 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: Colors.grey),
+          ),
         ),
         TextButton(
           onPressed: () => _submitForm(context),
-          child: const Text('Confirm'),
+          child: Text(
+            'Confirm',
+            style: TextStyle(
+              color: orangeContainer,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );

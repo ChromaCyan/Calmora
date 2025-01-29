@@ -1,14 +1,14 @@
-import 'package:armstrong/authentication/models/user_model.dart';
-import 'package:armstrong/patient/screens/discover/specialist_detail_screen.dart';
+import 'package:armstrong/patient/blocs/profile/profile_state.dart';
+import 'package:armstrong/patient/models/widgets/banner_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
-import 'package:armstrong/patient/blocs/profile/profile_state.dart';
 import 'package:armstrong/patient/blocs/profile/profile_event.dart';
-import 'package:armstrong/services/api.dart';
+import 'package:armstrong/widgets/cards/daily_advice_card.dart';
+import 'package:armstrong/widgets/banners/patient_banner_card.dart';
 import 'package:armstrong/widgets/navigation/category.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
+import 'package:armstrong/patient/screens/discover/specialist_detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({Key? key}) : super(key: key);
@@ -25,6 +25,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   void initState() {
     super.initState();
+    // Fetch specialists when the screen is first created
+    _fetchSpecialists();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Fetch specialists every time the screen is visited (useful after navigating back)
+    _fetchSpecialists();
+  }
+
+  void _fetchSpecialists() {
     final profileBloc = BlocProvider.of<ProfileBloc>(context);
     profileBloc.add(FetchSpecialistsEvent());
   }
@@ -40,6 +52,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
+                Center(
+                  child: HealthAdviceSection(items: carouselData),
+                ),
                 const SizedBox(height: 20),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -67,7 +82,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       searchQuery = '';
                     });
                   },
-                  onSearch: () {},
                 ),
                 const SizedBox(height: 20),
                 CategoryChip(
@@ -131,16 +145,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: InkWell(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => SpecialistDetailScreen(
-                          specialistId:
-                              specialist['_id'], // Pass the specialist ID
+                          specialistId: specialist['_id'],
                         ),
                       ),
                     );
+                    if (result != null && result == 'refresh') {
+                      _fetchSpecialists(); // Refresh data on return
+                    }
                   },
                   child: Column(
                     children: [
