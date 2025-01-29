@@ -60,6 +60,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
           } else if (state is SpecialistDetailsLoaded) {
             final specialist = state.specialistDetails;
 
+            // Extract specialist details
             final firstName =
                 specialist['firstName'] ?? 'No first name available';
             final lastName = specialist['lastName'] ?? 'No last name available';
@@ -96,112 +97,132 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image Section (Hero-like)
-                    Container(
-                      width: double.infinity,
-                      height: 300, // Adjust the height as needed
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: profileImage.isNotEmpty
-                              ? NetworkImage(profileImage)
-                              : const AssetImage('images/splash/doc1.jpg')
-                                  as ImageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(16.0),
-                          bottomRight: Radius.circular(16.0),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Name and Specialization (No card)
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      specialization,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Bio Section (Not in a card)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        bio,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-
-                    // Contact Information Section (Card)
-                    _buildSectionCard(
-                      title: 'Contact Information',
-                      content: Column(
+                    // Profile Image and Name
+                    Center(
+                      child: Column(
                         children: [
-                          _buildInfoRow(Icons.email, email),
-                          _buildInfoRow(Icons.phone, phoneNumber),
-                        ],
-                      ),
-                    ),
-
-                    // Professional Details Section (Card)
-                    _buildSectionCard(
-                      title: 'Professional Details',
-                      content: Column(
-                        children: [
-                          _buildInfoRow(Icons.work,
-                              'Years of Experience: $yearsOfExperience'),
-                          _buildInfoRow(Icons.language,
-                              'Languages Spoken: ${languagesSpoken.join(", ")}'),
-                          _buildInfoRow(Icons.assignment,
-                              'License Number: $licenseNumber'),
-                        ],
-                      ),
-                    ),
-
-                    // Action Buttons
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () =>
-                                _bookAppointment(context, widget.specialistId),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 18),
-                              minimumSize: const Size(150, 50),
-                            ),
-                            child: const Text(
-                              'Book Appointment',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundImage: profileImage.isNotEmpty
+                                ? NetworkImage(profileImage)
+                                : const AssetImage('assets/default_profile.png')
+                                    as ImageProvider,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final token = await _storage.read(key: 'token');
-                              if (token != null) {
+                          const SizedBox(height: 8),
+                          Text(
+                            specialization,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Bio
+                    _buildSectionTitle('Bio'),
+                    Text(
+                      bio,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Contact Information
+                    _buildSectionTitle('Contact Information'),
+                    _buildInfoRow(Icons.email, email),
+                    _buildInfoRow(Icons.phone, phoneNumber),
+                    const SizedBox(height: 16),
+
+                    // Professional Details
+                    _buildSectionTitle('Professional Details'),
+                    _buildInfoRow(
+                        Icons.work, 'Years of Experience: $yearsOfExperience'),
+                    _buildInfoRow(Icons.language,
+                        'Languages Spoken: ${languagesSpoken.join(", ")}'),
+                    _buildInfoRow(
+                        Icons.assignment, 'License Number: $licenseNumber'),
+                    const SizedBox(height: 16),
+
+                    // Availability
+                    _buildSectionTitle('Availability'),
+                    Chip(
+                      label: Text(
+                        availability,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor:
+                          availability == 'Available' ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Reviews
+                    _buildSectionTitle('Reviews'),
+                    if (reviews.isEmpty) const Text('No reviews yet.'),
+                    if (reviews.isNotEmpty)
+                      Column(
+                        children: reviews.map<Widget>((review) {
+                          return ListTile(
+                            leading: const Icon(Icons.person, color: Colors.blue),
+                            title: Text(review['reviewerName'] ?? 'Anonymous'),
+                            subtitle: Text(review['comment'] ?? 'No comment'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(
+                                5,
+                                (index) => Icon(
+                                  Icons.star,
+                                  color: index < (review['rating'] ?? 0)
+                                      ? Colors.amber
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    const SizedBox(height: 24),
+
+                    // Action Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () =>
+                              _bookAppointment(context, widget.specialistId),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                          child: const Text(
+                            'Book Appointment',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final token = await _storage.read(key: 'token');
+                            if (token != null) {
+                              try {
+                                // Check if a chat already exists
                                 final existingChatId =
                                     await _apiRepository.getExistingChatId(
                                         widget.specialistId, token);
+
                                 if (existingChatId != null) {
+                                  // Navigate to the existing chat
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -213,35 +234,36 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                     ),
                                   );
                                 } else {
+                                  // Create a new chat
                                   final newChatId = await _apiRepository
                                       .createChat(widget.specialistId, token);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ChatScreen(
-                                        chatId: newChatId,
+                                        chatId: existingChatId ?? newChatId,
                                         recipientId: widget.specialistId,
                                         recipientName: name,
                                       ),
                                     ),
                                   );
                                 }
+                              } catch (e) {
+                                print('Error starting chat: $e');
                               }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 18),
-                              minimumSize: const Size(150, 50),
-                            ),
-                            child: const Text(
-                              'Chat with Specialist',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            ),
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
                           ),
-                        ],
-                      ),
+                          child: const Text(
+                            'Chat with Specialist',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -256,35 +278,17 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
     );
   }
 
-  Widget _buildSectionCard({required String title, required Widget content}) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 4.0,
-      margin: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionTitle(title),
-            const SizedBox(height: 8.0),
-            content,
-          ],
-        ),
-      ),
-    );
-  }
-
   // Helper method to build section titles
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Colors.blueAccent,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.blueAccent,
+        ),
       ),
     );
   }
