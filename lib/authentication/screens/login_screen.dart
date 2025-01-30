@@ -62,12 +62,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     if (userType == 'Patient') {
                       final firstName = userData['firstName'];
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Welcome, Patient!"),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -75,12 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       );
                     } else if (userType == 'Specialist') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Welcome, Specialist"),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(

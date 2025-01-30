@@ -1,5 +1,6 @@
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
 import 'package:armstrong/patient/models/widgets/banner_model.dart';
+import 'package:armstrong/widgets/cards/specialist_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
@@ -105,95 +106,68 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  Widget _buildSpecialistList() {
-    return BlocBuilder<ProfileBloc, ProfileState>(
-      builder: (context, state) {
-        if (state is ProfileLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is SpecialistsLoaded) {
-          final filteredSpecialists = state.specialists.where((specialist) {
-            final name = '${specialist['firstName']} ${specialist['lastName']}';
-            return name.toLowerCase().contains(searchQuery.toLowerCase());
-          }).toList();
+Widget _buildSpecialistList() {
+  return BlocBuilder<ProfileBloc, ProfileState>(
+    builder: (context, state) {
+      if (state is ProfileLoading) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (state is SpecialistsLoaded) {
+        final filteredSpecialists = state.specialists.where((specialist) {
+          final name = '${specialist['firstName']} ${specialist['lastName']}';
+          return name.toLowerCase().contains(searchQuery.toLowerCase());
+        }).toList();
 
-          if (filteredSpecialists.isEmpty) {
-            return const Center(child: Text('No results found.'));
-          }
-
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 0.75,
-            ),
-            itemCount: filteredSpecialists.length,
-            itemBuilder: (context, index) {
-              final specialist = filteredSpecialists[index];
-              final name =
-                  '${specialist['firstName']} ${specialist['lastName']}';
-              final specialization = specialist['specialization'] ?? 'Unknown';
-              final image = specialist['profileImage']?.isEmpty ?? true
-                  ? 'assets/default_image.png'
-                  : specialist['profileImage'];
-
-              return Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: InkWell(
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SpecialistDetailScreen(
-                          specialistId: specialist['_id'],
-                        ),
-                      ),
-                    );
-                    if (result != null && result == 'refresh') {
-                      _fetchSpecialists(); // Refresh data on return
-                    }
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        image,
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        specialization,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        } else if (state is ProfileError) {
-          return Center(child: Text('Error: ${state.message}'));
+        if (filteredSpecialists.isEmpty) {
+          return const Center(child: Text('No results found.'));
         }
-        return const Center(child: Text('No data available.'));
-      },
-    );
-  }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.75,
+          ),
+          itemCount: filteredSpecialists.length,
+          itemBuilder: (context, index) {
+            final specialist = filteredSpecialists[index];
+            final name = '${specialist['firstName']} ${specialist['lastName']}';
+            final specialization = specialist['specialization'] ?? 'Unknown';
+            final image = specialist['profileImage']?.isEmpty ?? true
+                ? 'images/splash/doc1.jpg'
+                : specialist['profileImage'];
+
+            return SpecialistCard(
+              specialist: Specialist(
+                name: name,
+                specialization: specialization,
+                imageUrl: image,
+              ),
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SpecialistDetailScreen(
+                      specialistId: specialist['_id'],
+                    ),
+                  ),
+                );
+                if (result != null && result == 'refresh') {
+                  _fetchSpecialists(); // Refresh data on return
+                }
+              },
+            );
+          },
+        );
+      } else if (state is ProfileError) {
+        return Center(child: Text('Error: ${state.message}'));
+      }
+      return const Center(child: Text('No data available.'));
+    },
+  );
+}
 
   Widget _buildArticleList() {
     List<Map<String, String>> articles = [

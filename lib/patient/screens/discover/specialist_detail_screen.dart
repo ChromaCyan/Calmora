@@ -89,7 +89,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                 } else if (state is AppointmentError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Error: ${state.message}'),
+                      content: Text('This day is already booked!'),
                     ),
                   );
                 }

@@ -11,6 +11,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
   AppointmentBloc({required ApiRepository apiRepository})
       : _apiRepository = apiRepository,
         super(AppointmentInitial()) {
+    on<BookAppointmentEvent>(_onBookAppointment);
     on<FetchSpecialistAppointmentsEvent>(_onFetchSpecialistAppointments);
     on<FetchPatientAppointmentsEvent>(_onFetchPatientAppointments);
     on<AcceptAppointmentEvent>(_onAcceptAppointment);

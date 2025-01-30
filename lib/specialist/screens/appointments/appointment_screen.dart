@@ -20,26 +20,26 @@ class SpecialistAppointmentListScreen extends StatefulWidget {
 
 class _SpecialistAppointmentListScreenState
     extends State<SpecialistAppointmentListScreen> {
-
   String _formatDate(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('MMM d, y').format(dateTime);  
+    return DateFormat('MMM d, y').format(dateTime);
   }
 
   String _formatTime(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('h:mm a').format(dateTime); 
+    return DateFormat('h:mm a').format(dateTime);
   }
 
   // Combine start and end times into one string
-  String _combineDateTimes(String startDateTimeString, String endDateTimeString) {
+  String _combineDateTimes(
+      String startDateTimeString, String endDateTimeString) {
     final startDateTime = DateTime.parse(startDateTimeString);
     final endDateTime = DateTime.parse(endDateTimeString);
 
-    final startFormatted = _formatTime(startDateTimeString); 
-    final endFormatted = _formatTime(endDateTimeString); 
+    final startFormatted = _formatTime(startDateTimeString);
+    final endFormatted = _formatTime(endDateTimeString);
 
-    return '$startFormatted - $endFormatted'; 
+    return '$startFormatted - $endFormatted';
   }
 
   @override
@@ -47,10 +47,9 @@ class _SpecialistAppointmentListScreenState
     super.initState();
     // Trigger event to fetch specialist appointments when the screen is loaded
     context.read<AppointmentBloc>().add(FetchSpecialistAppointmentsEvent(
-      specialistId: widget.specialistId,
-    ));
+          specialistId: widget.specialistId,
+        ));
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -62,13 +61,19 @@ class _SpecialistAppointmentListScreenState
           } else if (state is AppointmentError) {
             return Center(child: Text('Error: ${state.message}'));
           } else if (state is SpecialistAppointmentsLoaded) {
-            // Filter out appointments with 'declined' status
             final appointments = state.appointments
                 .where((appointment) => appointment['status'] != 'declined')
                 .toList();
 
             if (appointments.isEmpty) {
               return Center(child: Text('No appointments found.'));
+            }
+            if (state is AppointmentAccepted || state is AppointmentDeclined) {
+              context
+                  .read<AppointmentBloc>()
+                  .add(FetchSpecialistAppointmentsEvent(
+                    specialistId: widget.specialistId,
+                  ));
             }
 
             return ListView.builder(
@@ -83,13 +88,11 @@ class _SpecialistAppointmentListScreenState
                 final status = appointment['status'];
                 final appointmentId = appointment['_id'];
 
-                // Combine start and end times
                 final timeRange = _combineDateTimes(startTime, endTime);
-                final formattedStartDate = _formatDate(startTime); // Date part
+                final formattedStartDate = _formatDate(startTime);
 
                 return Card(
-                  margin: EdgeInsets.symmetric(
-                      vertical: 8.0, horizontal: 16.0),
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   elevation: 8.0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -110,37 +113,25 @@ class _SpecialistAppointmentListScreenState
                           ),
                         ),
                         SizedBox(height: 8.0),
-                        // Date Row
                         Row(
                           children: [
-                            Icon(
-                              Icons.calendar_today,
-                              color: Colors.orange,
-                              size: 18.0,
-                            ),
+                            Icon(Icons.calendar_today,
+                                color: Colors.orange, size: 18.0),
                             SizedBox(width: 8.0),
-                            Text(
-                              'Date: $formattedStartDate',  // Display date
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.black54),
-                            ),
+                            Text('Date: $formattedStartDate',
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.black54)),
                           ],
                         ),
                         SizedBox(height: 8.0),
-                        // Time Row
                         Row(
                           children: [
-                            Icon(
-                              Icons.lock_clock,
-                              color: Colors.blue,
-                              size: 18.0,
-                            ),
+                            Icon(Icons.lock_clock,
+                                color: Colors.blue, size: 18.0),
                             SizedBox(width: 8.0),
-                            Text(
-                              'Time: $timeRange', // Display time range
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.black54),
-                            ),
+                            Text('Time: $timeRange',
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.black54)),
                           ],
                         ),
                         SizedBox(height: 8.0),
@@ -157,21 +148,30 @@ class _SpecialistAppointmentListScreenState
                           ),
                         ),
                         SizedBox(height: 8.0),
-                        if (status == 'pending') ...[  
+                        if (status == 'pending') ...[
                           Row(
                             children: [
                               ElevatedButton(
                                 onPressed: () {
                                   context.read<AppointmentBloc>().add(
-                                    AcceptAppointmentEvent(
-                                      appointmentId: appointmentId,
-                                    ),
-                                  );
+                                      AcceptAppointmentEvent(
+                                          appointmentId: appointmentId));
                                 },
                                 child: Text('Accept'),
                               ),
+                              SizedBox(width: 8.0),
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.read<AppointmentBloc>().add(
+                                      DeclineAppointmentEvent(
+                                          appointmentId: appointmentId));
+                                },
+                                child: Text('Decline'),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red),
+                              ),
                             ],
-                          )
+                          ),
                         ]
                       ],
                     ),

@@ -33,18 +33,16 @@ class SpecialistCard extends StatelessWidget {
           padding: EdgeInsets.all(padding),
           child: Column(
             children: [
-              // Image at the top
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  specialist.imageUrl, // Add image URL
-                  height: 120, // Set a fixed height for the image
-                  width: double.infinity, // Make the image take up the full width
-                  fit: BoxFit.cover, // Ensure the image covers the space
+                  specialist.imageUrl, 
+                  height: 120,
+                  width: double.infinity, 
+                  fit: BoxFit.cover, 
                 ),
               ),
-              SizedBox(height: 10), // Space between the image and text
-              // Name text
+              SizedBox(height: 10), 
               Text(
                 specialist.name,
                 style: TextStyle(
@@ -53,8 +51,7 @@ class SpecialistCard extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 8), // Space between the name and specialization text
-              // Specialization text
+              SizedBox(height: 8), 
               Text(
                 specialist.specialization,
                 style: TextStyle(
