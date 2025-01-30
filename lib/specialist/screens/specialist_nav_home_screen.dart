@@ -1,3 +1,4 @@
+import 'package:armstrong/patient/screens/discover/specialist_list.dart';
 import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
 import 'package:armstrong/universal/chat/screen/chat_list_screen.dart';
 import 'package:armstrong/widgets/navigation/specialist_drawer.dart';
@@ -19,6 +20,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   int _selectedIndex = 0;
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
+  String? _userId; 
 
   void _onTabSelected(int index) {
     setState(() {
@@ -30,11 +32,18 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       );
     });
   }
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
+    _loadUserId();
   }
 
   @override
@@ -85,8 +94,9 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             children: [
               SpecialistDashboardScreen(),
               ChatListScreen(),
-              AppointmentsScreen(),
-              //FourthPage(),
+              _userId != null
+                  ? SpecialistAppointmentListScreen(specialistId: _userId!)
+                  : Center(child: CircularProgressIndicator()), 
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordDialog extends StatefulWidget {
@@ -57,7 +58,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: buttonColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

@@ -123,9 +123,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return Stack(
             children: [
               Positioned.fill(
-                child: Image.asset(
-                  "images/wallpaper.jpg",
-                  fit: BoxFit.cover,
+                child: Container(
+                  color: buttonColor, 
                 ),
               ),
               SingleChildScrollView(

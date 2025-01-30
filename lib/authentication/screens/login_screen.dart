@@ -43,11 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, constraints) {
           return Stack(
             children: [
-              // Background Image
               Positioned.fill(
-                child: Image.asset(
-                  "images/wallpaper.jpg",
-                  fit: BoxFit.cover,
+                child: Container(
+                  color: buttonColor, 
                 ),
               ),
               BlocListener<AuthBloc, AuthState>(
@@ -130,9 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
-                              height: 150,
+                              height: 200,
                               child: Image.asset(
-                                'images/splash/logo_placeholder.png',
+                                'images/splash/logo1.png',
                                 fit: BoxFit.contain,
                               ),
                             ),

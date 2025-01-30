@@ -1,5 +1,5 @@
-import 'package:armstrong/patient/blocs/appointment/appointment_bloc.dart';
-import 'package:armstrong/patient/blocs/appointment/appointment_state.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';

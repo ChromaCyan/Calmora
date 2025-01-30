@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/patient/blocs/appointment/appointment_bloc.dart';
-import 'package:armstrong/patient/blocs/appointment/appointment_event.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/config/colors.dart'; // Assuming you have a color configuration file
 

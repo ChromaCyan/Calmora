@@ -89,6 +89,8 @@ flutter:
     - images/splash/image7.png
     - images/splash/doc1.jpg
     - images/wallpaper.jpg
+    - images/splash/logo1.png
+    - images/splash/logo2.png
     - images/
 
   # An image asset can refer to one or more resolution-specific "variants", see

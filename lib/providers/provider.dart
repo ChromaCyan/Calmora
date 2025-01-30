@@ -1,4 +1,4 @@
-import 'package:armstrong/patient/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';

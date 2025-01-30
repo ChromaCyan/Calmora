@@ -1,0 +1,153 @@
+import 'dart:convert';
+
+class User {
+  final String id;
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phoneNumber;
+  final String? profileImage;
+  final String userType;
+  
+  // Patient-specific fields
+  final String? address;
+  final DateTime? dateOfBirth;
+  final EmergencyContact? emergencyContact;
+  final String? medicalHistory;
+  final List<String>? therapyGoals;
+
+  // Specialist-specific fields
+  final String? specialization;
+  final String? licenseNumber;
+  final String? bio;
+  final int? yearsOfExperience;
+  final List<String>? languagesSpoken;
+  final String? availability;
+  final List<Review>? reviews;
+
+  User({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phoneNumber,
+    this.profileImage,
+    required this.userType,
+    this.address,
+    this.dateOfBirth,
+    this.emergencyContact,
+    this.medicalHistory,
+    this.therapyGoals,
+    this.specialization,
+    this.licenseNumber,
+    this.bio,
+    this.yearsOfExperience,
+    this.languagesSpoken,
+    this.availability,
+    this.reviews,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['_id'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      email: json['email'],
+      phoneNumber: json['phoneNumber'],
+      profileImage: json['profileImage'],
+      userType: json['userType'],
+      
+      // Patient fields
+      address: json['address'],
+      dateOfBirth: json['dateOfBirth'] != null ? DateTime.parse(json['dateOfBirth']) : null,
+      emergencyContact: json['emergencyContact'] != null ? EmergencyContact.fromJson(json['emergencyContact']) : null,
+      medicalHistory: json['medicalHistory'],
+      therapyGoals: json['therapyGoals'] != null ? List<String>.from(json['therapyGoals']) : null,
+
+      // Specialist fields
+      specialization: json['specialization'],
+      licenseNumber: json['licenseNumber'],
+      bio: json['bio'],
+      yearsOfExperience: json['yearsOfExperience'],
+      languagesSpoken: json['languagesSpoken'] != null ? List<String>.from(json['languagesSpoken']) : null,
+      availability: json['availability'],
+      reviews: json['reviews'] != null ? (json['reviews'] as List).map((e) => Review.fromJson(e)).toList() : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'profileImage': profileImage,
+      'userType': userType,
+
+      // Patient fields
+      'address': address,
+      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'emergencyContact': emergencyContact?.toJson(),
+      'medicalHistory': medicalHistory,
+      'therapyGoals': therapyGoals,
+
+      // Specialist fields
+      'specialization': specialization,
+      'licenseNumber': licenseNumber,
+      'bio': bio,
+      'yearsOfExperience': yearsOfExperience,
+      'languagesSpoken': languagesSpoken,
+      'availability': availability,
+      'reviews': reviews?.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class EmergencyContact {
+  final String? name;
+  final String? phone;
+  final String? relation;
+
+  EmergencyContact({this.name, this.phone, this.relation});
+
+  factory EmergencyContact.fromJson(Map<String, dynamic> json) {
+    return EmergencyContact(
+      name: json['name'],
+      phone: json['phone'],
+      relation: json['relation'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'phone': phone,
+      'relation': relation,
+    };
+  }
+}
+
+class Review {
+  final int? rating;
+  final String? comment;
+  final String? reviewerName;
+
+  Review({this.rating, this.comment, this.reviewerName});
+
+  factory Review.fromJson(Map<String, dynamic> json) {
+    return Review(
+      rating: json['rating'],
+      comment: json['comment'],
+      reviewerName: json['reviewerName'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rating': rating,
+      'comment': comment,
+      'reviewerName': reviewerName,
+    };
+  }
+}

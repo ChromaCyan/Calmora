@@ -37,3 +37,30 @@ class PatientAppointmentsLoaded extends AppointmentState {
   @override
   List<Object> get props => [appointments];
 }
+
+class SpecialistAppointmentsLoaded extends AppointmentState {
+  final List<dynamic> appointments;
+
+  const SpecialistAppointmentsLoaded({required this.appointments});
+
+  @override
+  List<Object> get props => [appointments];
+}
+
+class AppointmentAccepted extends AppointmentState {
+  final Map<String, dynamic> appointment;
+
+  const AppointmentAccepted({required this.appointment});
+
+  @override
+  List<Object> get props => [appointment];
+}
+
+class AppointmentDeclined extends AppointmentState {
+  final Map<String, dynamic> appointment;
+
+  const AppointmentDeclined({required this.appointment});
+
+  @override
+  List<Object> get props => [appointment];
+}

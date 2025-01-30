@@ -1,166 +1,188 @@
 import 'package:armstrong/config/colors.dart';
-import 'package:armstrong/specialist/screens/appointments/appointment_complete_screen.dart';
-import 'package:armstrong/specialist/screens/appointments/appointment_request_screen.dart';
+import 'package:armstrong/services/api.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AppointmentsScreen extends StatelessWidget {
-  final List<Map<String, String?>> requestAppointments = [
-    {
-      "fullName": "John Kevin",
-      "specialty": "General Checkup",
-      "reason": "Routine Examination",
-      "phoneNumber": "123-456-7890",
-      "email": "john@gmail.com",
-      "address": "123 Main St, Springfield",
-      "time": "10:00 AM",
-      "date": "Saturday, 25 January 2025",
-      "color": "0xFFFFCCBC",
-    },
-  ];
+class SpecialistAppointmentListScreen extends StatefulWidget {
+  final String specialistId;
 
-  final List<Map<String, String?>> acceptedAppointments = [
-    {
-      "fullName": "Dudung Sokmati",
-      "specialty": "Cardiology",
-      "reason": "Follow-up Visit",
-      "phoneNumber": "111-222-3333",
-      "email": "dudung@gmail.com",
-      "address": "789 Oak St, Springfield",
-      "time": "11:00 AM",
-      "date": "Monday, 20 Januarary 2025",
-      "color": "0xFFB2DFDB",
-      "rating": "5",
-    },
-  ];
+  const SpecialistAppointmentListScreen({required this.specialistId, Key? key})
+      : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        body: Column(
-          children: [
-            Container(
-              color: Colors.transparent,
-              child: const TabBar(
-                tabs: [
-                  Tab(text: "Request"),
-                  Tab(text: "Completed"),
-                ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  AppointmentList(
-                    appointments: requestAppointments,
-                    onTap: (appointment) {
-                      if (appointment != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AppointmentDetailScreen(
-                              fullName: appointment["fullName"]!,
-                              specialty: appointment["specialty"]!,
-                              reason: appointment["reason"]!,
-                              phoneNumber: appointment["phoneNumber"]!,
-                              email: appointment["email"]!,
-                              address: appointment["address"]!,
-                              time: appointment["time"]!,
-                              date: appointment["date"]!,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  AppointmentList(
-                    appointments: acceptedAppointments,
-                    onTap: (appointment) {
-                      if (appointment != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CompletedAppointmentDetail(
-                              fullName: appointment["fullName"]!,
-                              specialty: appointment["specialty"]!,
-                              reason: appointment["reason"]!,
-                              phoneNumber: appointment["phoneNumber"]!,
-                              email: appointment["email"]!,
-                              address: appointment["address"]!,
-                              time: appointment["time"]!,
-                              date: appointment["date"]!,
-                              rating: appointment["rating"]!,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  _SpecialistAppointmentListScreenState createState() =>
+      _SpecialistAppointmentListScreenState();
 }
 
-class AppointmentList extends StatelessWidget {
-  final List<Map<String, String?>> appointments;
-  final void Function(Map<String, String?>?) onTap;
+class _SpecialistAppointmentListScreenState
+    extends State<SpecialistAppointmentListScreen> {
 
-  const AppointmentList({
-    Key? key,
-    required this.appointments,
-    required this.onTap,
-  }) : super(key: key);
+  String _formatDate(String dateTimeString) {
+    final dateTime = DateTime.parse(dateTimeString);
+    return DateFormat('MMM d, y').format(dateTime);  
+  }
+
+  String _formatTime(String dateTimeString) {
+    final dateTime = DateTime.parse(dateTimeString);
+    return DateFormat('h:mm a').format(dateTime); 
+  }
+
+  // Combine start and end times into one string
+  String _combineDateTimes(String startDateTimeString, String endDateTimeString) {
+    final startDateTime = DateTime.parse(startDateTimeString);
+    final endDateTime = DateTime.parse(endDateTimeString);
+
+    final startFormatted = _formatTime(startDateTimeString); 
+    final endFormatted = _formatTime(endDateTimeString); 
+
+    return '$startFormatted - $endFormatted'; 
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Trigger event to fetch specialist appointments when the screen is loaded
+    context.read<AppointmentBloc>().add(FetchSpecialistAppointmentsEvent(
+      specialistId: widget.specialistId,
+    ));
+  }
+  
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
-      itemCount: appointments.length,
-      itemBuilder: (context, index) {
-        final appointment = appointments[index];
-        return GestureDetector(
-          onTap: () => onTap(appointment),
-          child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: appointment["color"] != null
-                    ? Color(int.parse(appointment["color"]!))
-                    : Colors.grey,
-                radius: 30.0,
-                child: Text(
-                  appointment["fullName"]?[0] ?? "",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: BlocBuilder<AppointmentBloc, AppointmentState>(
+        builder: (context, state) {
+          if (state is AppointmentLoading) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state is AppointmentError) {
+            return Center(child: Text('Error: ${state.message}'));
+          } else if (state is SpecialistAppointmentsLoaded) {
+            // Filter out appointments with 'declined' status
+            final appointments = state.appointments
+                .where((appointment) => appointment['status'] != 'declined')
+                .toList();
+
+            if (appointments.isEmpty) {
+              return Center(child: Text('No appointments found.'));
+            }
+
+            return ListView.builder(
+              itemCount: appointments.length,
+              itemBuilder: (context, index) {
+                final appointment = appointments[index];
+                final patient = appointment['patient'];
+                final patientName =
+                    '${patient['firstName']} ${patient['lastName']}';
+                final startTime = appointment['startTime'];
+                final endTime = appointment['endTime'];
+                final status = appointment['status'];
+                final appointmentId = appointment['_id'];
+
+                // Combine start and end times
+                final timeRange = _combineDateTimes(startTime, endTime);
+                final formattedStartDate = _formatDate(startTime); // Date part
+
+                return Card(
+                  margin: EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                  elevation: 8.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade200, width: 1),
                   ),
-                ),
-              ),
-              title: Text(
-                appointment["fullName"] ?? "",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    appointment["specialty"] ?? "",
-                    style: const TextStyle(color: orangeContainer),
+                  shadowColor: Colors.black.withOpacity(0.1),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          patientName,
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 8.0),
+                        // Date Row
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              color: Colors.orange,
+                              size: 18.0,
+                            ),
+                            SizedBox(width: 8.0),
+                            Text(
+                              'Date: $formattedStartDate',  // Display date
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.0),
+                        // Time Row
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.lock_clock,
+                              color: Colors.blue,
+                              size: 18.0,
+                            ),
+                            SizedBox(width: 8.0),
+                            Text(
+                              'Time: $timeRange', // Display time range
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.0),
+                        Text(
+                          'Status: ${status[0].toUpperCase() + status.substring(1)}',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                            color: status == 'pending'
+                                ? Colors.orange
+                                : status == 'accepted'
+                                    ? Colors.green
+                                    : Colors.red,
+                          ),
+                        ),
+                        SizedBox(height: 8.0),
+                        if (status == 'pending') ...[  
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.read<AppointmentBloc>().add(
+                                    AcceptAppointmentEvent(
+                                      appointmentId: appointmentId,
+                                    ),
+                                  );
+                                },
+                                child: Text('Accept'),
+                              ),
+                            ],
+                          )
+                        ]
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(appointment["date"] ?? ""),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+                );
+              },
+            );
+          }
+          return Center(child: Text('Unexpected state.'));
+        },
+      ),
     );
   }
 }
