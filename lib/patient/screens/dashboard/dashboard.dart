@@ -1,10 +1,12 @@
-import 'package:armstrong/config/colors.dart';
-import 'package:armstrong/widgets/cards/journal_card.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/widgets/cards/mood_graph.dart';
+import 'package:armstrong/widgets/cards/journal_card.dart';
 import 'package:armstrong/widgets/buttons/survey_button.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:armstrong/config/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -14,8 +16,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final GlobalKey _welcomeKey = GlobalKey();
-  final GlobalKey _adviceKey = GlobalKey();
   final GlobalKey _journalKey = GlobalKey();
   final GlobalKey _articleKey = GlobalKey();
   final GlobalKey _quickTestKey = GlobalKey();
@@ -33,13 +33,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (!hasCompletedOnboarding) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ShowCaseWidget.of(context).startShowCase([
-          //_welcomeKey,
-          //_adviceKey,
-          _journalKey,
-          _articleKey,
-          _quickTestKey,
-        ]);
+        ShowCaseWidget.of(context)
+            .startShowCase([_journalKey, _articleKey, _quickTestKey]);
       });
 
       // Set onboarding as completed
@@ -57,23 +52,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-
               const SizedBox(height: 20),
-
-              // Highlight Welcome Section
-              // Showcase(
-              //   key: _welcomeKey,
-              //   description:
-              //       "This is your welcome section where you get personalized greetings.",
-              //   textColor: Colors.white,
-              //   tooltipBackgroundColor: buttonColor,
-              //   targetPadding: EdgeInsets.all(10),
-              //   targetShapeBorder: RoundedRectangleBorder(
-              //     borderRadius: BorderRadius.circular(20),
-              //   ),
-              //   child: WelcomeSection(),
-              // ),
-              // const SizedBox(height: 30),
 
               // Highlight Quick Test Button
               Showcase(
@@ -103,6 +82,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 child: JournalSection(),
               ),
+              const SizedBox(height: 30),
+
+              Container(
+                height: 300, 
+                child: MoodChartScreen(),
+              ),
+
               const SizedBox(height: 30),
 
               Center(
