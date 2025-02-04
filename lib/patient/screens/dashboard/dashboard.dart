@@ -1,14 +1,9 @@
 import 'package:armstrong/config/colors.dart';
+import 'package:armstrong/widgets/cards/journal_card.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:armstrong/widgets/buttons/survey_button.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
-import 'package:armstrong/widgets/cards/journal_card.dart';
-import 'package:armstrong/widgets/cards/welcome_card.dart';
-import 'package:armstrong/widgets/cards/daily_advice_card.dart';
-import 'package:armstrong/widgets/banners/patient_banner_card.dart';
-import 'package:armstrong/patient/models/widgets/banner_model.dart';
-import 'package:armstrong/helpers/onboard_helper.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 class DashboardScreen extends StatefulWidget {

@@ -170,15 +170,16 @@ class ApiRepository {
   //Chat (API)
 
   Future<String?> getExistingChatId(String recipientId, String token) async {
-  final chatList = await getChatList(token);
-  for (var chat in chatList) {
-    final participants = chat['participants'] as List<dynamic>;
-    if (participants.any((participant) => participant['_id'] == recipientId)) {
-      return chat['chatId']; 
+    final chatList = await getChatList(token);
+    for (var chat in chatList) {
+      final participants = chat['participants'] as List<dynamic>;
+      if (participants
+          .any((participant) => participant['_id'] == recipientId)) {
+        return chat['chatId'];
+      }
     }
+    return null;
   }
-  return null; 
-}
 
   Future<String> createChat(String recipientId, String token) async {
     final url = Uri.parse('$baseUrl/chat/create-chat');
@@ -261,7 +262,7 @@ class ApiRepository {
       throw Exception('Failed to fetch chat history: ${response.body}');
     }
   }
-   /////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////
   // Appointments (API)
 
   // Create a new appointment
@@ -322,7 +323,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to fetch specialist appointments: ${response.body}');
+      throw Exception(
+          'Failed to fetch specialist appointments: ${response.body}');
     }
   }
 
@@ -361,6 +363,50 @@ class ApiRepository {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to decline appointment: ${response.body}');
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////
+  // Mood (API)
+  // Create Mood Entry
+  Future<Map<String, dynamic>> createMoodEntry(
+      int moodScale, String moodDescription) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/mood/create-mood');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'moodScale': moodScale,
+        'moodDescription': moodDescription,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to create mood entry: ${response.body}');
+    }
+  }
+
+  // Get Mood Entries
+  Future<List<dynamic>> getMoodEntries(String userId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/mood/mood-entries/$userId');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch mood entries: ${response.body}');
     }
   }
 }

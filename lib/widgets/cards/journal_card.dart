@@ -1,5 +1,5 @@
+import 'package:armstrong/patient/screens/journal/journal_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/patient/screens/dashboard/journal_page/journal_page.dart';
 import 'package:armstrong/config/colors.dart';
 
 class JournalSection extends StatelessWidget {
