@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/forms/question_form.dart';
 import 'package:armstrong/patient/screens/survey/submission_page.dart';
@@ -31,6 +32,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     setState(() {
       _userId = userId;
     });
+    print("User ID: $_userId");
   }
 
   Future<void> _fetchQuestions() async {
@@ -39,12 +41,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
       if (surveys.isNotEmpty && surveys[0] != null) {
         final survey = surveys[0];
-
-        // Ensure that category is properly assigned, otherwise set a fallback
-        _category = survey['category'] ?? 'No Category'; // Set default if null
+        _category = survey['category'] ?? 'No Category';
         _questions = List<Map<String, dynamic>>.from(survey['questions'] ?? []);
 
-        // Ensure the category and questions are properly populated before continuing
         if (_category == 'No Category' || _questions.isEmpty) {
           print("Category or questions are missing!");
         }
@@ -79,20 +78,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   Future<void> _submitAnswers() async {
     List<Map<String, dynamic>> responses = [];
-
     final category = _category.isNotEmpty ? _category : '';
 
     _selectedAnswers.forEach((questionIndex, choiceId) {
       final question = _questions[questionIndex];
       final questionId = question['_id'];
-
       final selectedChoice = question['choices'].firstWhere(
-          (choice) => choice['_id'] == choiceId,
-          orElse: () => null);
+        (choice) => choice['_id'] == choiceId,
+        orElse: () => null,
+      );
 
       if (selectedChoice != null) {
         final score = selectedChoice['score'] ?? 0;
-
         responses.add({
           'questionId': questionId,
           'choiceId': selectedChoice['_id'],
@@ -104,9 +101,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     });
 
     final patientId = _userId!;
-
-    // Get the surveyId from the survey data, not from the first question
-    final surveyId = _questions.isNotEmpty ? _questions[0]['surveyId'] : null;
+    final surveyId = _questions.isNotEmpty ? _questions[0]['_id'] : null;
 
     if (patientId == null || surveyId == null || responses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -116,15 +111,17 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
 
     try {
+      // Submit the survey response
       await _apiRepository.submitSurveyResponse(
           patientId, surveyId, responses, category);
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SubmissionScreen()),
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Your survey has been completed!')),
       );
+
+      Navigator.pop(context);
     } catch (e) {
-      // Handle error submission
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error submitting answers: $e')),
       );
@@ -134,9 +131,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Survey - $_category'),
-        backgroundColor: Color(0xFF81C784),
+      appBar: UniversalAppBar(
+        title: "Quick Mental Health Survey",
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
+        actions: [],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
