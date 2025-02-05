@@ -1,15 +1,18 @@
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
 import 'package:armstrong/patient/models/widgets/banner_model.dart';
-import 'package:armstrong/widgets/cards/specialist_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
-import 'package:armstrong/patient/blocs/profile/profile_event.dart';
-import 'package:armstrong/widgets/cards/daily_advice_card.dart';
-import 'package:armstrong/widgets/banners/patient_banner_card.dart';
+import 'package:showcaseview/showcaseview.dart';
+import 'package:armstrong/widgets/cards/specialist_card.dart';
 import 'package:armstrong/widgets/navigation/category.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
+import 'package:armstrong/widgets/cards/daily_advice_card.dart';
+import 'package:armstrong/widgets/banners/patient_banner_card.dart';
+import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
+import 'package:armstrong/patient/blocs/profile/profile_event.dart';
 import 'package:armstrong/patient/screens/discover/specialist_detail_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({Key? key}) : super(key: key);
@@ -19,6 +22,10 @@ class DiscoverScreen extends StatefulWidget {
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
+  final GlobalKey _searchKey = GlobalKey();
+  final GlobalKey _categoryKey = GlobalKey();
+  final GlobalKey _specialistKey = GlobalKey();
+  
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
   String selectedCategory = 'Specialist';
@@ -26,18 +33,33 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch specialists when the screen is first created
+    _checkOnboarding();
     _fetchSpecialists();
   }
 
-  @override
+  void _checkOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool hasCompletedOnboarding =
+        prefs.getBool('hasCompletedOnboarding') ?? false;
+
+    if (!hasCompletedOnboarding) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context)
+            .startShowCase([_searchKey, _categoryKey, _specialistKey]);
+      });
+
+      // Set onboarding as completed
+      await prefs.setBool('hasCompletedOnboarding', true);
+    }
+  }
+
+   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Fetch specialists every time the screen is visited (useful after navigating back)
     _fetchSpecialists();
   }
 
-  void _fetchSpecialists() {
+   void _fetchSpecialists() {
     final profileBloc = BlocProvider.of<ProfileBloc>(context);
     profileBloc.add(FetchSpecialistsEvent());
   }
@@ -56,48 +78,69 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 Center(
                   child: HealthAdviceSection(items: carouselData),
                 ),
-                const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Browse Articles and Specialists',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                Showcase(
+                  key: _searchKey,
+                  description: "Search for specialists or articles here.",
+                  textColor: Colors.white,
+                  tooltipBackgroundColor: Colors.blueAccent,
+                  targetPadding: EdgeInsets.all(12),
+                  targetShapeBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: CustomSearchBar(
+                    hintText: 'Search',
+                    searchController: searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    onClear: () {
+                      setState(() {
+                        searchController.clear();
+                        searchQuery = '';
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 20),
-                CustomSearchBar(
-                  hintText: 'Search',
-                  searchController: searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      searchQuery = value;
-                    });
-                  },
-                  onClear: () {
-                    setState(() {
-                      searchController.clear();
-                      searchQuery = '';
-                    });
-                  },
+
+                // Showcase for Category Chip
+                Showcase(
+                  key: _categoryKey,
+                  description: "Select the category of your choice.",
+                  textColor: Colors.white,
+                  tooltipBackgroundColor: Colors.blueAccent,
+                  targetPadding: EdgeInsets.all(12),
+                  targetShapeBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: CategoryChip(
+                    categories: ['Specialist', 'Articles'],
+                    selectedCategory: selectedCategory,
+                    onSelected: (String category) {
+                      setState(() {
+                        selectedCategory = category;
+                      });
+                    },
+                  ),
                 ),
                 const SizedBox(height: 20),
-                CategoryChip(
-                  categories: ['Specialist', 'Articles'],
-                  selectedCategory: selectedCategory,
-                  onSelected: (String category) {
-                    setState(() {
-                      selectedCategory = category;
-                    });
-                  },
+
+                // Showcase for Specialist List
+                Showcase(
+                  key: _specialistKey,
+                  description: "Browse through available specialists or articles",
+                  textColor: Colors.white,
+                  tooltipBackgroundColor: Colors.blueAccent,
+                  targetPadding: EdgeInsets.all(12),
+                  targetShapeBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: selectedCategory == 'Specialist'
+                      ? _buildSpecialistList()
+                      : _buildArticleList(),
                 ),
-                const SizedBox(height: 20),
-                selectedCategory == 'Specialist'
-                    ? _buildSpecialistList()
-                    : _buildArticleList(),
               ],
             ),
           ),
@@ -106,68 +149,68 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-Widget _buildSpecialistList() {
-  return BlocBuilder<ProfileBloc, ProfileState>(
-    builder: (context, state) {
-      if (state is ProfileLoading) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state is SpecialistsLoaded) {
-        final filteredSpecialists = state.specialists.where((specialist) {
-          final name = '${specialist['firstName']} ${specialist['lastName']}';
-          return name.toLowerCase().contains(searchQuery.toLowerCase());
-        }).toList();
-
-        if (filteredSpecialists.isEmpty) {
-          return const Center(child: Text('No results found.'));
-        }
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 0.75,
-          ),
-          itemCount: filteredSpecialists.length,
-          itemBuilder: (context, index) {
-            final specialist = filteredSpecialists[index];
+  Widget _buildSpecialistList() {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is SpecialistsLoaded) {
+          final filteredSpecialists = state.specialists.where((specialist) {
             final name = '${specialist['firstName']} ${specialist['lastName']}';
-            final specialization = specialist['specialization'] ?? 'Unknown';
-            final image = specialist['profileImage']?.isEmpty ?? true
-                ? 'images/splash/doc1.jpg'
-                : specialist['profileImage'];
+            return name.toLowerCase().contains(searchQuery.toLowerCase());
+          }).toList();
 
-            return SpecialistCard(
-              specialist: Specialist(
-                name: name,
-                specialization: specialization,
-                imageUrl: image,
-              ),
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SpecialistDetailScreen(
-                      specialistId: specialist['_id'],
+          if (filteredSpecialists.isEmpty) {
+            return const Center(child: Text('No results found.'));
+          }
+
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: filteredSpecialists.length,
+            itemBuilder: (context, index) {
+              final specialist = filteredSpecialists[index];
+              final name = '${specialist['firstName']} ${specialist['lastName']}';
+              final specialization = specialist['specialization'] ?? 'Unknown';
+              final image = specialist['profileImage']?.isEmpty ?? true
+                  ? 'images/splash/doc1.jpg'
+                  : specialist['profileImage'];
+
+              return SpecialistCard(
+                specialist: Specialist(
+                  name: name,
+                  specialization: specialization,
+                  imageUrl: image,
+                ),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SpecialistDetailScreen(
+                        specialistId: specialist['_id'],
+                      ),
                     ),
-                  ),
-                );
-                if (result != null && result == 'refresh') {
-                  _fetchSpecialists(); // Refresh data on return
-                }
-              },
-            );
-          },
-        );
-      } else if (state is ProfileError) {
-        return Center(child: Text('Error: ${state.message}'));
-      }
-      return const Center(child: Text('No data available.'));
-    },
-  );
-}
+                  );
+                  if (result != null && result == 'refresh') {
+                     _fetchSpecialists(); 
+                  }
+                },
+              );
+            },
+          );
+        } else if (state is ProfileError) {
+          return Center(child: Text('Error: ${state.message}'));
+        }
+        return const Center(child: Text('No data available.'));
+      },
+    );
+  }
 
   Widget _buildArticleList() {
     List<Map<String, String>> articles = [
