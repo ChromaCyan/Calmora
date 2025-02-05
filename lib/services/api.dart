@@ -409,4 +409,83 @@ class ApiRepository {
       throw Exception('Failed to fetch mood entries: ${response.body}');
     }
   }
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// Survey API
+
+// Get all surveys
+  Future<List<Map<String, dynamic>>> getSurveys() async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/survey/all');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((survey) => Map<String, dynamic>.from(survey)).toList();
+    } else {
+      throw Exception('Failed to fetch surveys: ${response.body}');
+    }
+  }
+
+// Submit survey response (Patient only)
+  Future<Map<String, dynamic>> submitSurveyResponse(
+      String patientId,
+      String surveyId,
+      List<Map<String, dynamic>> responses,
+      String category) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/survey/submit');
+
+    print('Submitting survey response with data:');
+    print({
+      'patientId': patientId,
+      'surveyId': surveyId,
+      'responses': responses,
+      'category': category,
+    });
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'patientId': patientId,
+        'surveyId': surveyId,
+        'responses': responses,
+        'category': category,
+      }),
+    );
+
+    print('Response from API: ${response.body}');
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body)['data'];
+    } else {
+      throw Exception('Failed to submit survey response: ${response.body}');
+    }
+  }
+
+// Get survey results for a patient
+  Future<List<Map<String, dynamic>>> getPatientSurveyResults(
+      String patientId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/survey/results/$patientId');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((result) => Map<String, dynamic>.from(result)).toList();
+    } else {
+      throw Exception('Failed to fetch survey results: ${response.body}');
+    }
+  }
 }

@@ -71,8 +71,8 @@ Widget build(BuildContext context) {
 
   Widget _buildBarChart() {
     return Container(
-      height: 300, // Set the height for the graph
-      width: double.infinity, // Ensure the chart takes the full available width
+      height: 300, 
+      width: double.infinity,
       child: BarChart(
         BarChartData(
           gridData: FlGridData(show: false),

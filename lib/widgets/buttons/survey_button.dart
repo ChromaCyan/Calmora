@@ -1,4 +1,5 @@
 import 'package:armstrong/config/colors.dart';
+import 'package:armstrong/patient/screens/survey/questions_screen.dart';
 import 'package:flutter/material.dart';
 
 class QuickTestButton extends StatelessWidget {
@@ -38,6 +39,10 @@ class QuickTestButton extends StatelessWidget {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => QuestionScreen()),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: orangeContainer,
