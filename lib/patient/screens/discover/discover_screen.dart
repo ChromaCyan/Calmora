@@ -1,5 +1,6 @@
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
 import 'package:armstrong/patient/models/widgets/banner_model.dart';
+import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -13,7 +14,6 @@ import 'package:armstrong/patient/blocs/profile/profile_event.dart';
 import 'package:armstrong/patient/screens/discover/specialist_detail_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({Key? key}) : super(key: key);
 
@@ -25,7 +25,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   final GlobalKey _searchKey = GlobalKey();
   final GlobalKey _categoryKey = GlobalKey();
   final GlobalKey _specialistKey = GlobalKey();
-  
+
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
   String selectedCategory = 'Specialist';
@@ -39,27 +39,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   void _checkOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
-    bool hasCompletedOnboarding =
-        prefs.getBool('hasCompletedOnboarding') ?? false;
+    bool hasCompletedOnboarding2 =
+        prefs.getBool('hasCompletedOnboarding2') ?? false;
 
-    if (!hasCompletedOnboarding) {
+    if (!hasCompletedOnboarding2) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context)
             .startShowCase([_searchKey, _categoryKey, _specialistKey]);
       });
 
-      // Set onboarding as completed
-      await prefs.setBool('hasCompletedOnboarding', true);
+      // Set onboarding as completed for the discovery screen
+      await prefs.setBool('hasCompletedOnboarding2', true);
     }
   }
 
-   @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _fetchSpecialists();
   }
 
-   void _fetchSpecialists() {
+  void _fetchSpecialists() {
     final profileBloc = BlocProvider.of<ProfileBloc>(context);
     profileBloc.add(FetchSpecialistsEvent());
   }
@@ -130,7 +130,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 // Showcase for Specialist List
                 Showcase(
                   key: _specialistKey,
-                  description: "Browse through available specialists or articles",
+                  description:
+                      "Browse through available specialists or articles",
                   textColor: Colors.white,
                   tooltipBackgroundColor: Colors.blueAccent,
                   targetPadding: EdgeInsets.all(12),
@@ -176,7 +177,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             itemCount: filteredSpecialists.length,
             itemBuilder: (context, index) {
               final specialist = filteredSpecialists[index];
-              final name = '${specialist['firstName']} ${specialist['lastName']}';
+              final name =
+                  '${specialist['firstName']} ${specialist['lastName']}';
               final specialization = specialist['specialization'] ?? 'Unknown';
               final image = specialist['profileImage']?.isEmpty ?? true
                   ? 'images/splash/doc1.jpg'
@@ -198,7 +200,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   );
                   if (result != null && result == 'refresh') {
-                     _fetchSpecialists(); 
+                    _fetchSpecialists();
                   }
                 },
               );
@@ -214,11 +216,31 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   Widget _buildArticleList() {
     List<Map<String, String>> articles = [
-      {'title': 'Mental Health Tips for Men', 'image': 'assets/article1.jpg'},
-      {'title': 'Overcoming Stress: A Guide', 'image': 'assets/article2.jpg'},
       {
-        'title': 'Building Emotional Resilience',
-        'image': 'assets/article3.jpg'
+        'imageUrl':
+            'https://images.unsplash.com/photo-1693168057717-56c81308a680?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Replace with your image URLs
+        'title':
+            "Ease your mind by talking to someone. See how it is beneficial to your health.",
+        'publisher': 'Dr. Bogart Fernandez',
+      },
+      {
+        'imageUrl':
+            'https://images.unsplash.com/photo-1724820205981-8321546b81c5?q=80&w=1918&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        'title':
+            "It isn't so bad to enjoy little things. See how it can affect your mental health.",
+        'publisher': 'Dr. Brando Sison',
+      },
+      {
+        'imageUrl':
+            'https://images.unsplash.com/photo-1440133197387-5a6020d5ace2?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        'title': "Try new things for a healthier mind.",
+        'publisher': 'Dr. Joelito Bugarin',
+      },
+      {
+        'imageUrl':
+            'https://as2.ftcdn.net/v2/jpg/01/31/30/73/1000_F_131307393_VCryyNEp2CDVJHunQqJtfwmXA8QHUmPp.jpg',
+        'title': "Suicide is not the answer. You are more than what you think.",
+        'publisher': 'Dr. Lulu',
       },
     ];
 
@@ -238,20 +260,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       itemCount: filteredArticles.length,
       itemBuilder: (context, index) {
         final article = filteredArticles[index];
-        return Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: ListTile(
-            leading: Image.asset(
-              article['image']!,
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
-            title: Text(article['title']!),
-          ),
+        return ArticleCard(
+          imageUrl: article['imageUrl']!,
+          title: article['title']!,
+          publisher: article['publisher']!,
         );
       },
     );

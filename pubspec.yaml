@@ -50,6 +50,7 @@ dependencies:
   showcaseview: ^4.0.0
   jwt_decoder: ^2.0.1
   fl_chart: ^0.70.2
+  flutter_svg: ^2.0.17
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -93,6 +94,15 @@ flutter:
     - images/splash/logo1.png
     - images/splash/logo2.png
     - images/
+    - images/icons/bipolar-disorder.svg
+    - images/icons/depression.svg
+    - images/icons/depression2.svg
+    - images/icons/hoarding.svg
+    - images/icons/hopeless.svg
+    - images/icons/mental-disorder.svg
+    - images/icons/psychosis.svg
+    - images/icons/relax.svg
+    - images/icons/very-happy.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

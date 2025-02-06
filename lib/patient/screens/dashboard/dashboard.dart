@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/cards/mood_graph.dart';
@@ -52,9 +53,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              const SizedBox(height: 20),
 
-              // Highlight Quick Test Button
+              //Welcome Card
+              const WelcomeSection(),
+
+              const SizedBox(height: 30),
+
+              // Highlight Survey Card
               Showcase(
                 key: _quickTestKey,
                 description:
@@ -69,7 +74,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Highlight Journal Section
+              Center(
+                child: const Text(
+                  'Write about your day!',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Highlight Journal Card
               Showcase(
                 key: _journalKey,
                 description:
@@ -81,12 +96,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: JournalSection(),
-              ),
-              const SizedBox(height: 30),
-
-              Container(
-                height: 300, 
-                child: MoodChartScreen(),
               ),
 
               const SizedBox(height: 30),
@@ -116,6 +125,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ArticleList(),
               ),
               const SizedBox(height: 30),
+
+              Center(
+                child: const Text(
+                  'Weekly Mood Chart',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              Container(
+                height: 300, 
+                child: MoodChartScreen(),
+              ),
             ],
           ),
         ),

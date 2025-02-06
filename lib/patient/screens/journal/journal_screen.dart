@@ -60,7 +60,7 @@ class _JournalPageState extends State<JournalPage> {
     if (savedMood != null) {
       setState(() {
         final moodData = Map<String, dynamic>.from(jsonDecode(savedMood));
-        _moods = [moodData];  // Convert the saved mood to a list
+        _moods = [moodData];  
       });
     }
   }
@@ -121,9 +121,8 @@ class _JournalPageState extends State<JournalPage> {
   Widget _buildMoodSelector() {
     return Column(
       children: [
-        _moodRadio('Very Happy 😊', 5, Colors.green),
-        _moodRadio('Happy 🙂', 4, Colors.lightGreen),
-        _moodRadio('Neutral 😐', 3, Colors.yellow),
+        _moodRadio('Very Happy 😊', 4, Colors.green),
+        _moodRadio('Happy 🙂', 3, Colors.lightGreen),
         _moodRadio('Sad ☹️', 2, Colors.orange),
         _moodRadio('Very Sad 😭', 1, Colors.red),
       ],
