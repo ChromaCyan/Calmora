@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/article_details.dart';
 
 class ArticleCard extends StatelessWidget {
+  final String articleId;
   final String imageUrl;
   final String title;
   final String publisher;
 
   const ArticleCard({
     Key? key,
+    required this.articleId,
     required this.imageUrl,
     required this.title,
     required this.publisher,
@@ -17,15 +19,10 @@ class ArticleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigate to the Article Detail Page
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => ArticleDetailPage(
-              imageUrl: imageUrl,
-              title: title,
-              publisher: publisher,
-            ),
+            pageBuilder: (context, animation, secondaryAnimation) =>  ArticleDetailPage(articleId: articleId),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               const begin = Offset(1.0, 0.0);
               const end = Offset.zero;

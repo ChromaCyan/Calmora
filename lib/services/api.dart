@@ -497,7 +497,7 @@ class ApiRepository {
   // Fetch all articles
   Future<List<Map<String, dynamic>>> getAllArticles() async {
     final token = await _storage.read(key: 'token');
-    final url = Uri.parse('$baseUrl/articles');
+    final url = Uri.parse('$baseUrl/article/articles');
 
     final response = await http.get(
       url,
