@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 
 class ApiRepository {
   final String baseUrl = 'http://192.168.18.253:5000/api';
@@ -486,6 +488,94 @@ class ApiRepository {
       return data.map((result) => Map<String, dynamic>.from(result)).toList();
     } else {
       throw Exception('Failed to fetch survey results: ${response.body}');
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Article API
+
+  // Fetch all articles
+  Future<List<Map<String, dynamic>>> getAllArticles() async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/articles');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((article) => Map<String, dynamic>.from(article)).toList();
+    } else {
+      throw Exception('Failed to fetch articles: ${response.body}');
+    }
+  }
+
+  // Fetch a single article by ID
+  Future<Map<String, dynamic>> getArticleById(String articleId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/article/$articleId');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch article: ${response.body}');
+    }
+  }
+
+  // Create a new article
+  Future<Map<String, dynamic>> createArticle({
+    required String title,
+    required String content,
+    required String heroImage,
+    List<String>? additionalImages,
+    required String specialistId,
+  }) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/article/create-article');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'title': title,
+        'content': content,
+        'heroImage': heroImage,
+        'additionalImages': additionalImages ?? [],
+        'specialistId': specialistId,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to create article: ${response.body}');
+    }
+  }
+
+
+
+  // Delete an article
+  Future<void> deleteArticle(String articleId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/article/$articleId');
+
+    final response = await http.delete(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete article: ${response.body}');
     }
   }
 }

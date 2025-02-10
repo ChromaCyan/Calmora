@@ -23,7 +23,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   @override
   void initState() {
     super.initState();
-    // Ensure AppointmentBloc is provided correctly
     context.read<AppointmentBloc>().add(FetchPatientAppointmentsEvent(
           patientId: widget.patientId,
         ));
