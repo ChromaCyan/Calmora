@@ -113,8 +113,10 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             },
             children: [
               SpecialistDashboardScreen(),
+              _userId != null
+                  ? SpecialistArticleScreen(specialistId: _userId!)
+                  : Center(child: CircularProgressIndicator()),
               ChatListScreen(),
-              AddArticleScreen(),
               _userId != null
                   ? SpecialistAppointmentListScreen(specialistId: _userId!)
                   : Center(child: CircularProgressIndicator()),

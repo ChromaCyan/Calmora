@@ -4,7 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class ApiRepository {
   final String baseUrl = 'http://192.168.18.253:5000/api';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -512,6 +511,25 @@ class ApiRepository {
     }
   }
 
+  // Fetch all articles by a specific specialist
+  Future<List<Map<String, dynamic>>> getArticlesBySpecialist(
+      String specialistId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/article/specialist/$specialistId');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((article) => Map<String, dynamic>.from(article)).toList();
+    } else {
+      throw Exception('Failed to fetch specialist articles: ${response.body}');
+    }
+  }
+
   // Fetch a single article by ID
   Future<Map<String, dynamic>> getArticleById(String articleId) async {
     final token = await _storage.read(key: 'token');
@@ -562,7 +580,37 @@ class ApiRepository {
     }
   }
 
+  // Edit an article
+  Future<Map<String, dynamic>> updateArticle({
+    required String articleId,
+    String? title,
+    String? content,
+    String? heroImage,
+    List<String>? additionalImages,
+  }) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/article/$articleId');
 
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'title': title,
+        'content': content,
+        'heroImage': heroImage,
+        'additionalImages': additionalImages ?? [],
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to update article: ${response.body}');
+    }
+  }
 
   // Delete an article
   Future<void> deleteArticle(String articleId) async {
