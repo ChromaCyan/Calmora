@@ -107,8 +107,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           child: PageView(
             controller: _pageController,
             onPageChanged: (index) {
-              BlocProvider.of<BottomNavCubit>(context)
-                  .changeSelectedIndex(index);
+              setState(() {
+                _selectedIndex = index;
+              });
             },
             children: [
               DashboardScreen(),

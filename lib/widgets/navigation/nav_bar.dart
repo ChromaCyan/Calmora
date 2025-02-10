@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:armstrong/config/colors.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -19,65 +18,134 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget _buildBadge(int count) {
     return count > 0
         ? Positioned(
-      right: 0,
-      top: 0,
-      child: Container(
-        padding: EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: Colors.red,
-          shape: BoxShape.circle,
-        ),
-        constraints: BoxConstraints(
-          minWidth: 18,
-          minHeight: 18,
-        ),
-        child: Center(
-          child: Text(
-            '$count',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              constraints: const BoxConstraints(
+                minWidth: 18,
+                minHeight: 18,
+              ),
+              child: Center(
+                child: Text(
+                  '$count',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    )
-        : SizedBox.shrink();
+          )
+        : const SizedBox.shrink();
   }
 
   @override
   Widget build(BuildContext context) {
-    return CurvedNavigationBar(
-      items: <Widget>[
-        Icon(Icons.home_filled, size: 30, color: Colors.white),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.home_filled, "Home", 0),
+          _buildNavItem(Icons.search, "Discover", 1),
+          _buildNavItemWithBadge(Icons.message_outlined, "Messages", 2, chatNotificationCount),
+          _buildNavItemWithBadge(Icons.checklist, "Appointments", 3, notificationCount),
+        ],
+      ),
+    );
+  }
 
-        Icon(Icons.search, size: 30, color: Colors.white),
-
-        Stack(
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    bool isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () => onItemTapped(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: isSelected
+            ? BoxDecoration(
+                color: buttonColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              )
+            : null,
+        child: Row(
           children: [
-            Icon(Icons.message_outlined, size: 30, color: Colors.white),
-            _buildBadge(chatNotificationCount), 
+            Icon(
+              icon,
+              color: isSelected ? buttonColor : Colors.grey,
+            ),
+            if (isSelected)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: buttonColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
           ],
         ),
+      ),
+    );
+  }
 
-        Stack(
+  Widget _buildNavItemWithBadge(IconData icon, String label, int index, int count) {
+    bool isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () => onItemTapped(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: isSelected
+            ? BoxDecoration(
+                color: buttonColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              )
+            : null,
+        child: Row(
           children: [
-            Icon(Icons.checklist, size: 30, color: Colors.white),
-            _buildBadge(notificationCount), 
+            Stack(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? orangeContainer : Colors.grey,
+                ),
+                _buildBadge(count),
+              ],
+            ),
+            if (isSelected)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: buttonColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
           ],
         ),
-      ],
-      index: selectedIndex,
-      color: orangeContainer,
-      buttonBackgroundColor: buttonColor,
-      backgroundColor: Colors.transparent,
-      animationCurve: Curves.easeInOut,
-      animationDuration: const Duration(milliseconds: 300),
-      onTap: (index) {
-        onItemTapped(index);
-      },
-      letIndexChange: (index) => true,
+      ),
     );
   }
 }

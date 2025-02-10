@@ -61,8 +61,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(80),
           child: Padding(
-            padding: const EdgeInsets.only(
-                top: 10.0, bottom: 10.0), // Adjust padding for better spacing
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
             child: AppBar(
               elevation: 0,
               backgroundColor: Colors.transparent,
@@ -91,14 +90,13 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                     ],
                   ),
                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            NotificationsScreen(),
-                                      ),
-                                    );
-                                  },
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationsScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -109,8 +107,9 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
           child: PageView(
             controller: _pageController,
             onPageChanged: (index) {
-              BlocProvider.of<BottomNavCubit>(context)
-                  .changeSelectedIndex(index);
+              setState(() {
+                _selectedIndex = index;
+              });
             },
             children: [
               SpecialistDashboardScreen(),
