@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/appbar.dart';
 import 'package:armstrong/services/api.dart';
@@ -5,7 +6,8 @@ import 'package:armstrong/services/api.dart';
 class ArticleDetailPage extends StatefulWidget {
   final String articleId;
 
-  const ArticleDetailPage({Key? key, required this.articleId}) : super(key: key);
+  const ArticleDetailPage({Key? key, required this.articleId})
+      : super(key: key);
 
   @override
   _ArticleDetailPageState createState() => _ArticleDetailPageState();
@@ -24,7 +26,8 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
 
   Future<void> _fetchArticle() async {
     try {
-      final fetchedArticle = await ApiRepository().getArticleById(widget.articleId);
+      final fetchedArticle =
+          await ApiRepository().getArticleById(widget.articleId);
       setState(() {
         article = fetchedArticle;
         isLoading = false;
@@ -40,12 +43,13 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: "",
-        hasBackButton: true,
-        onBackButtonPressed: () {
-          Navigator.of(context).pop();
+      appBar: UniversalAppBar(
+        title: article?['title'] ??
+            'Article Details',
+        onBackPressed: () {
+          Navigator.pop(context);
         },
+        actions: [],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -61,8 +65,9 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                             article!['heroImage'] ?? '',
                             height: 300,
                             width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.error),
                           ),
                           const SizedBox(height: 16),
                           Padding(
@@ -79,7 +84,8 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'By ${article!['specialistId']?['firstName'] ?? "Unknown"} ${article!['specialistId']?['lastName'] ?? ""}'.trim(),
+                                  'By ${article!['specialistId']?['firstName'] ?? "Unknown"} ${article!['specialistId']?['lastName'] ?? ""}'
+                                      .trim(),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey,

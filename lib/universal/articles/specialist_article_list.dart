@@ -13,7 +13,8 @@ class SpecialistArticleScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _SpecialistArticleScreenState createState() => _SpecialistArticleScreenState();
+  _SpecialistArticleScreenState createState() =>
+      _SpecialistArticleScreenState();
 }
 
 class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
@@ -42,14 +43,38 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
           ),
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: ApiRepository().getArticlesBySpecialist(widget.specialistId),
+              future:
+                  ApiRepository().getArticlesBySpecialist(widget.specialistId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No articles found.'));
+                }
+
+                // Handle backend "No articles found" as a normal response instead of an error
+                if (snapshot.hasError) {
+                  final errorMessage = snapshot.error.toString();
+                  if (errorMessage
+                      .contains("No articles found for this specialist")) {
+                    return const Center(
+                      child: Text(
+                        "No articles found.",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }
+                  return const Center(child: Text('Error loading articles.'));
+                }
+
+                // If no data or empty list, show "No articles found."
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No articles found.",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  );
                 }
 
                 final articles = snapshot.data!;
@@ -58,7 +83,9 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
                 }).toList();
 
                 if (filteredArticles.isEmpty) {
-                  return const Center(child: Text('No matching articles found.'));
+                  return const Center(
+                    child: Text("No matching articles found."),
+                  );
                 }
 
                 return ListView.builder(

@@ -15,24 +15,20 @@ class SupabaseService {
 
   // Upload image to Supabase storage
   static Future<String?> uploadImage(File image, String folder) async {
-    final fileName = 'private/${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
+  final fileName = '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
+
   try {
-    final response = await SupabaseService.client.storage
-        .from('article-images')
-        .upload(fileName, image);
+    await client.storage.from(folder).upload(fileName, image);
 
-    if (response != null) {
-      final signedUrlResponse = await SupabaseService.client.storage
-          .from('article-images')
-          .createSignedUrl(fileName, 60 * 60 * 24 * 7); 
-
-      return signedUrlResponse; 
-    }
+    // Generate a signed URL (works for both articles & profiles)
+    final signedUrl = await client.storage.from(folder).createSignedUrl(fileName, 60 * 60 * 24 * 7);
+    return signedUrl;
   } catch (e) {
     print('Error uploading image: $e');
+    return null;
   }
-  return null;
 }
+
 
   // Upload hero image for articles
   static Future<String?> uploadArticleImage(File image) async {

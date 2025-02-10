@@ -136,8 +136,10 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       case 0:
         return 'Dashboard';
       case 1:
-        return 'Chat';
+        return 'Articles';
       case 2:
+        return 'Chat';
+      case 3:
         return 'Appointment';
       default:
         return 'Home';
