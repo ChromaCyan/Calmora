@@ -4,7 +4,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/services/api.dart';
-import 'package:armstrong/widgets/cards/appointment_card.dart'; // Import the extracted UI component
+import 'package:armstrong/patient/screens/appointment/appointment_card.dart'; // Import the extracted UI component
 
 class AppointmentListScreen extends StatefulWidget {
   final String patientId;
