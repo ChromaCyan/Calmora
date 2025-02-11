@@ -44,64 +44,75 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: UniversalAppBar(
-        title: article?['title'] ??
-            'Article Details',
+        title: article?['title'] ?? 'Article Details',
         onBackPressed: () {
           Navigator.pop(context);
         },
         actions: [],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-              ? Center(child: Text('Error: $errorMessage'))
-              : article == null
-                  ? const Center(child: Text('Article not found'))
-                  : SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.network(
-                            article!['heroImage'] ?? '',
-                            height: 300,
-                            width: double.infinity,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.error),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'images/article_detail_bg_img.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : errorMessage.isNotEmpty
+                  ? Center(child: Text('Error: $errorMessage'))
+                  : article == null
+                      ? const Center(child: Text('Article not found'))
+                      : SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.network(
+                                article!['heroImage'] ?? '',
+                                height: 300,
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.error),
+                              ),
+                              const SizedBox(height: 16),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      article!['title'] ?? 'No Title',
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'By ${article!['specialistId']?['firstName'] ?? "Unknown"} ${article!['specialistId']?['lastName'] ?? ""}'
+                                          .trim(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      article!['content'] ??
+                                          'No content available',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  article!['title'] ?? 'No Title',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'By ${article!['specialistId']?['firstName'] ?? "Unknown"} ${article!['specialistId']?['lastName'] ?? ""}'
-                                      .trim(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  article!['content'] ?? 'No content available',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+        ],
+      ),
     );
   }
 }
