@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

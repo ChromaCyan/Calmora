@@ -1,14 +1,69 @@
-import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'package:armstrong/widgets/cards/notification.dart';
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'package:armstrong/services/api.dart'; 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class NotificationsScreen extends StatelessWidget {
-  final List<String> notifications = [
-    'You have a new appointment request.',
-    'Your specialist has updated the appointment.',
-    'New message from your specialist.',
-    'Your appointment has been declined.',
-    'Reminder: Your appointment is tomorrow.',
-  ];
+class NotificationsScreen extends StatefulWidget {
+  @override
+  _NotificationsScreenState createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  final ApiRepository apiService = ApiRepository();
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+  
+  List<Map<String, dynamic>> notifications = [];
+  bool isLoading = true;
+  bool hasError = false;
+  String? _userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeNotifications();
+  }
+
+  /// Loads user ID and fetches notifications
+  Future<void> _initializeNotifications() async {
+    await _loadUserId();
+    if (_userId != null) {
+      await fetchNotifications();
+    } else {
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
+
+  /// Fetch user ID from storage
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+  }
+
+  /// Fetch notifications using the stored user ID
+  Future<void> fetchNotifications() async {
+    try {
+      if (_userId == null) return;
+
+      List<Map<String, dynamic>> fetchedNotifications =
+          await apiService.getNotifications(_userId!);
+
+      setState(() {
+        notifications = fetchedNotifications;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,45 +74,20 @@ class NotificationsScreen extends StatelessWidget {
           Navigator.pop(context);
         },
       ),
-      body: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          return NotificationCard(
-            notification: notifications[index],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class NotificationCard extends StatelessWidget {
-  final String notification;
-
-  const NotificationCard({required this.notification});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      elevation: 3,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(
-          notification,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-        onTap: () {
-          // Handle tap (you can navigate to a detailed notification page here)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No function yet')),
-          );
-        },
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator()) 
+          : hasError
+              ? const Center(child: Text("Failed to load notifications"))
+              : notifications.isEmpty
+                  ? const Center(child: Text("No notifications yet"))
+                  : ListView.builder(
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        return NotificationCard(
+                          notification: notifications[index],
+                        );
+                      },
+                    ),
     );
   }
 }

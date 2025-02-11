@@ -626,4 +626,44 @@ class ApiRepository {
       throw Exception('Failed to delete article: ${response.body}');
     }
   }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Notification API
+
+  // Fetch all notifications for a user
+  Future<List<Map<String, dynamic>>> getNotifications(String userId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/notification/$userId');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load notifications: ${response.body}');
+    }
+  }
+
+  // Mark a notification as read
+  Future<void> markNotificationAsRead(String notificationId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/notification/mark-read/$notificationId');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to mark notification as read: ${response.body}');
+    }
+  }
 }

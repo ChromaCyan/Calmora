@@ -14,10 +14,6 @@ import 'services/supabase.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
-  await SupabaseService.initialize();
-
-  final supabase = Supabase.instance.client;
-  final session = supabase.auth.currentSession;
 
   String? token = await storage.read(key: 'jwt');
   String? role;
@@ -28,15 +24,10 @@ void main() async {
       role = jwt.payload['userType'];
     } catch (e) {
       print('Invalid token: $e');
+      await storage.delete(key: 'jwt'); 
+      token = null;
       role = null;
     }
-  }
-
-  // 🛑 If there's no Supabase session, log the user out
-  if (session == null) {
-    await storage.delete(key: 'jwt');
-    token = null;
-    role = null;
   }
 
   runApp(MyApp(
