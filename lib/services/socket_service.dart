@@ -1,47 +1,94 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SocketService {
-  late IO.Socket socket;
+  static final SocketService _instance = SocketService._internal();
+  factory SocketService() => _instance;
+  SocketService._internal();
 
-  // Callback functions for receiving messages and notifications
+  IO.Socket? socket; // Make nullable to avoid late initialization errors
+
   Function? onMessageReceived;
   Function? onNotificationReceived;
 
-  // Initialize connection to Socket.IO server
-  void connect(String userId) {
-    socket = IO.io('http://localhost:5000', <String, dynamic>{
-      'transports': ['websocket'],
-      'query': {'userId': userId},
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
+
+  /// Initialize local notifications
+  Future<void> initNotifications() async {
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    final InitializationSettings settings =
+        InitializationSettings(android: androidSettings);
+
+    await _localNotifications.initialize(settings);
+  }
+
+  /// Show local notification
+  Future<void> showNotification(String title, String message) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'channel_id',
+      'Notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: true,
+    );
+
+    const NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
+
+    await _localNotifications.show(0, title, message, platformDetails);
+  }
+
+  /// Connect to the Socket.IO server (No Authorization)
+  void connect(String token) {
+    if (socket != null && socket!.connected) return; // Prevent duplicate connections
+
+    socket = IO.io('http://localhost:5000', IO.OptionBuilder()
+        .setTransports(['websocket'])
+        .disableAutoConnect() 
+        .setExtraHeaders({'Authorization': 'Bearer $token'})
+        .build());
+
+    socket!.connect();
+
+    socket!.onConnect((_) {
+      print('✅ Connected to Socket.IO server');
     });
 
-    socket.on('connect', (_) {
-      print('Connected to Socket.IO server');
+    socket!.onDisconnect((_) {
+      print('❌ Disconnected from server');
     });
 
-    // Listen for new messages
-    socket.on('receiveMessage', (data) {
-      print('Received message: $data');
-      if (onMessageReceived != null) {
-        onMessageReceived!(data);
-      }
+    socket!.onError((error) {
+      print('⚠️ Socket error: $error');
     });
 
-    // Listen for new notifications
-    socket.on('new_notification', (data) {
-      print('New notification: $data');
-      if (onNotificationReceived != null) {
-        onNotificationReceived!(data);
-      }
+    socket!.onReconnect((_) {
+      print('🔄 Reconnecting to server...');
     });
 
-    socket.on('disconnect', (_) {
-      print('Disconnected from server');
+    /// Listen for incoming messages
+    socket!.on('receiveMessage', (data) {
+      print('📩 Received message: $data');
+      onMessageReceived?.call(data);
+      showNotification("New Message", data["message"]);
+    });
+
+    /// Listen for new notifications
+    socket!.on('new_notification', (data) {
+      print('🔔 New notification: $data');
+      onNotificationReceived?.call(data);
+      showNotification("New Notification", data["message"]);
     });
   }
 
-  // Emit message to the server
+  /// Emit a message to the server
   void sendMessage(String senderId, String recipientId, String message, String chatId) {
-    socket.emit('sendMessage', {
+    if (socket == null || !socket!.connected) return;
+    socket!.emit('sendMessage', {
       'senderId': senderId,
       'recipientId': recipientId,
       'message': message,
@@ -49,13 +96,16 @@ class SocketService {
     });
   }
 
-  // Join a specific chat room
+  /// Join a specific chat room
   void joinRoom(String roomId) {
-    socket.emit('joinRoom', roomId);
+    if (socket == null || !socket!.connected) return;
+    socket!.emit('joinRoom', roomId);
   }
 
-  // Disconnect from the Socket.IO server
+  /// Disconnect from the server
   void disconnect() {
-    socket.disconnect();
+    if (socket != null && socket!.connected) {
+      socket!.disconnect();
+    }
   }
 }

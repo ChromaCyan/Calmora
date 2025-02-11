@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'splash_screen/screens/splash_screen.dart';
 import 'authentication/screens/login_screen.dart';
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
@@ -9,11 +8,13 @@ import 'package:armstrong/providers/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:showcaseview/showcaseview.dart';
-import 'services/supabase.dart';
+import 'package:armstrong/services/socket_service.dart';
+import 'package:armstrong/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
+  final socketService = SocketService();
 
   String? token = await storage.read(key: 'jwt');
   String? role;
@@ -28,6 +29,14 @@ void main() async {
       token = null;
       role = null;
     }
+  }
+
+  // Initialize Notifications
+  await socketService.initNotifications();
+
+  // Connect to Socket if Logged In
+  if (token != null) {
+    socketService.connect(token);
   }
 
   runApp(MyApp(

@@ -84,7 +84,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
                         return NotificationCard(
-                          notification: notifications[index],
+                          notification: notifications[index], 
                         );
                       },
                     ),

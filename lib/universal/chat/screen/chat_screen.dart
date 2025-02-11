@@ -50,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadMessages();
   }
 
-  void _initializeSocket() async {
+   void _initializeSocket() async {
     final token = await _storage.read(key: 'token');
     if (token != null) {
       _socketService.connect(token);
@@ -61,6 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
       };
     }
   }
+
 
   void _loadMessages() async {
     final token = await _storage.read(key: 'token');
