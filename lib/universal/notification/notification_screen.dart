@@ -1,8 +1,8 @@
-import 'package:armstrong/widgets/cards/notification.dart';
+import 'package:armstrong/widgets/cards/notification_card.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class NotificationsScreen extends StatefulWidget {
   @override
@@ -12,7 +12,7 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final ApiRepository apiService = ApiRepository();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-
+  
   List<Map<String, dynamic>> notifications = [];
   bool isLoading = true;
   bool hasError = false;
@@ -82,8 +82,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   : ListView.builder(
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
-                        return NotificationCard(
-                            notification: notifications[index]);
+                        return NotificationCard(notification: notifications[index]);
                       },
                     ),
     );
