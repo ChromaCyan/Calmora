@@ -10,11 +10,22 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:armstrong/services/notification_service.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
   final socketService = SocketService();
+  
+
+  print("🚀 Starting app...");
+
+   // Initialize Local Notifications
+  await NotificationService.initNotifications();
+
+  Future.delayed(Duration(seconds: 3), () {
+    socketService.showNotification("Test", "This is a test notification");
+  });
 
   String? token = await storage.read(key: 'jwt');
   String? role;
@@ -31,8 +42,6 @@ void main() async {
     }
   }
 
-  // Initialize Notifications
-  await socketService.initNotifications();
 
   // Connect to Socket if Logged In
   if (token != null) {

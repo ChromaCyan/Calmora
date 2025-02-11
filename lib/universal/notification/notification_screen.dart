@@ -1,7 +1,7 @@
 import 'package:armstrong/widgets/cards/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
-import 'package:armstrong/services/api.dart'; 
+import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final ApiRepository apiService = ApiRepository();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-  
+
   List<Map<String, dynamic>> notifications = [];
   bool isLoading = true;
   bool hasError = false;
@@ -24,7 +24,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     _initializeNotifications();
   }
 
-  /// Loads user ID and fetches notifications
   Future<void> _initializeNotifications() async {
     await _loadUserId();
     if (_userId != null) {
@@ -37,7 +36,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  /// Fetch user ID from storage
   Future<void> _loadUserId() async {
     final userId = await _storage.read(key: 'userId');
     setState(() {
@@ -45,7 +43,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     });
   }
 
-  /// Fetch notifications using the stored user ID
   Future<void> fetchNotifications() async {
     try {
       if (_userId == null) return;
@@ -54,7 +51,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           await apiService.getNotifications(_userId!);
 
       setState(() {
-        notifications = fetchedNotifications;
+        notifications =
+            fetchedNotifications.where((n) => n["isRead"] == false).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -70,22 +68,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       appBar: UniversalAppBar(
         title: "Notifications",
-        onBackPressed: () {
-          Navigator.pop(context);
+        onBackPressed: () async {
+          await apiService.markAllNotificationsAsRead(_userId!);
+          Navigator.pop(context, 0);
         },
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) 
+          ? const Center(child: CircularProgressIndicator())
           : hasError
               ? const Center(child: Text("Failed to load notifications"))
               : notifications.isEmpty
-                  ? const Center(child: Text("No notifications yet"))
+                  ? const Center(child: Text("No new notifications"))
                   : ListView.builder(
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
                         return NotificationCard(
-                          notification: notifications[index], 
-                        );
+                            notification: notifications[index]);
                       },
                     ),
     );

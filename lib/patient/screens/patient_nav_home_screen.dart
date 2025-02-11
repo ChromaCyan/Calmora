@@ -7,6 +7,8 @@ import 'package:armstrong/universal/nav_cubit.dart';
 import 'package:armstrong/patient/screens/pages.dart';
 import 'package:armstrong/widgets/navigation/nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/services/api.dart'; 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -20,6 +22,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   String? _userId;
+  int _unreadCount = 0; // Add this variable to track unread notifications
 
   @override
   void initState() {
@@ -34,6 +37,24 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     setState(() {
       _userId = userId;
     });
+
+    if (_userId != null) {
+      await _fetchUnreadNotificationsCount();
+    }
+  }
+
+  Future<void> _fetchUnreadNotificationsCount() async {
+    try {
+      List<Map<String, dynamic>> notifications =
+          await ApiRepository().getNotifications(_userId!);
+      int unreadCount = notifications.where((n) => n["isRead"] == false).length;
+
+      setState(() {
+        _unreadCount = unreadCount;
+      });
+    } catch (e) {
+      print("Failed to fetch unread notifications: $e");
+    }
   }
 
   void _onTabSelected(int index) {
@@ -87,6 +108,29 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   icon: Stack(
                     children: [
                       const Icon(Icons.notifications, size: 28),
+                      if (_unreadCount > 0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 12,
+                              minHeight: 12,
+                            ),
+                            child: Text(
+                              '$_unreadCount',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                   onPressed: () {
@@ -95,7 +139,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       MaterialPageRoute(
                         builder: (context) => NotificationsScreen(),
                       ),
-                    );
+                    ).then((value) {
+                      // Refresh the unread count when returning from the notifications screen
+                      if (_userId != null) {
+                        _fetchUnreadNotificationsCount();
+                      }
+                    });
                   },
                 ),
               ],

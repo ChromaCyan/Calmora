@@ -52,13 +52,15 @@ dependencies:
   fl_chart: ^0.70.2
   flutter_svg: ^2.0.17
   google_nav_bar: ^5.0.7
+  workmanager: ^0.5.2
+  supabase_flutter: ^2.8.3
+  path: ^1.9.0
+  flutter_local_notifications: ^18.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  supabase_flutter: ^2.8.3
-  path: ^1.9.0
-  flutter_local_notifications: ^18.0.1
+  
   
 dev_dependencies:
   flutter_test:

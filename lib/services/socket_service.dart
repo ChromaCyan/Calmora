@@ -16,6 +16,7 @@ class SocketService {
 
   /// Initialize local notifications
   Future<void> initNotifications() async {
+    print("🔔 Initializing Local Notifications...");
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -27,6 +28,7 @@ class SocketService {
 
   /// Show local notification
   Future<void> showNotification(String title, String message) async {
+    print("📢 Showing Notification: $title - $message");
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
       'channel_id',
@@ -42,15 +44,17 @@ class SocketService {
     await _localNotifications.show(0, title, message, platformDetails);
   }
 
-  /// Connect to the Socket.IO server (No Authorization)
+  /// Connect to the Socket.IO server
   void connect(String token) {
-    if (socket != null && socket!.connected) return; // Prevent duplicate connections
+    if (socket != null && socket!.connected) return;
 
-    socket = IO.io('http://localhost:5000', IO.OptionBuilder()
-        .setTransports(['websocket'])
-        .disableAutoConnect() 
-        .setExtraHeaders({'Authorization': 'Bearer $token'})
-        .build());
+    socket = IO.io(
+        'http://192.168.18.253:5000',
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .disableAutoConnect()
+            .setExtraHeaders({'Authorization': 'Bearer $token'})
+            .build());
 
     socket!.connect();
 
@@ -74,19 +78,29 @@ class SocketService {
     socket!.on('receiveMessage', (data) {
       print('📩 Received message: $data');
       onMessageReceived?.call(data);
-      showNotification("New Message", data["message"]);
+      showNotification(
+          "New Message", data["message"] ?? "You have a new message");
     });
 
     /// Listen for new notifications
     socket!.on('new_notification', (data) {
       print('🔔 New notification: $data');
       onNotificationReceived?.call(data);
-      showNotification("New Notification", data["message"]);
+
+      // Ensuring messages exist
+      if (data["message"] == null) {
+        print("❌ Error: 'message' field is missing in notification payload!");
+        return; 
+      }
+
+      showNotification(
+          "New Message", data["message"] ?? "You have a new message");
     });
   }
 
   /// Emit a message to the server
-  void sendMessage(String senderId, String recipientId, String message, String chatId) {
+  void sendMessage(
+      String senderId, String recipientId, String message, String chatId) {
     if (socket == null || !socket!.connected) return;
     socket!.emit('sendMessage', {
       'senderId': senderId,

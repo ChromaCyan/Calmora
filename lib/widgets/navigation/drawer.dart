@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:armstrong/services/socket_service.dart';
 
 class AppDrawer extends StatelessWidget {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
@@ -11,7 +12,9 @@ class AppDrawer extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     await _storage.delete(key: 'jwt');
-    await Supabase.instance.client.auth.signOut();
+    await _storage.delete(key: 'userId');
+
+    print("✅ User logged out successfully!");
 
     Navigator.pushReplacement(
       context,

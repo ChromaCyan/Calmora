@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:armstrong/config/colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
-import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 
 class ChatScreen extends StatefulWidget {

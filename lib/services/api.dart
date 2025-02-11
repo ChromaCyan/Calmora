@@ -666,4 +666,21 @@ class ApiRepository {
       throw Exception('Failed to mark notification as read: ${response.body}');
     }
   }
+
+  Future<void> markAllNotificationsAsRead(String userId) async {
+  final token = await _storage.read(key: 'token');
+  final url = Uri.parse('$baseUrl/notification/mark-all/$userId');
+
+  final response = await http.put(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to mark all notifications as read: ${response.body}');
+  }
+}
 }

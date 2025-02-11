@@ -8,6 +8,7 @@ import 'package:armstrong/universal/nav_cubit.dart';
 import 'package:armstrong/specialist/screens/pages.dart';
 import 'package:armstrong/widgets/navigation/specialist_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/services/api.dart';
 
 class SpecialistHomeScreen extends StatefulWidget {
   const SpecialistHomeScreen({Key? key}) : super(key: key);
@@ -21,6 +22,38 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   String? _userId;
+  int _unreadCount = 0; // Track unread notifications
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+    if (_userId != null) {
+      await _fetchUnreadNotificationsCount();
+    }
+  }
+
+  Future<void> _fetchUnreadNotificationsCount() async {
+    try {
+      List<Map<String, dynamic>> notifications =
+          await ApiRepository().getNotifications(_userId!);
+      int unreadCount = notifications.where((n) => n["isRead"] == false).length;
+
+      setState(() {
+        _unreadCount = unreadCount;
+      });
+    } catch (e) {
+      print("Failed to fetch unread notifications: $e");
+    }
+  }
 
   void _onTabSelected(int index) {
     setState(() {
@@ -31,20 +64,6 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         curve: Curves.easeInOut,
       );
     });
-  }
-
-  Future<void> _loadUserId() async {
-    final userId = await _storage.read(key: 'userId');
-    setState(() {
-      _userId = userId;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-    _loadUserId();
   }
 
   @override
@@ -87,6 +106,29 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                   icon: Stack(
                     children: [
                       const Icon(Icons.notifications, size: 28),
+                      if (_unreadCount > 0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 12,
+                              minHeight: 12,
+                            ),
+                            child: Text(
+                              '$_unreadCount',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                   onPressed: () {
@@ -95,7 +137,11 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                       MaterialPageRoute(
                         builder: (context) => NotificationsScreen(),
                       ),
-                    );
+                    ).then((value) {
+                      if (_userId != null) {
+                        _fetchUnreadNotificationsCount();
+                      }
+                    });
                   },
                 ),
               ],
