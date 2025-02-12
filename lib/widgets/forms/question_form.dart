@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class QuestionWidget extends StatelessWidget {
   final String question;
-  final List<Map<String, dynamic>> choices; 
-  final String selectedChoiceId; 
-  final ValueChanged<String> onAnswerSelected; 
+  final List<Map<String, dynamic>> choices;
+  final String selectedChoiceId;
+  final ValueChanged<String> onAnswerSelected;
 
   const QuestionWidget({
     Key? key,
@@ -16,6 +16,9 @@ class QuestionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
       child: Column(
@@ -24,37 +27,36 @@ class QuestionWidget extends StatelessWidget {
           Text(
             question,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
+            style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.blueGrey[800],
+              color: colorScheme.onBackground,
             ),
           ),
-          SizedBox(height: 20),
-          ...List.generate(
-            choices.length,
-            (index) => Padding(
+          const SizedBox(height: 20),
+          ...choices.map((choice) {
+            bool isSelected = selectedChoiceId == choice['_id'];
+            return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: GestureDetector(
-                onTap: () => onAnswerSelected(choices[index]['_id']),
+                onTap: () => onAnswerSelected(choice['_id']),
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  padding: EdgeInsets.all(18),
+                  duration: const Duration(milliseconds: 300),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    gradient: selectedChoiceId == choices[index]['_id']
+                    gradient: isSelected
                         ? LinearGradient(
-                            colors: [Color(0xFF81C784), Color(0xFF388E3C)],
+                            colors: [colorScheme.primary, colorScheme.primaryContainer],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           )
                         : LinearGradient(
-                            colors: [Colors.white, Colors.white],
+                            colors: [colorScheme.surface, colorScheme.surface],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: Color(0xFF81C784),
+                      color: colorScheme.primary,
                       width: 2,
                     ),
                     boxShadow: [
@@ -67,20 +69,17 @@ class QuestionWidget extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      choices[index]['text'],
-                      style: TextStyle(
-                        color: selectedChoiceId == choices[index]['_id']
-                            ? Colors.white
-                            : Colors.black,
-                        fontSize: 16,
+                      choice['text'],
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         ],
       ),
     );

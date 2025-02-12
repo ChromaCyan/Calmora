@@ -74,18 +74,19 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); 
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(80),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+           child: Padding(
+            padding: const EdgeInsets.only(top: 20.0),
             child: AppBar(
               elevation: 0,
               backgroundColor: Colors.transparent,
-              iconTheme: const IconThemeData(
-                color: Colors.black,
+              iconTheme: IconThemeData(
+                color: theme.iconTheme.color, 
                 size: 28.0,
               ),
               title: AnimatedSwitcher(
@@ -93,10 +94,11 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                 child: Text(
                   _getDynamicTitle(),
                   key: ValueKey<int>(_selectedIndex),
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color:
+                        theme.textTheme.headlineMedium?.color ?? Colors.black,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),

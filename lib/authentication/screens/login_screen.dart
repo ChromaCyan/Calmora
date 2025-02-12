@@ -3,13 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/authentication/blocs/auth_event.dart';
 import 'package:armstrong/authentication/blocs/auth_state.dart';
-import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/authentication/screens/registration_screen.dart';
 import 'package:armstrong/widgets/forms/forget_password.dart';
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
-import 'package:armstrong/authentication/models/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Positioned.fill(
                 child: Container(
-                  color: buttonColor, 
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               BlocListener<AuthBloc, AuthState>(
@@ -99,13 +97,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         : constraints.maxWidth * 0.9,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surface, 
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black26,
+                          color: Theme.of(context)
+                              .shadowColor, 
                           blurRadius: 10,
-                          offset: Offset(0, 5),
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
@@ -123,12 +124,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: 30),
-                            const Text(
+                            Text(
                               "Login",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall, 
                             ),
                             const SizedBox(height: 20),
                             TextField(
@@ -136,7 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 hintText: "Enter your email:",
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: Theme.of(context)
+                                    .colorScheme
+                                    .background,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -149,7 +151,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 hintText: "Enter your password:",
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor:
+                                    Theme.of(context).colorScheme.background,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -162,9 +165,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () {
                                   _showForgotPasswordDialog(context);
                                 },
-                                child: const Text(
+                                child: Text(
                                   "Forgot Password?",
-                                  style: TextStyle(color: Colors.blue),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
                                 ),
                               ),
                             ),
@@ -172,7 +178,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text("No account yet?"),
+                                Text(
+                                  "No account yet?",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium,
+                                ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.push(
@@ -183,9 +194,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     );
                                   },
-                                  child: const Text(
+                                  child: Text(
                                     "Sign up",
-                                    style: TextStyle(color: Colors.blue),
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                                   ),
                                 ),
                               ],
@@ -207,22 +221,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                         }
                                       : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: orangeContainer,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .secondary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
                                       horizontal: 50,
                                       vertical: 15,
                                     ),
                                     child: Text(
-                                      "Log in",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white,
-                                      ),
+                                      "Login",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary, 
+                                          ),
                                     ),
                                   ),
                                 );

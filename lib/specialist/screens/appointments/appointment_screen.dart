@@ -6,7 +6,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/specialist/screens/appointments/specialist_appointment_card.dart'; // Import the new UI file
+import 'package:armstrong/widgets/cards/specialist_appointment_card.dart';
 
 class SpecialistAppointmentListScreen extends StatefulWidget {
   final String specialistId;
@@ -31,7 +31,8 @@ class _SpecialistAppointmentListScreenState
     return DateFormat('h:mm a').format(dateTime);
   }
 
-  String _combineDateTimes(String startDateTimeString, String endDateTimeString) {
+  String _combineDateTimes(
+      String startDateTimeString, String endDateTimeString) {
     final startFormatted = _formatTime(startDateTimeString);
     final endFormatted = _formatTime(endDateTimeString);
     return '$startFormatted - $endFormatted';
@@ -64,8 +65,9 @@ class _SpecialistAppointmentListScreenState
             }
             if (state is AppointmentAccepted || state is AppointmentDeclined) {
               context.read<AppointmentBloc>().add(
-                FetchSpecialistAppointmentsEvent(specialistId: widget.specialistId),
-              );
+                    FetchSpecialistAppointmentsEvent(
+                        specialistId: widget.specialistId),
+                  );
             }
 
             return ListView.builder(
@@ -73,7 +75,8 @@ class _SpecialistAppointmentListScreenState
               itemBuilder: (context, index) {
                 final appointment = appointments[index];
                 final patient = appointment['patient'];
-                final patientName = '${patient['firstName']} ${patient['lastName']}';
+                final patientName =
+                    '${patient['firstName']} ${patient['lastName']}';
                 final startTime = appointment['startTime'];
                 final endTime = appointment['endTime'];
                 final status = appointment['status'];
@@ -90,7 +93,18 @@ class _SpecialistAppointmentListScreenState
                 //   status: status,
                 //   appointmentId: appointmentId,
                 // );
-                return SpecialistAppointmentCard(appointment: appointment);
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0), 
+                  child: Column(
+                    children: [
+                      SpecialistAppointmentCard(appointment: appointment),
+                      if (index < appointments.length - 1)
+                        const SizedBox(height: 12.0),
+                    ],
+                  ),
+                );
               },
             );
           }

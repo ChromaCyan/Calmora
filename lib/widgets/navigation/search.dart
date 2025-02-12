@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:armstrong/config/colors.dart';
 
 class CustomSearchBar extends StatefulWidget {
   final String hintText;
@@ -37,6 +36,8 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: TextField(
@@ -46,23 +47,33 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
         decoration: InputDecoration(
           hintText: widget.hintText,
           filled: true,
-          fillColor: Colors.grey.shade200, 
+          fillColor: theme.colorScheme.surfaceVariant, // Background color
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide(
+              color: theme.colorScheme.outline, // Edge color from theme
+              width: 1.5,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(
+              color: theme.colorScheme.primary, // Highlighted color on focus
+              width: 2,
+            ),
           ),
           prefixIcon: _isSearching
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: orangeContainer),
+                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.primary),
                   onPressed: () {
                     FocusScope.of(context).unfocus();
                     setState(() => _isSearching = false);
                   },
                 )
-              : const Icon(Icons.search, color: Colors.grey),
+              : Icon(Icons.search, color: theme.colorScheme.onSurfaceVariant),
           suffixIcon: widget.searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear, color: buttonColor),
+                  icon: Icon(Icons.clear, color: theme.colorScheme.secondary),
                   onPressed: widget.onClear,
                 )
               : null,

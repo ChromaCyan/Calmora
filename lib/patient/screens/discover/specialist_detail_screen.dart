@@ -89,7 +89,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                 } else if (state is AppointmentError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('This day is already booked!'),
+                      content: Text(state.message ?? 'An error occurred!'),
+                      backgroundColor: Colors.red, // Make the error stand out
                     ),
                   );
                 }
@@ -162,8 +163,9 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         availability,
                         style: const TextStyle(color: Colors.white),
                       ),
-                      backgroundColor:
-                          availability == 'Available' ? Colors.green : Colors.red,
+                      backgroundColor: availability == 'Available'
+                          ? Colors.green
+                          : Colors.red,
                     ),
                     const SizedBox(height: 24),
 
@@ -174,7 +176,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       Column(
                         children: reviews.map<Widget>((review) {
                           return ListTile(
-                            leading: const Icon(Icons.person, color: Colors.blue),
+                            leading:
+                                const Icon(Icons.person, color: Colors.blue),
                             title: Text(review['reviewerName'] ?? 'Anonymous'),
                             subtitle: Text(review['comment'] ?? 'No comment'),
                             trailing: Row(

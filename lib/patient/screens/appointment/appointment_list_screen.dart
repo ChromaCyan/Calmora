@@ -4,7 +4,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/services/api.dart';
-import 'package:armstrong/patient/screens/appointment/appointment_card.dart'; // Import the extracted UI component
+import 'package:armstrong/widgets/cards/appointment_card.dart'; // Import the extracted UI component
 
 class AppointmentListScreen extends StatefulWidget {
   final String patientId;
@@ -48,7 +48,11 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
             return ListView.builder(
               itemCount: appointments.length,
               itemBuilder: (context, index) {
-                return AppointmentCard(appointment: appointments[index]);
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8.0), 
+                  child: AppointmentCard(appointment: appointments[index]),
+                );
               },
             );
           }

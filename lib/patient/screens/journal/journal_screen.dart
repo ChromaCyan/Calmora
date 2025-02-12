@@ -129,7 +129,7 @@ class _JournalPageState extends State<JournalPage> {
     );
   }
 
-  Widget _moodRadio(String label, int mood, Color color) {
+   Widget _moodRadio(String label, int mood, Color color) {
     return RadioListTile<int>(
       title: Text(label),
       value: mood,
@@ -148,7 +148,8 @@ class _JournalPageState extends State<JournalPage> {
     );
   }
 
-  Widget _journalTextField({required TextEditingController controller}) {
+  Widget _journalTextField(BuildContext context, {required TextEditingController controller}) {
+    final theme = Theme.of(context);
     return TextField(
       controller: controller,
       maxLines: 6,
@@ -158,12 +159,15 @@ class _JournalPageState extends State<JournalPage> {
           borderRadius: BorderRadius.circular(8),
         ),
         contentPadding: const EdgeInsets.all(12),
+        filled: true,
+        fillColor: theme.colorScheme.surfaceVariant,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (_userId == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -181,53 +185,44 @@ class _JournalPageState extends State<JournalPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Log Your Mood',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            // Show mood selector if the user has not yet answered today
             if (!hasAnsweredMoodToday) ...[
               _buildMoodSelector(),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Day Summary:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                style: theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
-              _journalTextField(controller: _daySummaryController),
+              _journalTextField(context, controller: _daySummaryController),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveMoodEntry,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
+                  backgroundColor: theme.colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text(
+                child: Text(
                   'Save Entry',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                  style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
-            // If mood already answered today, show message and mood entries
             if (hasAnsweredMoodToday) ...[
-              const Text(
+              Text(
                 'You have already answered your mood for today.',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.green),
+                style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
               ),
               const SizedBox(height: 20),
-              // Display mood summaries as text entries
               if (_moods.isEmpty)
-                const Text('No mood data available.')
+                Text('No mood data available.', style: theme.textTheme.bodyLarge)
               else
                 ..._moods.map((mood) {
                   DateTime date = DateTime.parse(mood['createdAt']);
@@ -235,7 +230,7 @@ class _JournalPageState extends State<JournalPage> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
                       'Mood: ${mood['moodScale']}, Summary: ${mood['moodDescription']} (Date: ${date.toLocal().toString().split(' ')[0]})',
-                      style: const TextStyle(fontSize: 16),
+                      style: theme.textTheme.bodyMedium,
                     ),
                   );
                 }).toList(),

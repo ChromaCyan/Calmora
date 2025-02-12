@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:armstrong/config/colors.dart';
 
 class SpecialistBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -15,15 +14,16 @@ class SpecialistBottomNavBar extends StatelessWidget {
     this.chatNotificationCount = 0,
   }) : super(key: key);
 
-  Widget _buildBadge(int count) {
+  Widget _buildBadge(BuildContext context, int count) {
+    final theme = Theme.of(context);
     return count > 0
         ? Positioned(
             right: 0,
             top: 0,
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.red,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.error, // Use theme error color
                 shape: BoxShape.circle,
               ),
               constraints: const BoxConstraints(
@@ -33,8 +33,8 @@ class SpecialistBottomNavBar extends StatelessWidget {
               child: Center(
                 child: Text(
                   '$count',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: theme.colorScheme.onError, // Ensure text contrast
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -47,14 +47,16 @@ class SpecialistBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface, // Use theme background color
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: theme.colorScheme.shadow.withOpacity(0.1), // Themed shadow
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -63,17 +65,19 @@ class SpecialistBottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.home_filled, "Home", 0),
-          _buildNavItem(Icons.newspaper, "Articles", 1),
-          _buildNavItemWithBadge(Icons.message_outlined, "Messages", 2, chatNotificationCount),
-          _buildNavItemWithBadge(Icons.checklist, "Appointments", 3, notificationCount),
+          _buildNavItem(context, Icons.home_filled, "Home", 0),
+          _buildNavItem(context, Icons.newspaper, "Articles", 1),
+          _buildNavItemWithBadge(context, Icons.message_outlined, "Messages", 2, chatNotificationCount),
+          _buildNavItemWithBadge(context, Icons.checklist, "Appointments", 3, notificationCount),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+    final theme = Theme.of(context);
     bool isSelected = selectedIndex == index;
+
     return GestureDetector(
       onTap: () => onItemTapped(index),
       child: AnimatedContainer(
@@ -81,7 +85,7 @@ class SpecialistBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                color: buttonColor.withOpacity(0.2),
+                color: theme.colorScheme.primary.withOpacity(0.2), // Themed selection color
                 borderRadius: BorderRadius.circular(20),
               )
             : null,
@@ -89,7 +93,7 @@ class SpecialistBottomNavBar extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isSelected ? buttonColor : Colors.grey,
+              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant, // Theme-based icon color
             ),
             if (isSelected)
               Padding(
@@ -97,8 +101,8 @@ class SpecialistBottomNavBar extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: buttonColor,
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary, // Themed text color
                   ),
                 ),
               ),
@@ -108,8 +112,10 @@ class SpecialistBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItemWithBadge(IconData icon, String label, int index, int count) {
+  Widget _buildNavItemWithBadge(BuildContext context, IconData icon, String label, int index, int count) {
+    final theme = Theme.of(context);
     bool isSelected = selectedIndex == index;
+
     return GestureDetector(
       onTap: () => onItemTapped(index),
       child: AnimatedContainer(
@@ -117,7 +123,7 @@ class SpecialistBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                color: buttonColor.withOpacity(0.2),
+                color: theme.colorScheme.primary.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               )
             : null,
@@ -127,9 +133,9 @@ class SpecialistBottomNavBar extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? orangeContainer : Colors.grey,
+                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant, // Themed icon color
                 ),
-                _buildBadge(count),
+                _buildBadge(context, count),
               ],
             ),
             if (isSelected)
@@ -138,8 +144,8 @@ class SpecialistBottomNavBar extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: buttonColor,
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary, // Themed text color
                   ),
                 ),
               ),

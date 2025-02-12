@@ -1,4 +1,3 @@
-import 'package:armstrong/config/colors.dart';
 import 'package:flutter/material.dart';
 
 class CategoryChip extends StatefulWidget {
@@ -20,47 +19,49 @@ class CategoryChip extends StatefulWidget {
 class _CategoryChipState extends State<CategoryChip> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: widget.categories.map((category) {
           bool isSelected = widget.selectedCategory == category;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0), 
+            padding: const EdgeInsets.symmetric(horizontal: 4.0), 
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250), 
+              duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,
+              width: 120, // Adjust width as needed
+              height: 45,  // Box style with fixed height
               decoration: BoxDecoration(
-                color: isSelected ? orangeContainer : Colors.transparent,
-                borderRadius: BorderRadius.circular(30),
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(10), // Less rounded for a box-style look
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFFE9879) : buttonColor,
+                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
                   width: 1.5,
                 ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: orangeContainer.withOpacity(0.4),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                          color: theme.colorScheme.primary.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         )
                       ]
                     : [],
               ),
               child: InkWell(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(10), 
                 onTap: () => widget.onSelected(category),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10.0),
+                child: Center(
                   child: Text(
                     category,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isSelected ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
+                      color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),

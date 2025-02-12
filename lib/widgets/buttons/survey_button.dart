@@ -1,4 +1,3 @@
-import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/patient/screens/survey/questions_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -7,17 +6,20 @@ class QuickTestButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get current theme
+    final colorScheme = theme.colorScheme;
+
     return Container(
       width: double.infinity,
       height: 140,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: buttonColor, 
+        color: colorScheme.primary, 
         image: DecorationImage(
-          image: AssetImage('/images/splash/image2.png'),
+          image: const AssetImage('images/splash/image2.png'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.3), 
+            Colors.black.withOpacity(0.3),
             BlendMode.darken,
           ),
         ),
@@ -27,11 +29,10 @@ class QuickTestButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Take a quick test about your mental health',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: Colors.white, 
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -45,17 +46,17 @@ class QuickTestButton extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: orangeContainer,
+              backgroundColor: colorScheme.secondary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
             ),
-            child: const Text(
-              'Accept',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
+            child: Text(
+              'Start',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSecondary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

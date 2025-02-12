@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 
-class AppointmentCard extends StatelessWidget {
+class SpecialistAppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
 
-  const AppointmentCard({Key? key, required this.appointment}) : super(key: key);
+  const SpecialistAppointmentCard({required this.appointment, Key? key}) : super(key: key);
 
   String _formatDate(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
@@ -16,19 +19,24 @@ class AppointmentCard extends StatelessWidget {
     return DateFormat('h:mm a').format(dateTime);
   }
 
+  String _combineDateTimes(String startDateTimeString, String endDateTimeString) {
+    final startFormatted = _formatTime(startDateTimeString);
+    final endFormatted = _formatTime(endDateTimeString);
+    return '$startFormatted - $endFormatted';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
-    final specialist = appointment['specialist'];
-    final specialistName = '${specialist['firstName']} ${specialist['lastName']}';
+    final patient = appointment['patient'];
+    final patientName = '${patient['firstName']} ${patient['lastName']}';
     final startTime = appointment['startTime'];
     final endTime = appointment['endTime'];
     final status = appointment['status'];
+    final appointmentId = appointment['_id'];
 
+    final timeRange = _combineDateTimes(startTime, endTime);
     final formattedStartDate = _formatDate(startTime);
-    final formattedStartTime = _formatTime(startTime);
-    final formattedEndTime = _formatTime(endTime);
-    final formattedCombinedTime = '$formattedStartTime - $formattedEndTime';
 
     return Center(
       child: Container(
@@ -40,7 +48,7 @@ class AppointmentCard extends StatelessWidget {
           border: Border.all(color: theme.outlineVariant),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Allows dynamic height adjustment
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
@@ -51,7 +59,7 @@ class AppointmentCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          specialistName,
+                          patientName,
                           style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
@@ -74,8 +82,6 @@ class AppointmentCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // SPECIALIST PROFILE IMAGE
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -104,14 +110,51 @@ class AppointmentCard extends StatelessWidget {
                   style: TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
                 ),
                 const SizedBox(width: 12.0),
-                Icon(Icons.lock_clock, color: theme.secondary, size: 18.0),
+                Icon(Icons.access_time, color: theme.secondary, size: 18.0),
                 const SizedBox(width: 8.0),
                 Text(
-                  formattedCombinedTime,
+                  timeRange,
                   style: TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
                 ),
               ],
             ),
+            const SizedBox(height: 12.0),
+            if (status == 'pending') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<AppointmentBloc>().add(AcceptAppointmentEvent(appointmentId: appointmentId));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Accept', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<AppointmentBloc>().add(DeclineAppointmentEvent(appointmentId: appointmentId));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.error,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Decline', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

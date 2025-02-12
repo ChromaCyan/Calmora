@@ -1,4 +1,3 @@
-import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/universal/notification/notification_screen.dart';
 import 'package:armstrong/widgets/navigation/drawer.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +6,7 @@ import 'package:armstrong/universal/nav_cubit.dart';
 import 'package:armstrong/patient/screens/pages.dart';
 import 'package:armstrong/widgets/navigation/nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:armstrong/services/api.dart'; 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/services/api.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -76,18 +74,20 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
+          preferredSize: const Size.fromHeight(80),
           child: Padding(
             padding: const EdgeInsets.only(top: 20.0),
             child: AppBar(
               elevation: 0,
               backgroundColor: Colors.transparent,
-              iconTheme: const IconThemeData(
-                color: Colors.black,
+              iconTheme: IconThemeData(
+                color: Colors.red, 
                 size: 28.0,
               ),
               title: AnimatedSwitcher(
@@ -95,10 +95,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 child: Text(
                   _getDynamicTitle(),
                   key: ValueKey<int>(_selectedIndex),
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color:
+                        theme.textTheme.headlineMedium?.color ?? Colors.black,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),

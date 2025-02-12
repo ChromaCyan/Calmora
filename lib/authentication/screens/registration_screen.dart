@@ -36,13 +36,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1900), 
+      firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
 
     if (pickedDate != null) {
       String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-      _dateOfBirthController.text = formattedDate; 
+      _dateOfBirthController.text = formattedDate;
     }
   }
 
@@ -124,7 +124,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             children: [
               Positioned.fill(
                 child: Container(
-                  color: buttonColor, 
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary, 
                 ),
               ),
               SingleChildScrollView(
@@ -136,7 +138,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         maxWidth: MediaQuery.of(context).size.width * 0.85,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surface,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Padding(
@@ -153,8 +157,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   IconButton(
                                     icon: const Icon(Icons.arrow_back),
                                     onPressed: () {
-                                      Navigator.pop(
-                                          context); 
+                                      Navigator.pop(context);
                                     },
                                   ),
                                 ],
@@ -179,9 +182,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     child: Text("Specialist"),
                                   ),
                                 ],
-                                color: Colors.black,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface, 
                                 selectedColor: Colors.white,
-                                fillColor: orangeContainer,
+                                fillColor: Theme.of(context)
+                                    .colorScheme
+                                    .secondary, 
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               const SizedBox(height: 20),
@@ -247,18 +254,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               ElevatedButton(
                                 onPressed: _onRegisterButtonPressed,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: orangeContainer,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.secondary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 50, vertical: 15),
                                   child: Text(
                                     "Sign up",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.white),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -283,19 +297,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.black),
+        labelStyle: TextStyle(
+            color:
+                Theme.of(context).colorScheme.onSurface), 
         filled: true,
-        fillColor: Colors.white,
+        fillColor:
+            Theme.of(context).colorScheme.background, 
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary), 
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black, width: 2),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 2),
         ),
       ),
-      style: const TextStyle(color: Colors.black),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       obscureText: obscureText,
       validator: (value) {
         if (isRequired && (value == null || value.isEmpty)) {

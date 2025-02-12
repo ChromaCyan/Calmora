@@ -27,7 +27,7 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
       body: Column(
         children: [
           CustomSearchBar(
-            hintText: 'Search articles...',
+            hintText: 'Search from your articles...',
             searchController: _searchController,
             onChanged: (query) {
               setState(() {

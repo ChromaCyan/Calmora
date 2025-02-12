@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:armstrong/config/colors.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -15,15 +14,15 @@ class CustomBottomNavBar extends StatelessWidget {
     this.chatNotificationCount = 0,
   }) : super(key: key);
 
-  Widget _buildBadge(int count) {
+  Widget _buildBadge(int count, Color badgeColor) {
     return count > 0
         ? Positioned(
             right: 0,
             top: 0,
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.red,
+              decoration: BoxDecoration(
+                color: badgeColor,
                 shape: BoxShape.circle,
               ),
               constraints: const BoxConstraints(
@@ -47,10 +46,13 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.bottomNavigationBarTheme.backgroundColor ?? theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -63,16 +65,18 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.home_filled, "Home", 0),
-          _buildNavItem(Icons.search, "Discover", 1),
-          _buildNavItemWithBadge(Icons.message_outlined, "Messages", 2, chatNotificationCount),
-          _buildNavItemWithBadge(Icons.checklist, "Appointments", 3, notificationCount),
+          _buildNavItem(Icons.home_filled, "Home", 0, colorScheme.primary),
+          _buildNavItem(Icons.search, "Discover", 1, colorScheme.primary),
+          _buildNavItemWithBadge(
+              Icons.message_outlined, "Messages", 2, chatNotificationCount, colorScheme.primary, colorScheme.secondary),
+          _buildNavItemWithBadge(
+              Icons.checklist, "Appointments", 3, notificationCount, colorScheme.primary, colorScheme.secondary),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(IconData icon, String label, int index, Color primaryColor) {
     bool isSelected = selectedIndex == index;
     return GestureDetector(
       onTap: () => onItemTapped(index),
@@ -81,7 +85,7 @@ class CustomBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                color: buttonColor.withOpacity(0.2),
+                color: primaryColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               )
             : null,
@@ -89,7 +93,7 @@ class CustomBottomNavBar extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isSelected ? buttonColor : Colors.grey,
+              color: isSelected ? primaryColor : Colors.grey,
             ),
             if (isSelected)
               Padding(
@@ -97,7 +101,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: buttonColor,
+                    color: primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -108,7 +112,8 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItemWithBadge(IconData icon, String label, int index, int count) {
+  Widget _buildNavItemWithBadge(
+      IconData icon, String label, int index, int count, Color primaryColor, Color badgeColor) {
     bool isSelected = selectedIndex == index;
     return GestureDetector(
       onTap: () => onItemTapped(index),
@@ -117,7 +122,7 @@ class CustomBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                color: buttonColor.withOpacity(0.2),
+                color: primaryColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               )
             : null,
@@ -127,9 +132,9 @@ class CustomBottomNavBar extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? orangeContainer : Colors.grey,
+                  color: isSelected ? badgeColor : Colors.grey,
                 ),
-                _buildBadge(count),
+                _buildBadge(count, badgeColor),
               ],
             ),
             if (isSelected)
@@ -138,7 +143,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: buttonColor,
+                    color: primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

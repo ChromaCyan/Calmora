@@ -12,7 +12,7 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final ApiRepository apiService = ApiRepository();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-  
+
   List<Map<String, dynamic>> notifications = [];
   bool isLoading = true;
   bool hasError = false;
@@ -25,7 +25,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Future<void> _initializeNotifications() async {
-    await _loadUserId();
+    _userId = await _storage.read(key: 'userId');
     if (_userId != null) {
       await fetchNotifications();
     } else {
@@ -36,13 +36,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _loadUserId() async {
-    final userId = await _storage.read(key: 'userId');
-    setState(() {
-      _userId = userId;
-    });
-  }
-
   Future<void> fetchNotifications() async {
     try {
       if (_userId == null) return;
@@ -51,8 +44,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           await apiService.getNotifications(_userId!);
 
       setState(() {
-        notifications =
-            fetchedNotifications.where((n) => n["isRead"] == false).toList();
+        notifications = fetchedNotifications.where((n) => n["isRead"] == false).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -63,22 +55,38 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _markAllAsReadAndExit() async {
+    if (_userId != null) {
+      await apiService.markAllNotificationsAsRead(_userId!);
+    }
+    Navigator.pop(context, 0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: UniversalAppBar(
         title: "Notifications",
-        onBackPressed: () async {
-          await apiService.markAllNotificationsAsRead(_userId!);
-          Navigator.pop(context, 0);
-        },
+        onBackPressed: _markAllAsReadAndExit,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : hasError
-              ? const Center(child: Text("Failed to load notifications"))
+              ? Center(
+                  child: Text(
+                    "Failed to load notifications",
+                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                  ),
+                )
               : notifications.isEmpty
-                  ? const Center(child: Text("No new notifications"))
+                  ? Center(
+                      child: Text(
+                        "No new notifications",
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    )
                   : ListView.builder(
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {

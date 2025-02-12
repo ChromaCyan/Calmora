@@ -67,90 +67,93 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                Center(
-                  child: HealthAdviceSection(items: carouselData),
-                ),
-                Showcase(
-                  key: _searchKey,
-                  description: "Search for specialists or articles here.",
-                  textColor: Colors.white,
-                  tooltipBackgroundColor: Colors.blueAccent,
-                  targetPadding: EdgeInsets.all(12),
-                  targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: CustomSearchBar(
-                    hintText: 'Search',
-                    searchController: searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        searchQuery = value;
-                      });
-                    },
-                    onClear: () {
-                      setState(() {
-                        searchController.clear();
-                        searchQuery = '';
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
+Widget build(BuildContext context) {
+  final theme = Theme.of(context);
 
-                // Showcase for Category Chip
-                Showcase(
-                  key: _categoryKey,
-                  description: "Select the category of your choice.",
-                  textColor: Colors.white,
-                  tooltipBackgroundColor: Colors.blueAccent,
-                  targetPadding: EdgeInsets.all(12),
-                  targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: CategoryChip(
-                    categories: ['Specialist', 'Articles'],
-                    selectedCategory: selectedCategory,
-                    onSelected: (String category) {
-                      setState(() {
-                        selectedCategory = category;
-                      });
-                    },
-                  ),
+  return Scaffold(
+    backgroundColor: theme.colorScheme.background,
+    body: SafeArea(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Center(
+                child: HealthAdviceSection(items: carouselData),
+              ),
+              const SizedBox(height: 20),
+              Showcase(
+                key: _searchKey,
+                description: "Search for specialists or articles here.",
+                textColor: theme.colorScheme.onPrimary,
+                tooltipBackgroundColor: theme.colorScheme.primary,
+                targetPadding: EdgeInsets.all(12),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 20),
+                child: CustomSearchBar(
+                  hintText: 'Search',
+                  searchController: searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                  onClear: () {
+                    setState(() {
+                      searchController.clear();
+                      searchQuery = '';
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
 
-                // Showcase for Specialist List
-                Showcase(
-                  key: _specialistKey,
-                  description:
-                      "Browse through available specialists or articles",
-                  textColor: Colors.white,
-                  tooltipBackgroundColor: Colors.blueAccent,
-                  targetPadding: EdgeInsets.all(12),
-                  targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: selectedCategory == 'Specialist'
-                      ? _buildSpecialistList()
-                      : _buildArticleList(),
+              Showcase(
+                key: _categoryKey,
+                description: "Select the category of your choice.",
+                textColor: theme.colorScheme.onPrimary,
+                tooltipBackgroundColor: theme.colorScheme.primary,
+                targetPadding: EdgeInsets.all(12),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ],
-            ),
+                child: CategoryChip(
+                  categories: ['Specialist', 'Articles'],
+                  selectedCategory: selectedCategory,
+                  onSelected: (String category) {
+                    setState(() {
+                      selectedCategory = category;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Showcase(
+                key: _specialistKey,
+                description: "Browse through available specialists or articles",
+                textColor: theme.colorScheme.onPrimary,
+                tooltipBackgroundColor: theme.colorScheme.primary,
+                targetPadding: EdgeInsets.all(12),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: selectedCategory == 'Specialist'
+                    ? _buildSpecialistList()
+                    : _buildArticleList(),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildSpecialistList() {
     return BlocBuilder<ProfileBloc, ProfileState>(

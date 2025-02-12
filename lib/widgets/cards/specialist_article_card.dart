@@ -15,6 +15,9 @@ class SpecialistArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -24,31 +27,32 @@ class SpecialistArticleCard extends StatelessWidget {
                 ArticleDetailPage(articleId: articleId),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              const begin = Offset(1.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
+              var tween = Tween<double>(begin: 0.95, end: 1.0)
+                  .chain(CurveTween(curve: Curves.easeOutQuad));
 
-              var tween = Tween(begin: begin, end: end)
-                  .chain(CurveTween(curve: curve));
-              var offsetAnimation = animation.drive(tween);
-
-              return SlideTransition(position: offsetAnimation, child: child);
+              return ScaleTransition(
+                scale: animation.drive(tween),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+              );
             },
           ),
         );
       },
       child: Container(
-        width: 200,
-        margin: const EdgeInsets.all(8.0),
+        width: 220, // Matches the ArticleCard width
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: colorScheme.shadow.withOpacity(0.15),
               spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -56,23 +60,27 @@ class SpecialistArticleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
               child: Image.network(
                 imageUrl,
-                height: 120,
+                height: 130,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.error),
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 130,
+                  color: Colors.grey[300],
+                  child: const Center(
+                      child: Icon(Icons.image_not_supported,
+                          size: 40, color: Colors.grey)),
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
               child: Text(
                 title,
-                style: const TextStyle(
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

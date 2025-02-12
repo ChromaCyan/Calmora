@@ -127,138 +127,112 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: UniversalAppBar(
-        title: "Chat with ${widget.recipientName}",
-        onBackPressed: () {
-          Navigator.pop(context);
-        },
-        actions: [],
-      ),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => _bookAppointment(context),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16, horizontal: 30), 
-                backgroundColor: orangeContainer,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), 
-                ),
-                shadowColor: Colors.black.withOpacity(0.2),
-                elevation: 5,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize
-                    .min, 
-                children: [
-                  Icon(
-                    Icons.calendar_today, 
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  SizedBox(width: 10), 
-                  Text(
-                    "Create Appointment Now",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                final isSender = message['senderId'] == _userId;
+Widget build(BuildContext context) {
+  final theme = Theme.of(context).colorScheme;
 
-                return Align(
-                  alignment:
-                      isSender ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    padding: const EdgeInsets.all(12),
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.75),
-                    decoration: BoxDecoration(
-                      color:
-                          isSender ? Colors.green.shade100 : Colors.grey[300],
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                        bottomLeft:
-                            isSender ? Radius.circular(12) : Radius.zero,
-                        bottomRight:
-                            isSender ? Radius.zero : Radius.circular(12),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (!isSender)
-                          Text(
-                            widget.recipientName,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        Text(
-                          message['content'],
-                          style: TextStyle(
-                            color: isSender ? Colors.black87 : Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          _formatTimestamp(message['timestamp']),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: isSender ? Colors.black54 : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+  return Scaffold(
+    appBar: UniversalAppBar(
+      title: "Chat with ${widget.recipientName}",
+      onBackPressed: () => Navigator.pop(context),
+    ),
+    body: Column(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () => _bookAppointment(context),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
+              backgroundColor: theme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              shadowColor: Colors.black.withOpacity(0.2),
+              elevation: 5,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
             child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.send, color: Colors.blue),
-                  onPressed: _sendMessage,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.calendar_today, color: Colors.white, size: 22),
+                const SizedBox(width: 10),
+                const Text(
+                  "Create Appointment Now",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _messages.length,
+            itemBuilder: (context, index) {
+              final message = _messages[index];
+              final isSender = message['senderId'] == _userId;
+              final content = message['content'] ?? 'No message';
+              final timestamp = message['timestamp'] ?? DateTime.now().toString();
+
+              return Align(
+                alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  padding: const EdgeInsets.all(12),
+                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                  decoration: BoxDecoration(
+                    color: isSender ? theme.primary.withOpacity(0.2) : theme.surfaceVariant,
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(12),
+                      topRight: const Radius.circular(12),
+                      bottomLeft: isSender ? const Radius.circular(12) : Radius.zero,
+                      bottomRight: isSender ? Radius.zero : const Radius.circular(12),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!isSender)
+                        Text(
+                          widget.recipientName,
+                          style: TextStyle(fontWeight: FontWeight.bold, color: theme.onSurface),
+                        ),
+                      Text(content, style: TextStyle(color: theme.onBackground)),
+                      const SizedBox(height: 5),
+                      Text(
+                        _formatTimestamp(timestamp),
+                        style: TextStyle(fontSize: 10, color: theme.onSurface.withOpacity(0.6)),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText: 'Type a message',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: Icon(Icons.send, color: theme.primary),
+                onPressed: _sendMessage,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }

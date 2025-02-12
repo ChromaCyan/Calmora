@@ -1,3 +1,4 @@
+import 'package:armstrong/config/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'splash_screen/screens/splash_screen.dart';
@@ -11,16 +12,16 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
   final socketService = SocketService();
-  
 
   print("🚀 Starting app...");
 
-   // Initialize Local Notifications
+  // Initialize Local Notifications
   await NotificationService.initNotifications();
 
   Future.delayed(Duration(seconds: 3), () {
@@ -36,12 +37,11 @@ void main() async {
       role = jwt.payload['userType'];
     } catch (e) {
       print('Invalid token: $e');
-      await storage.delete(key: 'jwt'); 
+      await storage.delete(key: 'jwt');
       token = null;
       role = null;
     }
   }
-
 
   // Connect to Socket if Logged In
   if (token != null) {
@@ -68,13 +68,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: AppProviders.getProviders(),
-      child: ShowCaseWidget( 
+      child: ShowCaseWidget(
         builder: (context) => MaterialApp(
           title: 'Armstrong',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: ThemeMode.system,
           debugShowCheckedModeBanner: false,
           home: _getInitialScreen(),
         ),

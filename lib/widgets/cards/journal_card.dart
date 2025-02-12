@@ -1,37 +1,34 @@
 import 'package:armstrong/patient/screens/journal/journal_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/config/colors.dart';
 
 class JournalSection extends StatelessWidget {
   const JournalSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Container(
-      width: double.infinity, 
-      height: 140, 
+      width: double.infinity,
+      height: 140,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: orangeContainer,  
-        image: DecorationImage(
-          image: AssetImage('images/splash/image1.png'), 
-          fit: BoxFit.cover,  
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.3), 
-            BlendMode.darken,
-          ),
+        color: theme.colorScheme.primaryContainer, 
+        image: const DecorationImage(
+          image: AssetImage('images/splash/image1.png'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
         ),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,  
-        crossAxisAlignment: CrossAxisAlignment.center,  
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Daily Journal',
-            style: TextStyle(
+            style: theme.textTheme.titleMedium?.copyWith(
               color: Colors.white,
-              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -40,20 +37,21 @@ class JournalSection extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => JournalPage()),
+                MaterialPageRoute(builder: (context) => const JournalPage()),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: buttonColor,
+              backgroundColor: theme.colorScheme.primary,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              elevation: 3,
             ),
-            child: const Text(
+            child: Text(
               'Log Your Mood',
-              style: TextStyle(
+              style: theme.textTheme.labelLarge?.copyWith(
                 color: Colors.white,
-                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
