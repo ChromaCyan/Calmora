@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:armstrong/specialist/screens/chat/chat_screen.dart';
 import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/services/api.dart';

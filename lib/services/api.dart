@@ -367,6 +367,50 @@ class ApiRepository {
     }
   }
 
+  // Mark an appointment as completed
+  Future<Map<String, dynamic>> completeAppointment(
+    String appointmentId,
+    String feedback,
+    String imageUrl,
+  ) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/$appointmentId/complete');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'feedback': feedback,
+        'imageUrl': imageUrl,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to complete appointment: ${response.body}');
+    }
+  }
+
+  // Fetch completed appointments
+  Future<List<dynamic>> getCompletedAppointments(String userId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/appointments/completed/$userId');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+          'Failed to fetch completed appointments: ${response.body}');
+    }
+  }
+
   /////////////////////////////////////////////////////////////////////////////////
   // Mood (API)
   // Create Mood Entry
@@ -668,19 +712,20 @@ class ApiRepository {
   }
 
   Future<void> markAllNotificationsAsRead(String userId) async {
-  final token = await _storage.read(key: 'token');
-  final url = Uri.parse('$baseUrl/notification/mark-all/$userId');
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/notification/mark-all/$userId');
 
-  final response = await http.put(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
-  if (response.statusCode != 200) {
-    throw Exception('Failed to mark all notifications as read: ${response.body}');
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to mark all notifications as read: ${response.body}');
+    }
   }
-}
 }

@@ -1,3 +1,4 @@
+import 'package:armstrong/specialist/screens/appointments/appointment_complete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -91,7 +92,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                       color: theme.primary,
                       shape: BoxShape.circle,
                       image: const DecorationImage(
-                        image: AssetImage("lib/icons/profile_placeholder.png"),
+                        image: AssetImage("images/splash/logo_placeholder.png"),
                         filterQuality: FilterQuality.high,
                         fit: BoxFit.cover,
                       ),
@@ -119,6 +120,8 @@ class SpecialistAppointmentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12.0),
+
+            // Accept & Decline buttons for "pending" appointments
             if (status == 'pending') ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -153,6 +156,30 @@ class SpecialistAppointmentCard extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ],
+
+            // "Proceed to Complete" button for "accepted" appointments
+            if (status == 'accepted') ...[
+              const SizedBox(height: 12.0),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to the AppointmentCompleteScreen
+                  print("Navigating to complete screen with ID: $appointmentId");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentCompleteScreen(appointmentId: appointmentId),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Proceed to Complete', style: TextStyle(color: Colors.white)),
               ),
             ],
           ],

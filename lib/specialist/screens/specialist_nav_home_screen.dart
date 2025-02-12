@@ -1,6 +1,7 @@
 import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
 import 'package:armstrong/universal/chat/screen/chat_list_screen.dart';
 import 'package:armstrong/universal/notification/notification_screen.dart';
+import 'package:armstrong/universal/profile/profile_screen.dart';
 import 'package:armstrong/widgets/navigation/specialist_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,6 +90,22 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                 color: theme.iconTheme.color, 
                 size: 28.0,
               ),
+              leading: IconButton(
+                icon: Icon(
+                  Icons.person_2,
+                  size: 28,
+                  color: theme.iconTheme.color ??
+                      Colors.black, 
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileScreen(),
+                    ),
+                  );
+                },
+              ),
               title: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: Text(
@@ -150,7 +167,6 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             ),
           ),
         ),
-        drawer: SpecialistAppDrawer(),
         body: SafeArea(
           child: PageView(
             controller: _pageController,

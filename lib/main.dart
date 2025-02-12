@@ -13,11 +13,13 @@ import 'package:armstrong/services/socket_service.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'services/supabase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
   final socketService = SocketService();
+  await SupabaseService.initialize();
 
   print("🚀 Starting app...");
 

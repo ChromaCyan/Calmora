@@ -54,8 +54,6 @@ Widget build(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
-
             // Welcome Card
             const WelcomeSection(),
 

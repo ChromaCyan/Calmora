@@ -1,4 +1,5 @@
 import 'package:armstrong/universal/notification/notification_screen.dart';
+import 'package:armstrong/universal/profile/profile_screen.dart';
 import 'package:armstrong/widgets/navigation/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,8 +88,24 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               elevation: 0,
               backgroundColor: Colors.transparent,
               iconTheme: IconThemeData(
-                color: Colors.red, 
+                color: Colors.red,
                 size: 28.0,
+              ),
+              leading: IconButton(
+                icon: Icon(
+                  Icons.person_2,
+                  size: 28,
+                  color: theme.iconTheme.color ??
+                      Colors.black, 
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileScreen(),
+                    ),
+                  );
+                },
               ),
               title: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
@@ -152,7 +169,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
           ),
         ),
-        drawer: AppDrawer(),
         body: SafeArea(
           child: PageView(
             controller: _pageController,
