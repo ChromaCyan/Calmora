@@ -101,7 +101,8 @@ flutter:
     - images/article_detail_bg_img.png
     - images/splash/logo1.png
     - images/splash/logo2.png
-    - images/
+    - images/armstrong_white.png
+    - images/armstrong_transparent.png
     - images/icons/bipolar-disorder.svg
     - images/icons/depression.svg
     - images/icons/depression2.svg

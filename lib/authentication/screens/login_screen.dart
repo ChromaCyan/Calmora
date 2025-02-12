@@ -117,9 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
-                              height: 200,
+                              height: 250,
                               child: Image.asset(
-                                'images/splash/logo1.png',
+                                'images/armstrong_transparent.png',
                                 fit: BoxFit.contain,
                               ),
                             ),

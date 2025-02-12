@@ -14,6 +14,7 @@ import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'services/supabase.dart';
+import 'package:flutter/services.dart'; // Import the necessary package
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ void main() async {
 
   String? token = await storage.read(key: 'jwt');
   String? role;
+  bool onboardingCompleted = await _checkOnboardingStatus();
 
   if (token != null) {
     try {
@@ -50,20 +52,32 @@ void main() async {
     socketService.connect(token);
   }
 
+  // Set the app to immersive full-screen mode (hide status and navigation bar)
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
   runApp(MyApp(
     isLoggedIn: token != null,
     role: role,
+    onboardingCompleted: onboardingCompleted,
   ));
+}
+
+Future<bool> _checkOnboardingStatus() async {
+  final storage = FlutterSecureStorage();
+  String? completed = await storage.read(key: 'onboarding_completed');
+  return completed == 'true';
 }
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
   final String? role;
+  final bool onboardingCompleted;
 
   const MyApp({
     super.key,
     required this.isLoggedIn,
     this.role,
+    required this.onboardingCompleted,
   });
 
   @override
@@ -77,7 +91,7 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.dark,
           themeMode: ThemeMode.system,
           debugShowCheckedModeBanner: false,
-          home: _getInitialScreen(),
+          home: onboardingCompleted ? _getInitialScreen() : const SplashScreen(),
         ),
       ),
     );

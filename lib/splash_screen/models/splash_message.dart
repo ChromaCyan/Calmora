@@ -7,7 +7,7 @@ class OnBoards {
 List<OnBoards> onBoardData = [
   OnBoards(
     text: "Welcome to Armstrong!\nA dedicated app for men's mental health and well-being.",
-    image: "images/splash/logo_placeholder.png",
+    image: "images/armstrong_transparent.png",
   ),
   OnBoards(
     text: "It's okay to feel broken sometimes.\nShowing your vulnerable side is not a sign of weakness—\nit's a step toward true strength and healing.",

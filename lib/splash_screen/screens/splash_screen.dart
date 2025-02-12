@@ -3,6 +3,7 @@ import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/splash_screen/models/splash_message.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,17 +15,51 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final PageController _pageController = PageController();
   int currentPage = 0;
+  bool onboardingCompleted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboardingStatus();
+  }
+
+  // Function to check if onboarding is completed
+  Future<void> _checkOnboardingStatus() async {
+    final storage = FlutterSecureStorage();
+    String? completed = await storage.read(key: 'onboarding_completed');
+    if (completed == 'true') {
+      setState(() {
+        onboardingCompleted = true;
+      });
+      // Skip onboarding and navigate to login screen
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+        ),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (onboardingCompleted) {
+      return Container();
+    }
+
     Size size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
+          // Use the app's background color or primary color instead of an image
           Positioned.fill(
-            child: Image.asset(
-              "images/wallpaper.jpg",
-              fit: BoxFit.cover,
+            child: Container(
+              color:
+                  colorScheme.background, // Using background color from theme
             ),
           ),
           Column(
@@ -41,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   },
                   controller: _pageController,
                   itemBuilder: (context, index) {
-                    return onBoardingItems(size, index);
+                    return onBoardingItems(size, index, context);
                   },
                 ),
               ),
@@ -49,12 +84,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 onTap: () async {
                   if (currentPage == onBoardData.length - 1) {
                     final storage = FlutterSecureStorage();
+                    // Mark onboarding as complete
                     await storage.write(
                         key: 'onboarding_completed', value: 'true');
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LoginScreen(),
+                        builder: (_) => const LoginScreen(),
                       ),
                       (route) => false,
                     );
@@ -69,7 +105,8 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 70,
                   width: size.width * 0.6,
                   decoration: BoxDecoration(
-                    color: orangeContainer,
+                    color:
+                        colorScheme.primary, // Using primary color from theme
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
@@ -104,78 +141,76 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   AnimatedContainer indicatorForSlider({int? index}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
-      width: currentPage == index ? 20 : 10,
-      height: 10,
-      margin: const EdgeInsets.only(right: 5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: currentPage == index ? orangeContainer : black.withOpacity(0.2),
-      ),
-    );
-  }
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
 
-  Column onBoardingItems(Size size, int index) {
-    return Column(
-      children: [
-        Container(
-          height: size.height * 0.4,
-          width: size.width * 0.9,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Stack(
-            children: [
-              // Positioned(
-              //   bottom: 0,
-              //   child: ClipRRect(
-              //     borderRadius: BorderRadius.circular(50),
-              //     child: Container(
-              //       height: 240,
-              //       width: size.width * 0.9,
-              //       color: black,
-              //     ),
-              //   ),
-              // ),
-              Positioned(
-                top: 75,
-                bottom: 0,
-                right: 0,
-                child: SizedBox(
-                  height: size.height * 0.9,
-                  width: size.width * 0.9,
-                  child: Image.asset(
-                    onBoardData[index].image,
-                    fit: BoxFit.contain,
-                  ),
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 500),
+    width: currentPage == index ? 20 : 10,
+    height: 10,
+    margin: const EdgeInsets.only(right: 5),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      color: currentPage == index 
+          ? colorScheme.primary 
+          : colorScheme.onBackground.withOpacity(0.2), // Use the app's primary color and background color for the indicator
+    ),
+  );
+}
+
+
+Column onBoardingItems(Size size, int index, BuildContext context) {
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+
+  return Column(
+    children: [
+      Container(
+        height: size.height * 0.4,
+        width: size.width * 0.9,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 75,
+              bottom: 0,
+              right: 0,
+              child: SizedBox(
+                height: size.height * 0.9,
+                width: size.width * 0.9,
+                child: Image.asset(
+                  onBoardData[index].image,
+                  fit: BoxFit.contain,
                 ),
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 30),
-        if (index == 0)
-          const Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 35,
-                color: black,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
-              children: [
-                TextSpan(text: "Armstrong"),
-              ],
             ),
-            textAlign: TextAlign.center,
-          )
-        else if (index == 1)
-        const Text.rich(
+          ],
+        ),
+      ),
+      const SizedBox(height: 30),
+      if (index == 0)
+        Text.rich(
           TextSpan(
             style: TextStyle(
               fontSize: 35,
-              color: black,
+              color: colorScheme.primary, // Use primary color from the theme
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            children: [
+              TextSpan(text: "Armstrong"),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        )
+      else if (index == 1)
+        Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: colorScheme.primary, // Use primary color from the theme
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
@@ -185,84 +220,76 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           textAlign: TextAlign.center,
         )
-        else if (index == 2)
-        const Text.rich(
+      else if (index == 2)
+        Text.rich(
           TextSpan(
             style: TextStyle(
               fontSize: 35,
-              color: black,
+              color: colorScheme.primary, // Use primary color from the theme
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
             children: [
-              TextSpan(
-                text: "Sorting through the Noise",
-              ),
+              TextSpan(text: "Sorting through the Noise"),
             ],
           ),
           textAlign: TextAlign.center,
         )
-        else if (index == 3)
-          const Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 35,
-                color: black,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
-              children: [
-                TextSpan(
-                  text: "Browse Resources!",
-                ),
-              ],
+      else if (index == 3)
+        Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: colorScheme.primary, // Use primary color from the theme
+              fontWeight: FontWeight.bold,
+              height: 1.2,
             ),
-            textAlign: TextAlign.center,
-          )
-        else if (index == 4)
-          const Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 35,
-                color: black,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
-              children: [
-                TextSpan(
-                  text: "Find a specialist",
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-          )
-        else if (index == 5)
-          const Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 35,
-                color: black,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
-              children: [
-                TextSpan(
-                  text: "Connect with the community",
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
+            children: [
+              TextSpan(text: "Browse Resources!"),
+            ],
           ),
-        const SizedBox(height: 10),
-        Text(
-          onBoardData[index].text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 15.5,
-            color: Colors.black,
+        )
+      else if (index == 4)
+        Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: colorScheme.primary, // Use primary color from the theme
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            children: [
+              TextSpan(text: "Find a specialist"),
+            ],
           ),
+          textAlign: TextAlign.center,
+        )
+      else if (index == 5)
+        Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: colorScheme.primary, // Use primary color from the theme
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            children: [
+              TextSpan(text: "Join Us"),
+            ],
+          ),
+          textAlign: TextAlign.center,
         ),
-      ],
-    );
-  }
+      const SizedBox(height: 10),
+      Text(
+        onBoardData[index].text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 15.5,
+          color: colorScheme.onBackground, // Use onBackground color for text
+        ),
+      ),
+    ],
+  );
+}
 }
