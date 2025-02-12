@@ -76,34 +76,43 @@ class _SpecialistAppointmentListScreenState
   }
 
   Widget _buildCategoryButton(String category, String label) {
-    final isSelected = selectedCategory == category;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedCategory = category;
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          alignment: Alignment.center,
+  final isSelected = selectedCategory == category;
+  return Expanded(
+    child: GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedCategory = category;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.surfaceVariant,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
-            ),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey.shade600, // Border color
+            width: 1, // Border thickness
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isSelected
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildAppointmentList() {
     List<dynamic> filteredAppointments = [];

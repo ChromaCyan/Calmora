@@ -89,7 +89,8 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 80),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  physics: BouncingScrollPhysics(),
                   itemCount: filteredArticles.length,
                   itemBuilder: (context, index) {
                     final article = filteredArticles[index];
@@ -112,7 +113,10 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
             MaterialPageRoute(builder: (context) => AddArticleScreen()),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          size: 35,
+        ),
       ),
     );
   }
