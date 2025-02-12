@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
 Widget build(BuildContext context) {
-  final theme = Theme.of(context); // Get the current theme
+  final theme = Theme.of(context); 
 
   return Scaffold(
     body: SingleChildScrollView(
@@ -100,10 +100,10 @@ Widget build(BuildContext context) {
 
             Center(
               child: Text(
-                'Recommended Articles for you!',
-                style: theme.textTheme.titleMedium?.copyWith(
+                'Recommended Articles For You!',
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onBackground, 
                 ),
               ),
             ),

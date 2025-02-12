@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Specialist {
   final String name;
   final String specialization;
-  final String imageUrl; // Add an image URL field
+  final String imageUrl; 
 
   Specialist({required this.name, required this.specialization, required this.imageUrl});
 }

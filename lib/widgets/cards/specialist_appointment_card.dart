@@ -4,11 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
+import 'package:armstrong/services/api.dart'; 
 
 class SpecialistAppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
+  final ApiRepository _apiRepository = ApiRepository();
+  final VoidCallback onStatusChanged;
 
-  const SpecialistAppointmentCard({required this.appointment, Key? key}) : super(key: key);
+  SpecialistAppointmentCard({
+    required this.appointment,
+    required this.onStatusChanged,
+  });
 
   String _formatDate(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
@@ -24,6 +30,24 @@ class SpecialistAppointmentCard extends StatelessWidget {
     final startFormatted = _formatTime(startDateTimeString);
     final endFormatted = _formatTime(endDateTimeString);
     return '$startFormatted - $endFormatted';
+  }
+
+  Future<void> _acceptAppointment(BuildContext context, String appointmentId) async {
+    try {
+      await _apiRepository.acceptAppointment(appointmentId);
+      onStatusChanged(); // Refresh the appointment list after accepting
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error accepting appointment')));
+    }
+  }
+
+  Future<void> _declineAppointment(BuildContext context, String appointmentId) async {
+    try {
+      await _apiRepository.declineAppointment(appointmentId);
+      onStatusChanged(); // Refresh the appointment list after declining
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error declining appointment')));
+    }
   }
 
   @override
@@ -120,8 +144,6 @@ class SpecialistAppointmentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12.0),
-
-            // Accept & Decline buttons for "pending" appointments
             if (status == 'pending') ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,7 +151,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        context.read<AppointmentBloc>().add(AcceptAppointmentEvent(appointmentId: appointmentId));
+                        _acceptAppointment(context, appointmentId);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primary,
@@ -144,7 +166,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        context.read<AppointmentBloc>().add(DeclineAppointmentEvent(appointmentId: appointmentId));
+                        _declineAppointment(context, appointmentId);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.error,
@@ -158,14 +180,11 @@ class SpecialistAppointmentCard extends StatelessWidget {
                 ],
               ),
             ],
-
-            // "Proceed to Complete" button for "accepted" appointments
             if (status == 'accepted') ...[
               const SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () {
                   // Navigate to the AppointmentCompleteScreen
-                  print("Navigating to complete screen with ID: $appointmentId");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
