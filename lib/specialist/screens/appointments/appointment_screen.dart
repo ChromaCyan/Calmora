@@ -38,7 +38,7 @@ class _SpecialistAppointmentListScreenState extends State<SpecialistAppointmentL
             return Center(child: Text('Error: ${state.message}'));
           } else if (state is SpecialistAppointmentsLoaded) {
             final allAppointments = state.appointments
-                .where((appointment) => appointment['status'] != 'declined')
+                .where((appointment) => appointment['status'] != 'declined' && appointment['status'] != 'completed')
                 .toList();
 
             if (allAppointments.isEmpty) {
