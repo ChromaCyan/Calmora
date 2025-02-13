@@ -28,7 +28,7 @@ void main() async {
   await NotificationService.initNotifications();
 
   Future.delayed(Duration(seconds: 3), () {
-    socketService.showNotification("Test", "This is a test notification");
+    socketService.showNotification("Welcome to Armstrong", "Men's Mental Health App!");
   });
 
   String? token = await storage.read(key: 'jwt');

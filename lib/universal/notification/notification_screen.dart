@@ -56,19 +56,37 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _markAllAsReadAndExit() async {
+    if (_userId != null) {
+      await apiService.markAllNotificationsAsRead(_userId!);
+      setState(() {
+        for (var notification in notifications) {
+          notification["isRead"] = true;
+        }
+      });
+    }
+    Navigator.pop(context, 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final unreadNotifications = notifications.where((n) => !n["isRead"]).toList();
+    final unreadNotifications =
+        notifications.where((n) => !n["isRead"]).toList();
     final readNotifications = notifications.where((n) => n["isRead"]).toList();
 
     List<Map<String, dynamic>> displayedNotifications =
         selectedCategory == 'unread' ? unreadNotifications : readNotifications;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Notification Screen")),
+      appBar: UniversalAppBar(
+        title: "Notifications",
+        onBackPressed:
+            _markAllAsReadAndExit, 
+      ),
       body: Column(
         children: [
+          const SizedBox(height: 10),
           _buildCategorySelector(),
           const SizedBox(height: 10),
           Expanded(
@@ -78,8 +96,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ? Center(
                         child: Text(
                           "Failed to load notifications",
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.error),
+                          style: theme.textTheme.bodyMedium
+                              ?.copyWith(color: theme.colorScheme.error),
                         ),
                       )
                     : displayedNotifications.isEmpty
@@ -92,7 +110,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         : ListView.builder(
                             itemCount: displayedNotifications.length,
                             itemBuilder: (context, index) {
-                              return NotificationCard(notification: displayedNotifications[index]);
+                              return NotificationCard(
+                                  notification: displayedNotifications[index]);
                             },
                           ),
           ),
