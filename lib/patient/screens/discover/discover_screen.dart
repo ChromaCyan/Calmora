@@ -70,10 +70,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
                 Center(
                   child: HealthAdviceSection(items: carouselData),
                 ),
@@ -81,11 +81,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 Showcase(
                   key: _searchKey,
                   description: "Search for specialists or articles here.",
-                  textColor: theme.colorScheme.onPrimary,
+                  textColor: theme.colorScheme.onBackground,
                   tooltipBackgroundColor: theme.colorScheme.primary,
-                  targetPadding: EdgeInsets.all(12),
+                  targetPadding: const EdgeInsets.all(16),
                   targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  descTextStyle: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.white,
                   ),
                   child: CustomSearchBar(
                     hintText: 'Search',
@@ -107,11 +113,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 Showcase(
                   key: _categoryKey,
                   description: "Select the category of your choice.",
-                  textColor: theme.colorScheme.onPrimary,
+                  textColor: theme.colorScheme.onBackground,
                   tooltipBackgroundColor: theme.colorScheme.primary,
-                  targetPadding: EdgeInsets.all(12),
+                  targetPadding: const EdgeInsets.all(16),
                   targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  descTextStyle: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.white,
                   ),
                   child: CategoryChip(
                     categories: ['Specialist', 'Articles'],
@@ -124,15 +136,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Showcase(
-                  key: _specialistKey,
-                  description:
-                      "Browse through available specialists or articles",
-                  textColor: theme.colorScheme.onPrimary,
-                  tooltipBackgroundColor: theme.colorScheme.primary,
-                  targetPadding: EdgeInsets.all(12),
-                  targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                   child: selectedCategory == 'Specialist'
                       ? _buildSpecialistList()
@@ -148,72 +163,70 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildSpecialistList() {
-  return FutureBuilder<List<dynamic>>(
-    future: ApiRepository().getSpecialistList(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Center(child: Text('Error: ${snapshot.error}'));
-      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return const Center(child: Text('No specialists found.'));
-      }
+    return FutureBuilder<List<dynamic>>(
+      future: ApiRepository().getSpecialistList(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No specialists found.'));
+        }
 
-      final specialists = snapshot.data!;
-      final filteredSpecialists = specialists.where((specialist) {
-        final name = '${specialist['firstName']} ${specialist['lastName']}';
-        return name.toLowerCase().contains(searchQuery.toLowerCase());
-      }).toList();
+        final specialists = snapshot.data!;
+        final filteredSpecialists = specialists.where((specialist) {
+          final name = '${specialist['firstName']} ${specialist['lastName']}';
+          return name.toLowerCase().contains(searchQuery.toLowerCase());
+        }).toList();
 
-      if (filteredSpecialists.isEmpty) {
-        return const Center(child: Text('No matching specialists found.'));
-      }
+        if (filteredSpecialists.isEmpty) {
+          return const Center(child: Text('No matching specialists found.'));
+        }
 
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 0.75,
-        ),
-        itemCount: filteredSpecialists.length,
-        itemBuilder: (context, index) {
-          final specialist = filteredSpecialists[index];
-          final name =
-              '${specialist['firstName']} ${specialist['lastName']}';
-          final specialization = specialist['specialization'] ?? 'Unknown';
-          final image = specialist['profileImage']?.isEmpty ?? true
-              ? 'images/splash/doc1.jpg'
-              : specialist['profileImage'];
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.75,
+          ),
+          itemCount: filteredSpecialists.length,
+          itemBuilder: (context, index) {
+            final specialist = filteredSpecialists[index];
+            final name = '${specialist['firstName']} ${specialist['lastName']}';
+            final specialization = specialist['specialization'] ?? 'Unknown';
+            final image = specialist['profileImage']?.isEmpty ?? true
+                ? 'images/splash/doc1.jpg'
+                : specialist['profileImage'];
 
-          return SpecialistCard(
-            specialist: Specialist(
-              name: name,
-              specialization: specialization,
-              imageUrl: image,
-            ),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SpecialistDetailScreen(
-                    specialistId: specialist['_id'],
+            return SpecialistCard(
+              specialist: Specialist(
+                name: name,
+                specialization: specialization,
+                imageUrl: image,
+              ),
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SpecialistDetailScreen(
+                      specialistId: specialist['_id'],
+                    ),
                   ),
-                ),
-              );
-              if (result != null && result == 'refresh') {
-                setState(() {});
-              }
-            },
-          );
-        },
-      );
-    },
-  );
-}
-
+                );
+                if (result != null && result == 'refresh') {
+                  setState(() {});
+                }
+              },
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget _buildArticleList() {
     return FutureBuilder<List<Map<String, dynamic>>>(

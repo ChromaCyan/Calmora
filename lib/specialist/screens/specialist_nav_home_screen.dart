@@ -75,95 +75,108 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); 
+    final theme = Theme.of(context);
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-           child: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              iconTheme: IconThemeData(
-                color: theme.iconTheme.color, 
-                size: 28.0,
-              ),
-              leading: IconButton(
-                icon: Icon(
-                  Icons.person_2,
-                  size: 28,
-                  color: theme.iconTheme.color ??
-                      Colors.black, 
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfileScreen(),
-                    ),
-                  );
-                },
-              ),
-              title: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: Text(
-                  _getDynamicTitle(),
-                  key: ValueKey<int>(_selectedIndex),
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color:
-                        theme.textTheme.headlineMedium?.color ?? Colors.black,
+          preferredSize: const Size.fromHeight(80),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0, left: 5, right: 5),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                ],
               ),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: Stack(
-                    children: [
-                      const Icon(Icons.notifications, size: 28),
-                      if (_unreadCount > 0)
-                        Positioned(
-                          right: 0,
-                          child: Container(
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            constraints: BoxConstraints(
-                              minWidth: 12,
-                              minHeight: 12,
-                            ),
-                            child: Text(
-                              '$_unreadCount',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
+              child: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                iconTheme: IconThemeData(
+                  color: theme.iconTheme.color,
+                  size: 28.0,
+                ),
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.person_2,
+                    size: 28,
+                    color: theme.iconTheme.color ?? Colors.black,
                   ),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NotificationsScreen(),
+                        builder: (context) => ProfileScreen(),
                       ),
-                    ).then((value) {
-                      if (_userId != null) {
-                        _fetchUnreadNotificationsCount();
-                      }
-                    });
+                    );
                   },
                 ),
-              ],
+                title: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Text(
+                    _getDynamicTitle(),
+                    key: ValueKey<int>(_selectedIndex),
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color:
+                          theme.textTheme.headlineMedium?.color ?? Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                    icon: Stack(
+                      children: [
+                        const Icon(Icons.notifications, size: 28),
+                        if (_unreadCount > 0)
+                          Positioned(
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                '$_unreadCount',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationsScreen(),
+                        ),
+                      ).then((value) {
+                        if (_userId != null) {
+                          _fetchUnreadNotificationsCount();
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -176,14 +189,16 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
               });
             },
             children: [
-              SpecialistDashboardScreen(),
+              _userId != null
+                  ? SpecialistDashboardScreen(specialistId: _userId!)
+                  : const Center(child: CircularProgressIndicator()),
               _userId != null
                   ? SpecialistArticleScreen(specialistId: _userId!)
-                  : Center(child: CircularProgressIndicator()),
+                  : const Center(child: CircularProgressIndicator()),
               ChatListScreen(),
               _userId != null
                   ? SpecialistAppointmentListScreen(specialistId: _userId!)
-                  : Center(child: CircularProgressIndicator()),
+                  : const Center(child: CircularProgressIndicator()),
             ],
           ),
         ),

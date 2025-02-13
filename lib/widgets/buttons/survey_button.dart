@@ -32,7 +32,8 @@ class QuickTestButton extends StatelessWidget {
           Text(
             'Take a quick test about your mental health',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.white, 
+              color: Colors.white,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -55,7 +56,7 @@ class QuickTestButton extends StatelessWidget {
             child: Text(
               'Start',
               style: theme.textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSecondary,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),

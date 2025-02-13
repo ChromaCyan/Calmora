@@ -29,6 +29,7 @@ class JournalSection extends StatelessWidget {
             'Daily Journal',
             style: theme.textTheme.titleMedium?.copyWith(
               color: Colors.white,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -52,6 +53,7 @@ class JournalSection extends StatelessWidget {
               'Log Your Mood',
               style: theme.textTheme.labelLarge?.copyWith(
                 color: Colors.white,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),

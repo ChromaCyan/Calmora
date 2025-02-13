@@ -5,7 +5,7 @@ import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ApiRepository {
-  final String baseUrl = 'http://192.168.18.253:5000/api';
+  final String baseUrl = 'https://armstrong-api.vercel.app/api';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /////////////////////////////////////////////////////////////////////////////////

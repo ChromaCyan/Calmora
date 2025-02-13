@@ -169,34 +169,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Reviews
-                    _buildSectionTitle('Reviews'),
-                    if (reviews.isEmpty) const Text('No reviews yet.'),
-                    if (reviews.isNotEmpty)
-                      Column(
-                        children: reviews.map<Widget>((review) {
-                          return ListTile(
-                            leading:
-                                const Icon(Icons.person, color: Colors.blue),
-                            title: Text(review['reviewerName'] ?? 'Anonymous'),
-                            subtitle: Text(review['comment'] ?? 'No comment'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(
-                                5,
-                                (index) => Icon(
-                                  Icons.star,
-                                  color: index < (review['rating'] ?? 0)
-                                      ? Colors.amber
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    const SizedBox(height: 24),
-
                     // Action Buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

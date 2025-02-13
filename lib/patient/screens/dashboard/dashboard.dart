@@ -44,102 +44,124 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  final theme = Theme.of(context); 
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
-  return Scaffold(
-    body: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Card
-            const WelcomeSection(),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Welcome Card
+              const WelcomeSection(),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            // Highlight Survey Card
-            Showcase(
-              key: _quickTestKey,
-              description: "Tap here to take a quick mental health assessment.",
-              textColor: theme.colorScheme.onPrimary, 
-              tooltipBackgroundColor: theme.colorScheme.primary, 
-              targetPadding: const EdgeInsets.all(12),
-              targetShapeBorder: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              // Highlight Survey Card
+              Showcase(
+                key: _quickTestKey,
+                description:
+                    "Tap here to take a quick mental health assessment.",
+                textColor: theme.colorScheme.onPrimary,
+                tooltipBackgroundColor: theme.colorScheme.primary,
+                targetPadding: const EdgeInsets.all(16),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                descTextStyle: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
+                ),
+                child: const Center(child: QuickTestButton()),
               ),
-              child: const Center(child: QuickTestButton()),
-            ),
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            Center(
-              child: Text(
-                'Write about your day!',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground, 
+              Center(
+                child: Text(
+                  'Write about your day!',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
                 ),
               ),
-            ),
 
-            // Highlight Journal Card
-            Showcase(
-              key: _journalKey,
-              description: "Write your thoughts and feelings in your personal journal.",
-              textColor: theme.colorScheme.onPrimary,
-              tooltipBackgroundColor: theme.colorScheme.primary,
-              targetPadding: const EdgeInsets.all(10),
-              targetShapeBorder: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              // Highlight Journal Card
+              Showcase(
+                key: _journalKey,
+                description:
+                    "Write your thoughts and feelings in your personal journal.",
+                textColor: theme.colorScheme.onPrimary,
+                tooltipBackgroundColor: theme.colorScheme.primary,
+                targetPadding: const EdgeInsets.all(16),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                descTextStyle: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
+                ),
+                child: const JournalSection(),
               ),
-              child: const JournalSection(),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            Center(
-              child: Text(
-                'Recommended Articles For You!',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground, 
+              Center(
+                child: Text(
+                  'Recommended Articles For You!',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
                 ),
               ),
-            ),
 
-            // Highlight Article List
-            Showcase(
-              key: _articleKey,
-              description: "Check out the latest articles recommended for you.",
-              textColor: theme.colorScheme.onPrimary,
-              tooltipBackgroundColor: theme.colorScheme.primary,
-              targetPadding: const EdgeInsets.all(10),
-              targetShapeBorder: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              // Highlight Article List
+              Showcase(
+                key: _articleKey,
+                description:
+                    "Check out the latest articles recommended for you.",
+                textColor: theme.colorScheme.onPrimary,
+                tooltipBackgroundColor: theme.colorScheme.primary,
+                targetPadding: const EdgeInsets.all(16),
+                targetShapeBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                descTextStyle: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
+                ),
+                child: const ArticleList(),
               ),
-              child: const ArticleList(),
-            ),
-            const SizedBox(height: 30),
 
-            Center(
-              child: Text(
-                'Weekly Mood Chart',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+              const SizedBox(height: 30),
+
+              Center(
+                child: Text(
+                  'Weekly Mood Chart',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
                 ),
               ),
-            ),
 
-            SizedBox(
-              height: 300,
-              child: const MoodChartScreen(),
-            ),
-          ],
+              SizedBox(
+                height: 300,
+                child: const MoodChartScreen(),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

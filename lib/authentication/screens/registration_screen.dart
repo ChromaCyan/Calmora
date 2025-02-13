@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/authentication/blocs/auth_event.dart';
 import 'package:armstrong/authentication/blocs/auth_state.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:armstrong/widgets/text/register_built_text_field.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -124,9 +124,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             children: [
               Positioned.fill(
                 child: Container(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary, 
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               SingleChildScrollView(
@@ -138,9 +136,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         maxWidth: MediaQuery.of(context).size.width * 0.85,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surface,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Padding(
@@ -182,73 +178,85 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     child: Text("Specialist"),
                                   ),
                                 ],
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface, 
+                                color: Theme.of(context).colorScheme.onSurface,
                                 selectedColor: Colors.white,
-                                fillColor: Theme.of(context)
-                                    .colorScheme
-                                    .secondary, 
+                                fillColor:
+                                    Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               const SizedBox(height: 20),
-                              _buildTextField(
-                                  "First Name", _firstNameController),
+                              CustomTextField(
+                                  label: "First Name",
+                                  controller: _firstNameController),
                               const SizedBox(height: 20),
-                              _buildTextField("Last Name", _lastNameController),
+                              CustomTextField(
+                                  label: "Last Name",
+                                  controller: _lastNameController),
                               const SizedBox(height: 20),
-                              _buildTextField("Email", _emailController),
+                              CustomTextField(
+                                  label: "Email", controller: _emailController),
                               const SizedBox(height: 20),
-                              _buildTextField(
-                                  "Phone Number", _phoneNumberController),
+                              CustomTextField(
+                                  label: "Phone Number",
+                                  controller: _phoneNumberController),
                               const SizedBox(height: 20),
-                              _buildTextField("Password", _passwordController,
+                              CustomTextField(
+                                  label: "Password",
+                                  controller: _passwordController,
                                   obscureText: true),
                               const SizedBox(height: 20),
-                              _buildTextField("Confirm Password",
-                                  _confirmPasswordController,
+                              CustomTextField(
+                                  label: "Confirm Password",
+                                  controller: _confirmPasswordController,
                                   obscureText: true),
                               const SizedBox(height: 20),
                               if (isPatient) ...[
                                 GestureDetector(
                                   onTap: () => _selectDate(context),
                                   child: AbsorbPointer(
-                                    child: _buildTextField(
-                                      "Date of Birth",
-                                      _dateOfBirthController,
-                                      isRequired: true,
+                                    child: CustomTextField(
+                                      label: "Date of Birth",
+                                      controller: _dateOfBirthController,
+                                      readOnly: true,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                _buildTextField(
-                                    "Emergency Contact Name (optional)",
-                                    _emergencyContactNameController,
+                                CustomTextField(
+                                    label: "Emergency Contact Name (optional)",
+                                    controller: _emergencyContactNameController,
                                     isRequired: false),
                                 const SizedBox(height: 20),
-                                _buildTextField(
-                                    "Emergency Contact Phone (optional)",
-                                    _emergencyContactPhoneController,
+                                CustomTextField(
+                                    label: "Emergency Contact Phone (optional)",
+                                    controller:
+                                        _emergencyContactPhoneController,
                                     isRequired: false),
                                 const SizedBox(height: 20),
-                                _buildTextField(
-                                    "Emergency Contact Relation (optional)",
-                                    _emergencyContactRelationController,
+                                CustomTextField(
+                                    label:
+                                        "Emergency Contact Relation (optional)",
+                                    controller:
+                                        _emergencyContactRelationController,
                                     isRequired: false),
                                 const SizedBox(height: 20),
-                                _buildTextField("Medical History (optional)",
-                                    _medicalHistoryController,
+                                CustomTextField(
+                                    label: "Medical History (optional)",
+                                    controller: _medicalHistoryController,
                                     isRequired: false),
                                 const SizedBox(height: 20),
-                                _buildTextField("Therapy Goals (optional)",
-                                    _therapyGoalsController,
+                                CustomTextField(
+                                    label: "Therapy Goals (optional)",
+                                    controller: _therapyGoalsController,
                                     isRequired: false),
                               ] else ...[
-                                _buildTextField("Specialization",
-                                    _specializationController),
+                                CustomTextField(
+                                    label: "Specialization",
+                                    controller: _specializationController),
                                 const SizedBox(height: 20),
-                                _buildTextField(
-                                    "License Number", _licenseNumberController),
+                                CustomTextField(
+                                    label: "License Number",
+                                    controller: _licenseNumberController),
                               ],
                               const SizedBox(height: 20),
                               ElevatedButton(
@@ -288,40 +296,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool obscureText = false, bool isRequired = true}) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(
-            color:
-                Theme.of(context).colorScheme.onSurface), 
-        filled: true,
-        fillColor:
-            Theme.of(context).colorScheme.background, 
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary), 
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 2),
-        ),
-      ),
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-      obscureText: obscureText,
-      validator: (value) {
-        if (isRequired && (value == null || value.isEmpty)) {
-          return "$label is required";
-        }
-        return null;
-      },
     );
   }
 }

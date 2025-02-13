@@ -70,6 +70,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       backgroundColor: theme.colorScheme.background,
       body: Column(
         children: [
+          const SizedBox(height: 20),
           CustomSearchBar(
             hintText: 'Search chats...',
             searchController: _searchController,
