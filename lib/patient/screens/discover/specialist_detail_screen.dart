@@ -175,19 +175,19 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
 
                           // Display the selected section
                           Expanded(
-        child: SingleChildScrollView(
-          child: showContactInfo
-              ? ContactInfoCard(
-                  email: specialist['email'] ?? 'No email',
-                  phoneNumber: specialist['phoneNumber'] ?? 'No phone',
-                )
-              : ProDeetsCard(
-                  yearsOfExperience: specialist['yearsOfExperience'] ?? 0,
-                  languagesSpoken: specialist['languagesSpoken'] ?? [],
-                  licenseNumber: specialist['licenseNumber'] ?? 'N/A',
-                ),
-        ),
-      ),
+                            child: SingleChildScrollView(
+                              child: showContactInfo
+                                  ? ContactInfoCard(
+                                      email: specialist['email'] ?? 'No email',
+                                      phoneNumber: specialist['phoneNumber'] ?? 'No phone',
+                                    )
+                                  : ProDeetsCard(
+                                      yearsOfExperience: specialist['yearsOfExperience'] ?? 0,
+                                      languagesSpoken: specialist['languagesSpoken'] ?? [],
+                                      licenseNumber: specialist['licenseNumber'] ?? 'N/A',
+                                    ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -195,45 +195,47 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     const SizedBox(height: 16),
 
                     // Availability
-                    _buildSectionTitle('Availability'),
-                    Chip(
-                      label: Text(
-                        availability,
-                        style: const TextStyle(color: Colors.white),
+                    _buildSectionTitle('Availability:'),
+                    Text(
+                      availability,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: availability == 'Available'
+                            ? Colors.green
+                            : Colors.red,
                       ),
-                      backgroundColor: availability == 'Available'
-                          ? Colors.green
-                          : Colors.red,
                     ),
+
                     const SizedBox(height: 24),
 
-                    // Reviews
-                    _buildSectionTitle('Reviews'),
-                    if (reviews.isEmpty) const Text('No reviews yet.'),
-                    if (reviews.isNotEmpty)
-                      Column(
-                        children: reviews.map<Widget>((review) {
-                          return ListTile(
-                            leading:
-                                const Icon(Icons.person, color: Colors.blue),
-                            title: Text(review['reviewerName'] ?? 'Anonymous'),
-                            subtitle: Text(review['comment'] ?? 'No comment'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(
-                                5,
-                                (index) => Icon(
-                                  Icons.star,
-                                  color: index < (review['rating'] ?? 0)
-                                      ? Colors.amber
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    const SizedBox(height: 24),
+                    // // Reviews
+                    // _buildSectionTitle('Reviews'),
+                    // if (reviews.isEmpty) const Text('No reviews yet.'),
+                    // if (reviews.isNotEmpty)
+                    //   Column(
+                    //     children: reviews.map<Widget>((review) {
+                    //       return ListTile(
+                    //         leading:
+                    //             const Icon(Icons.person, color: Colors.blue),
+                    //         title: Text(review['reviewerName'] ?? 'Anonymous'),
+                    //         subtitle: Text(review['comment'] ?? 'No comment'),
+                    //         trailing: Row(
+                    //           mainAxisSize: MainAxisSize.min,
+                    //           children: List.generate(
+                    //             5,
+                    //             (index) => Icon(
+                    //               Icons.star,
+                    //               color: index < (review['rating'] ?? 0)
+                    //                   ? Colors.amber
+                    //                   : Colors.grey,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       );
+                    //     }).toList(),
+                    //   ),
+                    // const SizedBox(height: 24),
 
                     // Action Buttons
                     SpecialistActionButtons(
