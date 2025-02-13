@@ -32,7 +32,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  "With: ${appointment["specialist"]?["firstName"]?["lastName"] ?? appointment["patient"]?["firstName"] ?? "Unknown"}",
+                  "With: ${appointment["specialist"] != null ? "${appointment["specialist"]["firstName"]} ${appointment["specialist"]["lastName"]}" : appointment["patient"]?["firstName"] ?? "Unknown"}",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),

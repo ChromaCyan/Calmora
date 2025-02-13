@@ -58,6 +58,8 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   flex_color_scheme: ^8.1.0
   scrollable_positioned_list: ^0.3.8
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -67,6 +69,21 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/armstrong_transparent.png"
+  adaptive_icon_background: "#00296b" 
+  adaptive_icon_foreground: "images/armstrong_transparent.png"
+
+flutter_native_splash:
+  color: "#00296b" 
+  image: "images/armstrong_transparent_2.png" 
+  android: true
+  ios: true
+  fullscreen: true
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -74,7 +91,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -104,6 +121,7 @@ flutter:
     - images/splash/logo2.png
     - images/armstrong_white.png
     - images/armstrong_transparent.png
+    - images/armstrong_transparent_2.png
     - images/icons/bipolar-disorder.svg
     - images/icons/depression.svg
     - images/icons/depression2.svg

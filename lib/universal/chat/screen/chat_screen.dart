@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadMessages();
   }
 
-   void _initializeSocket() async {
+  void _initializeSocket() async {
     final token = await _storage.read(key: 'token');
     if (token != null) {
       _socketService.connect(token);
@@ -60,7 +60,6 @@ class _ChatScreenState extends State<ChatScreen> {
       };
     }
   }
-
 
   void _loadMessages() async {
     final token = await _storage.read(key: 'token');
@@ -127,112 +126,127 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  final theme = Theme.of(context).colorScheme;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
 
-  return Scaffold(
-    appBar: UniversalAppBar(
-      title: "Chat with ${widget.recipientName}",
-      onBackPressed: () => Navigator.pop(context),
-    ),
-    body: Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () => _bookAppointment(context),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-              backgroundColor: theme.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+    return Scaffold(
+      appBar: AppBar(title: Text("Chat with ${widget.recipientName}")),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => _bookAppointment(context),
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
+                backgroundColor: theme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                shadowColor: Colors.black.withOpacity(0.2),
+                elevation: 5,
               ),
-              shadowColor: Colors.black.withOpacity(0.2),
-              elevation: 5,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.calendar_today,
+                      color: Colors.white, size: 22),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Create Appointment Now",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ],
+              ),
             ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final message = _messages[index];
+                final isSender = message['senderId'] == _userId;
+                final content = message['content'] ?? 'No message';
+                final timestamp =
+                    message['timestamp'] ?? DateTime.now().toString();
+
+                return Align(
+                  alignment:
+                      isSender ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    padding: const EdgeInsets.all(12),
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75),
+                    decoration: BoxDecoration(
+                      color: isSender
+                          ? theme.primary.withOpacity(0.2)
+                          : theme.surfaceVariant,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(12),
+                        topRight: const Radius.circular(12),
+                        bottomLeft:
+                            isSender ? const Radius.circular(12) : Radius.zero,
+                        bottomRight:
+                            isSender ? Radius.zero : const Radius.circular(12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isSender)
+                          Text(
+                            widget.recipientName,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: theme.onSurface),
+                          ),
+                        Text(content,
+                            style: TextStyle(color: theme.onBackground)),
+                        const SizedBox(height: 5),
+                        Text(
+                          _formatTimestamp(timestamp),
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: theme.onSurface.withOpacity(0.6)),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.calendar_today, color: Colors.white, size: 22),
-                const SizedBox(width: 10),
-                const Text(
-                  "Create Appointment Now",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: 'Type a message',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.send, color: theme.primary),
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: _messages.length,
-            itemBuilder: (context, index) {
-              final message = _messages[index];
-              final isSender = message['senderId'] == _userId;
-              final content = message['content'] ?? 'No message';
-              final timestamp = message['timestamp'] ?? DateTime.now().toString();
-
-              return Align(
-                alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  padding: const EdgeInsets.all(12),
-                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-                  decoration: BoxDecoration(
-                    color: isSender ? theme.primary.withOpacity(0.2) : theme.surfaceVariant,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(12),
-                      topRight: const Radius.circular(12),
-                      bottomLeft: isSender ? const Radius.circular(12) : Radius.zero,
-                      bottomRight: isSender ? Radius.zero : const Radius.circular(12),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (!isSender)
-                        Text(
-                          widget.recipientName,
-                          style: TextStyle(fontWeight: FontWeight.bold, color: theme.onSurface),
-                        ),
-                      Text(content, style: TextStyle(color: theme.onBackground)),
-                      const SizedBox(height: 5),
-                      Text(
-                        _formatTimestamp(timestamp),
-                        style: TextStyle(fontSize: 10, color: theme.onSurface.withOpacity(0.6)),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Type a message',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Icon(Icons.send, color: theme.primary),
-                onPressed: _sendMessage,
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }

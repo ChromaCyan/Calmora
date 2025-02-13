@@ -33,18 +33,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _licenseNumberController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
+  final DateTime now = DateTime.now();
+  final DateTime minAllowedDate = DateTime(1900);
+  final DateTime maxAllowedDate = DateTime(now.year - 12, now.month, now.day);
 
-    if (pickedDate != null) {
-      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-      _dateOfBirthController.text = formattedDate;
-    }
+  final DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: maxAllowedDate, 
+    firstDate: minAllowedDate,
+    lastDate: maxAllowedDate, 
+  );
+
+  if (pickedDate != null) {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+    _dateOfBirthController.text = formattedDate;
   }
+}
+
 
   void _onRegisterButtonPressed() {
     if (_formKey.currentState!.validate()) {

@@ -52,9 +52,6 @@ void main() async {
     socketService.connect(token);
   }
 
-  // Set the app to immersive full-screen mode (hide status and navigation bar)
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-
   runApp(MyApp(
     isLoggedIn: token != null,
     role: role,

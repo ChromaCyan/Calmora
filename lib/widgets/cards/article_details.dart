@@ -44,13 +44,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: UniversalAppBar(
-        title: article?['title'] ?? 'Article Details',
-        onBackPressed: () {
-          Navigator.pop(context);
-        },
-        actions: [],
-      ),
+      appBar: AppBar(title: Text(article?['title'] ?? 'Article Details')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty

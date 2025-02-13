@@ -47,12 +47,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: UniversalAppBar(
-        title: "Specialist Details",
-        onBackPressed: () {
-          Navigator.pop(context);
-        },
-      ),
+      appBar: AppBar(title: Text("Specialist Details")),
       body: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading) {

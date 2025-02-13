@@ -66,13 +66,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         selectedCategory == 'unread' ? unreadNotifications : readNotifications;
 
     return Scaffold(
-      appBar: UniversalAppBar(
-        title: "Notifications",
-        onBackPressed: () => Navigator.pop(context, 0),
-      ),
+      appBar: AppBar(title: Text("Notification Screen")),
       body: Column(
         children: [
-          const SizedBox(height:20),
           _buildCategorySelector(),
           const SizedBox(height: 10),
           Expanded(

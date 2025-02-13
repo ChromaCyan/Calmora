@@ -99,8 +99,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text('Add Article')),
-      appBar: UniversalAppBar(title: "Add Article"),
+      appBar: AppBar(title: Text("Publish Article"),),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Card(
