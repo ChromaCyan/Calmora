@@ -10,6 +10,11 @@ import 'package:armstrong/patient/blocs/profile/profile_event.dart';
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/widgets/buttons/specialist_action_button.dart';
+import 'package:armstrong/widgets/cards/specialist_bio_card.dart';
+import 'package:armstrong/widgets/buttons/toggle_button.dart';
+import 'package:armstrong/patient/screens/discover/contact_info_card.dart';
+import 'package:armstrong/patient/screens/discover/pro_deets_card.dart';
 
 class SpecialistDetailScreen extends StatefulWidget {
   final String specialistId;
@@ -24,6 +29,7 @@ class SpecialistDetailScreen extends StatefulWidget {
 class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
   final ApiRepository _apiRepository = ApiRepository();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
+  bool showContactInfo = true;
 
   @override
   void initState() {
@@ -47,7 +53,12 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Specialist Details")),
+      appBar: UniversalAppBar(
+        title: "Specialist Details",
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       body: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading) {
@@ -128,27 +139,59 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     const SizedBox(height: 24),
 
                     // Bio
-                    _buildSectionTitle('Bio'),
-                    Text(
-                      bio,
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    SpecialistBioSection(bio: bio),
+
                     const SizedBox(height: 16),
 
                     // Contact Information
-                    _buildSectionTitle('Contact Information'),
-                    _buildInfoRow(Icons.email, email),
-                    _buildInfoRow(Icons.phone, phoneNumber),
-                    const SizedBox(height: 16),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.30, // 35% of screen height
 
-                    // Professional Details
-                    _buildSectionTitle('Professional Details'),
-                    _buildInfoRow(
-                        Icons.work, 'Years of Experience: $yearsOfExperience'),
-                    _buildInfoRow(Icons.language,
-                        'Languages Spoken: ${languagesSpoken.join(", ")}'),
-                    _buildInfoRow(
-                        Icons.assignment, 'License Number: $licenseNumber'),
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor, // Matches theme
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.4),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          // Toggle Buttons
+                          ToggleButton(
+                            onToggle: (isContactInfo) {
+                              setState(() {
+                                showContactInfo = isContactInfo;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Display the selected section
+                          Expanded(
+        child: SingleChildScrollView(
+          child: showContactInfo
+              ? ContactInfoCard(
+                  email: specialist['email'] ?? 'No email',
+                  phoneNumber: specialist['phoneNumber'] ?? 'No phone',
+                )
+              : ProDeetsCard(
+                  yearsOfExperience: specialist['yearsOfExperience'] ?? 0,
+                  languagesSpoken: specialist['languagesSpoken'] ?? [],
+                  licenseNumber: specialist['licenseNumber'] ?? 'N/A',
+                ),
+        ),
+      ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 16),
 
                     // Availability
@@ -164,76 +207,39 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Action Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () =>
-                              _bookAppointment(context, widget.specialistId),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
-                          ),
-                          child: const Text(
-                            'Book Appointment',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final token = await _storage.read(key: 'token');
-                            if (token != null) {
-                              try {
-                                // Check if a chat already exists
-                                final existingChatId =
-                                    await _apiRepository.getExistingChatId(
-                                        widget.specialistId, token);
+                    // Reviews
+                    _buildSectionTitle('Reviews'),
+                    if (reviews.isEmpty) const Text('No reviews yet.'),
+                    if (reviews.isNotEmpty)
+                      Column(
+                        children: reviews.map<Widget>((review) {
+                          return ListTile(
+                            leading:
+                                const Icon(Icons.person, color: Colors.blue),
+                            title: Text(review['reviewerName'] ?? 'Anonymous'),
+                            subtitle: Text(review['comment'] ?? 'No comment'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(
+                                5,
+                                (index) => Icon(
+                                  Icons.star,
+                                  color: index < (review['rating'] ?? 0)
+                                      ? Colors.amber
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    const SizedBox(height: 24),
 
-                                if (existingChatId != null) {
-                                  // Navigate to the existing chat
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatScreen(
-                                        chatId: existingChatId,
-                                        recipientId: widget.specialistId,
-                                        recipientName: name,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  // Create a new chat
-                                  final newChatId = await _apiRepository
-                                      .createChat(widget.specialistId, token);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatScreen(
-                                        chatId: existingChatId ?? newChatId,
-                                        recipientId: widget.specialistId,
-                                        recipientName: name,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              } catch (e) {
-                                print('Error starting chat: $e');
-                              }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
-                          ),
-                          child: const Text(
-                            'Chat with Specialist',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
+                    // Action Buttons
+                    SpecialistActionButtons(
+                      specialistId: widget.specialistId,
+                      name: name,
+                      onBookAppointment: () => _bookAppointment(context, widget.specialistId),
                     ),
                   ],
                 ),

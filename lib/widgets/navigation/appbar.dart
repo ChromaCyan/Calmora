@@ -20,7 +20,7 @@ class UniversalAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
+        icon: Icon(Icons.arrow_back_ios_new_rounded, color: colorScheme.onPrimary),
         onPressed: onBackPressed ?? () => Navigator.pop(context),
       ),
       title: Text(
