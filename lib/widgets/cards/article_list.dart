@@ -1,19 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/models/article/article.dart';
 
-class ArticleList extends StatelessWidget {
+class ArticleList extends StatefulWidget {
   final String searchQuery;
 
   const ArticleList({Key? key, this.searchQuery = ''}) : super(key: key);
 
   @override
+  _ArticleListState createState() => _ArticleListState();
+}
+
+class _ArticleListState extends State<ArticleList> {
+  String? _patientId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  // Fetch patientId from secure storage
+  Future<void> _loadUserId() async {
+    final FlutterSecureStorage storage = FlutterSecureStorage();
+    final userId = await storage.read(key: 'userId');
+    setState(() {
+      _patientId = userId;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // If patientId is not loaded yet, show a loading indicator
+    if (_patientId == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return SizedBox(
       height: 230,
       child: FutureBuilder<List<Article>>(
-        future: ApiRepository().getAllArticles(),
+        future: ApiRepository().getRecommendedArticles(_patientId!), 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -25,7 +53,7 @@ class ArticleList extends StatelessWidget {
 
           final articles = snapshot.data!;
           final filteredArticles = articles.where((article) {
-            return article.title.toLowerCase().contains(searchQuery.toLowerCase());
+            return article.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
           }).toList();
 
           if (filteredArticles.isEmpty) {

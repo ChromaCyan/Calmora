@@ -461,7 +461,7 @@ class ApiRepository {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Survey API
 
-// Get all surveys
+  // Get all surveys
   Future<List<Map<String, dynamic>>> getSurveys() async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/survey/all');
@@ -479,7 +479,7 @@ class ApiRepository {
     }
   }
 
-// Submit survey response (Patient only)
+  // Submit survey response (Patient only)
   Future<Map<String, dynamic>> submitSurveyResponse(
       String patientId,
       String surveyId,
@@ -535,6 +535,25 @@ class ApiRepository {
       return data.map((result) => Map<String, dynamic>.from(result)).toList();
     } else {
       throw Exception('Failed to fetch survey results: ${response.body}');
+    }
+  }
+
+  // Get recommended articles based on the patient's latest survey interpretation
+  Future<List<Article>> getRecommendedArticles(String patientId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/survey/$patientId/recommended-articles');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      // Convert each item to an Article object
+      return data.map((articleData) => Article.fromMap(articleData)).toList();
+    } else {
+      throw Exception('Failed to fetch recommended articles: ${response.body}');
     }
   }
 
@@ -595,7 +614,6 @@ class ApiRepository {
     }
   }
 
-
   // Create a new article
   Future<Map<String, dynamic>> createArticle({
     required String title,
@@ -603,7 +621,7 @@ class ApiRepository {
     required String heroImage,
     List<String>? additionalImages,
     required String specialistId,
-    required List<String> categories, 
+    required List<String> categories,
   }) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/create-article');
@@ -620,7 +638,7 @@ class ApiRepository {
         'heroImage': heroImage,
         'additionalImages': additionalImages ?? [],
         'specialistId': specialistId,
-        'categories': categories, 
+        'categories': categories,
       }),
     );
 
