@@ -1,4 +1,5 @@
 import 'package:armstrong/config/app_theme.dart';
+import 'package:armstrong/splash_screen/screens/survey_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'splash_screen/screens/splash_screen.dart';
@@ -28,12 +29,23 @@ void main() async {
   await NotificationService.initNotifications();
 
   Future.delayed(Duration(seconds: 3), () {
-    socketService.showNotification("Welcome to Armstrong", "Men's Mental Health App!");
+    socketService.showNotification(
+        "Welcome to Armstrong", "Men's Mental Health App!");
   });
 
   String? token = await storage.read(key: 'jwt');
   String? role;
   bool onboardingCompleted = await _checkOnboardingStatus();
+
+  // Check if survey is completed for patient
+  bool hasCompletedSurvey = false;
+  bool surveyOnboardingCompleted = false;
+  if (token != null && role == 'Patient') {
+    hasCompletedSurvey =
+        await storage.read(key: 'hasCompletedSurvey') == 'true';
+    surveyOnboardingCompleted =
+        await storage.read(key: 'survey_onboarding_completed') == 'true';
+  }
 
   if (token != null) {
     try {
@@ -56,6 +68,8 @@ void main() async {
     isLoggedIn: token != null,
     role: role,
     onboardingCompleted: onboardingCompleted,
+    hasCompletedSurvey: hasCompletedSurvey,
+    surveyOnboardingCompleted: surveyOnboardingCompleted,
   ));
 }
 
@@ -69,12 +83,16 @@ class MyApp extends StatelessWidget {
   final bool isLoggedIn;
   final String? role;
   final bool onboardingCompleted;
+  final bool hasCompletedSurvey;
+  final bool surveyOnboardingCompleted;
 
   const MyApp({
     super.key,
     required this.isLoggedIn,
     this.role,
     required this.onboardingCompleted,
+    required this.hasCompletedSurvey,
+    required this.surveyOnboardingCompleted,
   });
 
   @override
@@ -88,7 +106,8 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.dark,
           themeMode: ThemeMode.system,
           debugShowCheckedModeBanner: false,
-          home: onboardingCompleted ? _getInitialScreen() : const SplashScreen(),
+          home:
+              onboardingCompleted ? _getInitialScreen() : const SplashScreen(),
         ),
       ),
     );
@@ -104,10 +123,18 @@ class MyApp extends StatelessWidget {
 
   Widget _getHomeScreen(String? role) {
     if (role == 'Patient') {
-      return const PatientHomeScreen();
+      // Check if the patient has completed the survey and onboarding before navigating to home screen
+      if (hasCompletedSurvey && surveyOnboardingCompleted) {
+        return const PatientHomeScreen();
+      } else {
+        // Navigate to Survey if the user hasn't completed it
+        return const SurveyScreen();
+      }
     } else if (role == 'Specialist') {
+      // Navigate to Specialist home screen
       return const SpecialistHomeScreen();
     } else {
+      // Default case, navigate to Login screen if no valid role
       return const LoginScreen();
     }
   }

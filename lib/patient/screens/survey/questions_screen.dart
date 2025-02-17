@@ -1,3 +1,4 @@
+import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/forms/question_form.dart';
@@ -14,6 +15,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   PageController _pageController = PageController();
   Map<int, String> _selectedAnswers = {};
   String? _userId;
+  bool _hasCompletedSurvey = false;
   List<Map<String, dynamic>> _questions = [];
   final ApiRepository _apiRepository = ApiRepository();
   bool _isLoading = true;
@@ -24,41 +26,35 @@ class _QuestionScreenState extends State<QuestionScreen> {
     super.initState();
     _loadUserId();
     _fetchQuestions();
+    _checkIfSurveyCompleted();
   }
 
   Future<void> _loadUserId() async {
     final FlutterSecureStorage storage = FlutterSecureStorage();
-    final userId = await storage.read(key: 'userId');
+    _userId = await storage.read(key: 'userId');
+  }
+
+  Future<void> _checkIfSurveyCompleted() async {
+    final FlutterSecureStorage storage = FlutterSecureStorage();
+    final hasCompletedSurvey =
+        await storage.read(key: 'hasCompletedSurvey_$_userId');
     setState(() {
-      _userId = userId;
+      _hasCompletedSurvey = hasCompletedSurvey == 'true';
     });
-    print("User ID: $_userId");
   }
 
   Future<void> _fetchQuestions() async {
     try {
       final surveys = await _apiRepository.getSurveys();
-
       if (surveys.isNotEmpty && surveys[0] != null) {
         final survey = surveys[0];
         _category = survey['category'] ?? 'No Category';
         _questions = List<Map<String, dynamic>>.from(survey['questions'] ?? []);
-
-        if (_category == 'No Category' || _questions.isEmpty) {
-          print("Category or questions are missing!");
-        }
-
-        setState(() {
-          _isLoading = false;
-        });
-      } else {
-        print('No surveys found or survey format is invalid');
         setState(() {
           _isLoading = false;
         });
       }
     } catch (e) {
-      print("Error fetching surveys: $e");
       setState(() {
         _isLoading = false;
       });
@@ -68,9 +64,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   void _nextQuestion(int index) {
     if (index < _questions.length - 1) {
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
     } else {
       _submitAnswers();
     }
@@ -93,75 +87,113 @@ class _QuestionScreenState extends State<QuestionScreen> {
         responses.add({
           'questionId': questionId,
           'choiceId': selectedChoice['_id'],
-          'score': score,
+          'score': score
         });
-      } else {
-        print('Invalid choice selected for question $questionId');
       }
     });
 
-    final patientId = _userId!;
-    final surveyId = _questions.isNotEmpty ? _questions[0]['_id'] : null;
-
-    if (patientId == null || surveyId == null || responses.isEmpty) {
+    if (_userId == null || responses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: Missing required data')),
-      );
+          SnackBar(content: Text('Error: Missing required data')));
       return;
     }
 
     try {
-      // Submit the survey response
       await _apiRepository.submitSurveyResponse(
-          patientId, surveyId, responses, category);
+          _userId!, _questions[0]['_id'], responses, category);
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Your survey has been completed!')),
+      // Save completion flag
+      final FlutterSecureStorage storage = FlutterSecureStorage();
+      await storage.write(key: 'hasCompletedSurvey_$_userId', value: 'true');
+      await storage.write(
+          key: 'survey_onboarding_completed_$_userId', value: 'true');
+
+      // Navigate to home screen after survey completion
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PatientHomeScreen()),
       );
-
-      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting answers: $e')),
-      );
+          SnackBar(content: Text('Error submitting answers: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_hasCompletedSurvey) {
+      Future.delayed(Duration(seconds: 1), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PatientHomeScreen()),
+        );
+      });
+    }
+
     return Scaffold(
-      appBar: UniversalAppBar(
-        title: "Quick Mental Health Survey",
-        onBackPressed: () {
-          Navigator.pop(context);
-        },
-        actions: [],
-      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : PageView.builder(
-              controller: _pageController,
-              itemCount: _questions.length,
-              itemBuilder: (context, index) {
-                final question = _questions[index];
-                final choices = question['choices'] ?? [];
-                final answers = List<Map<String, dynamic>>.from(choices);
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    "This survey will help personalize your dashboard to recommend the most suitable articles for your mental health needs.",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                // Add skip button on top
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PatientHomeScreen()),
+                        );
+                      },
+                      child: Text(
+                        "Skip for Test",
+                        style: TextStyle(fontSize: 16, color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _questions.length,
+                    itemBuilder: (context, index) {
+                      final question = _questions[index];
+                      final choices = question['choices'] ?? [];
+                      final answers = List<Map<String, dynamic>>.from(choices);
 
-                return QuestionWidget(
-                  question: question['questionText'],
-                  choices: answers,
-                  selectedChoiceId: _selectedAnswers[index] ?? '',
-                  onAnswerSelected: (choiceId) {
-                    setState(() {
-                      _selectedAnswers[index] = choiceId;
-                    });
-                    Future.delayed(Duration(milliseconds: 300), () {
-                      _nextQuestion(index);
-                    });
-                  },
-                );
-              },
+                      return QuestionWidget(
+                        question: question['questionText'],
+                        choices: answers,
+                        selectedChoiceId: _selectedAnswers[index] ?? '',
+                        onAnswerSelected: (choiceId) {
+                          setState(() {
+                            _selectedAnswers[index] = choiceId;
+                          });
+                          Future.delayed(Duration(milliseconds: 300), () {
+                            _nextQuestion(index);
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
     );
   }

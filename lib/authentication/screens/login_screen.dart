@@ -1,3 +1,5 @@
+import 'package:armstrong/patient/screens/survey/questions_screen.dart';
+import 'package:armstrong/splash_screen/screens/survey_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
@@ -8,6 +10,7 @@ import 'package:armstrong/widgets/forms/forget_password.dart';
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -51,43 +54,41 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (state is AuthSuccess) {
                     final userData = state.userData;
                     final userType = userData['userType'];
-                    final token = userData['token'];
                     final userId = userData['userId'];
+                    final token = userData['token'];
 
                     await StorageHelper.saveUserId(userId);
-
                     await StorageHelper.saveToken(token);
 
                     if (userType == 'Patient') {
-                      final firstName = userData['firstName'];
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PatientHomeScreen(),
-                        ),
-                      );
+                      final FlutterSecureStorage storage =
+                          FlutterSecureStorage();
+                      final hasCompletedSurvey =
+                          await storage.read(key: 'hasCompletedSurvey_$userId');
+                      final surveyOnboardingCompleted = await storage.read(
+                          key: 'survey_onboarding_completed_$userId');
+
+                      if (hasCompletedSurvey == 'true' &&
+                          surveyOnboardingCompleted == 'true') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PatientHomeScreen()),
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SurveyScreen()),
+                        );
+                      }
                     } else if (userType == 'Specialist') {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SpecialistHomeScreen(),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("You've successfully registered!"),
-                          duration: const Duration(seconds: 2),
-                        ),
+                            builder: (context) => SpecialistHomeScreen()),
                       );
                     }
-                  } else if (state is AuthError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.message ?? "Login failed"),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
                   }
                 },
                 child: Center(
@@ -97,14 +98,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         : constraints.maxWidth * 0.9,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surface, 
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context)
-                              .shadowColor, 
+                          color: Theme.of(context).shadowColor,
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -126,9 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(height: 30),
                             Text(
                               "Login",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall, 
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             const SizedBox(height: 20),
                             TextField(
@@ -136,9 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 hintText: "Enter your email:",
                                 filled: true,
-                                fillColor: Theme.of(context)
-                                    .colorScheme
-                                    .background,
+                                fillColor:
+                                    Theme.of(context).colorScheme.background,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -165,9 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Text(
                                   "No account yet?",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium,
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -206,9 +199,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         }
                                       : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .secondary,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.secondary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -226,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ?.copyWith(
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .onSecondary, 
+                                                .onSecondary,
                                           ),
                                     ),
                                   ),

@@ -1,3 +1,6 @@
+import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
+import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
+import 'package:armstrong/splash_screen/screens/survey_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
@@ -6,6 +9,7 @@ import 'package:armstrong/authentication/blocs/auth_state.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -102,28 +106,55 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Registration Successful!')),
-            );
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) async {
+        if (state is AuthSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration Successful!')),
+          );
+
+          // Retrieve the user type after successful registration
+          final userType = state.userData['userType']; // Assuming `userType` is in the response
+
+          // Check if the user is a Specialist or Patient
+          if (userType == 'Specialist') {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              MaterialPageRoute(builder: (context) => const SpecialistHomeScreen()),
             );
-          } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Registration Failed: ${state.message}')),
-            );
+          } else if (userType == 'Patient') {
+            // Check if the survey is completed (if not, navigate to the survey screen)
+            final FlutterSecureStorage storage = FlutterSecureStorage();
+            final hasCompletedSurvey = await storage.read(key: 'hasCompletedSurvey');
+            final surveyOnboardingCompleted =
+                await storage.read(key: 'survey_onboarding_completed');
+
+            // If survey is completed, navigate to the Patient Home screen
+            if (hasCompletedSurvey == 'true' && surveyOnboardingCompleted == 'true') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const PatientHomeScreen()),
+              );
+            } else {
+              // If survey not completed, navigate to the survey (Splash) screen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SurveyScreen()),
+              );
+            }
           }
-        },
-        builder: (context, state) {
-          if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Registration Failed: ${state.message}')),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is AuthLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
           return Stack(
             children: [
