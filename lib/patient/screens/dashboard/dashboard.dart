@@ -1,12 +1,10 @@
 import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/cards/mood_graph.dart';
 import 'package:armstrong/widgets/cards/journal_card.dart';
 import 'package:armstrong/widgets/buttons/survey_button.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
 import 'package:showcaseview/showcaseview.dart';
-import 'package:armstrong/config/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {

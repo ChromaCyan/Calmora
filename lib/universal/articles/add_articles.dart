@@ -1,3 +1,4 @@
+import 'package:armstrong/models/article/article.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -19,6 +20,17 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
   final ApiRepository _apiRepository = ApiRepository();
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   String? _userId;
+
+  List<String> _categories = [
+    'Health',
+    'Social',
+    'Relationships',
+    'Growth',
+    'Coping Strategies',
+    'Mental Wellness',
+    'Self-Care'
+  ];
+  List<String> _selectedCategories = [];
 
   @override
   void initState() {
@@ -49,10 +61,20 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
   Future<void> _submitArticle() async {
     if (_titleController.text.isEmpty ||
         _contentController.text.isEmpty ||
-        _image == null) {
-      _showSnackbar('Please fill all fields and select an image', isError: true);
+        _image == null ||
+        _selectedCategories.isEmpty) {
+      _showSnackbar(
+          'Please fill all fields, select an image, and choose categories',
+          isError: true);
       return;
     }
+
+    if (_selectedCategories.length > 2) {
+      _showSnackbar('You can only select up to 2 categories', isError: true);
+      return;
+    }
+
+     final normalizedCategories = _selectedCategories.map((category) => category.toLowerCase()).toList();
 
     final heroImageUrl = await _uploadImageToSupabase(_image!);
     if (heroImageUrl == null) {
@@ -70,6 +92,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
         content: _contentController.text,
         heroImage: heroImageUrl,
         specialistId: _userId ?? '',
+        categories: normalizedCategories,
       );
 
       if (response.isNotEmpty) {
@@ -98,13 +121,17 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text("Publish Article"),),
+      appBar: AppBar(
+        title: Text("Publish Article"),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Card(
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child: Column(
@@ -127,17 +154,25 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                           borderRadius: BorderRadius.circular(12),
                           color: Theme.of(context).colorScheme.surfaceVariant,
                           image: _image != null
-                              ? DecorationImage(image: FileImage(_image!), fit: BoxFit.cover)
+                              ? DecorationImage(
+                                  image: FileImage(_image!), fit: BoxFit.cover)
                               : null,
                         ),
                         child: _image == null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.image, size: 50, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                  Icon(Icons.image,
+                                      size: 50,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant),
                                   SizedBox(height: 8),
                                   Text('Add image cover',
-                                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant)),
                                 ],
                               )
                             : null,
@@ -158,11 +193,17 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                             child: Container(
                               padding: EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.background.withOpacity(0.7), 
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .background
+                                    .withOpacity(0.7),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(Icons.close,
-                                  color: Theme.of(context).colorScheme.onBackground, size: 20),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground,
+                                  size: 20),
                             ),
                           ),
                         ),
@@ -174,13 +215,18 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                 // Title TextField
                 TextFormField(
                   controller: _titleController,
-                  style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).textTheme.bodyLarge?.color),
                   decoration: InputDecoration(
                     labelText: 'Title',
-                    labelStyle: TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
+                    labelStyle: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 14),
                     hintText: 'Enter article title',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
-                    prefixIcon: Icon(Icons.title, color: Theme.of(context).iconTheme.color),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 14),
+                    prefixIcon: Icon(Icons.title,
+                        color: Theme.of(context).iconTheme.color),
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.surface,
                     border: OutlineInputBorder(
@@ -189,13 +235,17 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).dividerColor, width: 1),
                     ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                   ),
                 ),
                 SizedBox(height: 12),
@@ -203,13 +253,18 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                 // Content TextField
                 TextFormField(
                   controller: _contentController,
-                  style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).textTheme.bodyLarge?.color),
                   decoration: InputDecoration(
                     labelText: 'Content',
-                    labelStyle: TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
+                    labelStyle: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 14),
                     hintText: 'Write your article content here...',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
-                    prefixIcon: Icon(Icons.description, color: Theme.of(context).iconTheme.color),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 14),
+                    prefixIcon: Icon(Icons.description,
+                        color: Theme.of(context).iconTheme.color),
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.surface,
                     border: OutlineInputBorder(
@@ -218,15 +273,52 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).dividerColor, width: 1),
                     ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                   ),
                   maxLines: 5,
+                ),
+                SizedBox(height: 20),
+
+                Center(
+                child: Text(
+                  'Categories',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
+                ),
+              ),
+
+                // Category Dropdown
+                Column(
+                  children: _categories.map((category) {
+                    return CheckboxListTile(
+                      title: Text(category),
+                      value: _selectedCategories.contains(category),
+                      onChanged: (bool? selected) {
+                        setState(() {
+                          if (selected == true &&
+                              _selectedCategories.length < 2) {
+                            _selectedCategories.add(
+                                category); 
+                          } else {
+                            _selectedCategories.remove(
+                                category); 
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
                 SizedBox(height: 12),
 

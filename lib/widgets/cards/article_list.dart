@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/models/article/article.dart';
 
 class ArticleList extends StatelessWidget {
   final String searchQuery;
@@ -11,7 +12,7 @@ class ArticleList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 230,
-      child: FutureBuilder<List<Map<String, dynamic>>>(
+      child: FutureBuilder<List<Article>>(
         future: ApiRepository().getAllArticles(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -24,9 +25,7 @@ class ArticleList extends StatelessWidget {
 
           final articles = snapshot.data!;
           final filteredArticles = articles.where((article) {
-            return article['title']
-                .toLowerCase()
-                .contains(searchQuery.toLowerCase());
+            return article.title.toLowerCase().contains(searchQuery.toLowerCase());
           }).toList();
 
           if (filteredArticles.isEmpty) {
@@ -39,12 +38,10 @@ class ArticleList extends StatelessWidget {
             itemBuilder: (context, index) {
               final article = filteredArticles[index];
               return ArticleCard(
-                articleId: article['_id'],
-                imageUrl: article['heroImage'],
-                title: article['title'],
-                publisher:
-                    'By ${article['specialistId']?['firstName'] ?? "Unknown"} ${article['specialistId']?['lastName'] ?? ""}'
-                        .trim(),
+                articleId: article.id,
+                imageUrl: article.heroImage,
+                title: article.title,
+                publisher: 'By ${article.specialistName}',
               );
             },
           );

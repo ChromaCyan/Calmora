@@ -1,3 +1,4 @@
+import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
 import 'package:armstrong/patient/models/widgets/banner_model.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
@@ -30,6 +31,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
   String selectedCategory = 'Specialist';
+  String selectedArticleCategory = '';
 
   @override
   void initState() {
@@ -131,10 +133,103 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     onSelected: (String category) {
                       setState(() {
                         selectedCategory = category;
+                        selectedArticleCategory =
+                            ''; // Reset article category filter when switching to Specialist
                       });
                     },
                   ),
                 ),
+                const SizedBox(height: 20),
+                // Category filter for articles
+                if (selectedCategory == 'Articles')
+                  Showcase(
+                    key: GlobalKey(),
+                    description: "Filter articles by category.",
+                    textColor: theme.colorScheme.onBackground,
+                    tooltipBackgroundColor: theme.colorScheme.primary,
+                    targetPadding: const EdgeInsets.all(16),
+                    targetShapeBorder: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    descTextStyle: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    child: DropdownButton<String>(
+                      value: selectedArticleCategory.isEmpty
+                          ? null
+                          : selectedArticleCategory,
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary, 
+                      ),
+                      isExpanded: true,
+                      elevation: 16,
+                      onChanged: (String? newCategory) {
+                        setState(() {
+                          selectedArticleCategory = newCategory ?? '';
+                        });
+                      },
+                      items: [
+                        'health',
+                        'social',
+                        'growth',
+                        'relationships',
+                        'coping strategies',
+                        'self-care'
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Container(
+                            width: double.infinity,
+                            height: 45, // Similar height as CategoryChip
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: selectedArticleCategory == value
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.surface,
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                              border: Border.all(
+                                color: selectedArticleCategory == value
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.outline,
+                                width: 1.5,
+                              ),
+                              boxShadow: selectedArticleCategory == value
+                                  ? [
+                                      BoxShadow(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.2),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      )
+                                    ]
+                                  : [],
+                            ),
+                            child: Center(
+                              child: Text(
+                                value[0].toUpperCase() + value.substring(1),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: selectedArticleCategory == value
+                                      ? Colors.white
+                                      : Theme.of(context).colorScheme.onSurface,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -151,7 +246,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                   child: selectedCategory == 'Specialist'
                       ? _buildSpecialistList()
-                      : _buildArticleList(),
+                      : _buildArticleList(searchQuery,
+                          selectedArticleCategory), // Pass the article category filter
                 ),
                 const SizedBox(height: 20),
               ],
@@ -228,8 +324,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  Widget _buildArticleList() {
-    return FutureBuilder<List<Map<String, dynamic>>>(
+  Widget _buildArticleList(String searchQuery, String selectedCategory) {
+    return FutureBuilder<List<Article>>(
       future: ApiRepository().getAllArticles(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -242,9 +338,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
         final articles = snapshot.data!;
         final filteredArticles = articles.where((article) {
-          return article['title']
-              .toLowerCase()
-              .contains(searchQuery.toLowerCase());
+          bool matchesCategory = selectedCategory.isEmpty ||
+              article.categories.contains(selectedCategory);
+          bool matchesSearchQuery =
+              article.title.toLowerCase().contains(searchQuery.toLowerCase());
+          return matchesCategory && matchesSearchQuery;
         }).toList();
 
         if (filteredArticles.isEmpty) {
@@ -258,12 +356,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           itemBuilder: (context, index) {
             final article = filteredArticles[index];
             return ArticleCard(
-              articleId: article['_id'],
-              imageUrl: article['heroImage'],
-              title: article['title'],
-              publisher:
-                  'By ${article['specialistId']?['firstName'] ?? "Unknown"} ${article['specialistId']?['lastName'] ?? ""}'
-                      .trim(),
+              articleId: article.id,
+              imageUrl: article.heroImage,
+              title: article.title,
+              publisher: 'By ${article.specialistName}',
             );
           },
         );

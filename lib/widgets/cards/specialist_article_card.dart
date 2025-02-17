@@ -42,7 +42,7 @@ class SpecialistArticleCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 220, // Matches the ArticleCard width
+        width: 220, 
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: colorScheme.surface,

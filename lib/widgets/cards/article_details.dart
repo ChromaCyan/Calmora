@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/models/article/article.dart';
 
 class ArticleDetailPage extends StatefulWidget {
   final String articleId;
@@ -13,7 +14,7 @@ class ArticleDetailPage extends StatefulWidget {
 }
 
 class _ArticleDetailPageState extends State<ArticleDetailPage> {
-  Map<String, dynamic>? article;
+  Article? article;
   bool isLoading = true;
   String errorMessage = '';
 
@@ -44,7 +45,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(article?['title'] ?? 'Article Details')),
+      appBar: AppBar(title: Text(article?.title ?? 'Article Details')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
@@ -66,32 +67,63 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.network(
-                            article!['heroImage'] ?? '',
-                            height: 250,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.error, size: 50),
+                          // Hero Image
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.network(
+                              article!.heroImage,
+                              height: 250,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.error, size: 50),
+                            ),
                           ),
                           const SizedBox(height: 16),
+                          
+                          // Article Title
                           Text(
-                            article!['title'] ?? 'No Title',
+                            article!.title,
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 8),
+                          
+                          // Specialist Name
                           Text(
-                            'By ${article!['specialistId']?['firstName'] ?? "Unknown"} ${article!['specialistId']?['lastName'] ?? ""}'
-                                .trim(),
+                            'By ${article!.specialistName}',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.7),
                             ),
                           ),
                           const SizedBox(height: 16),
+                          
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Wrap(
+                              spacing: 8.0,
+                              runSpacing: 4.0,
+                              children: article!.categories.map((category) {
+                                String capitalizedCategory = category
+                                    .split(' ')
+                                    .map((word) => word[0].toUpperCase() + word.substring(1))
+                                    .join(' ');
+                                return Chip(
+                                  label: Text(
+                                    capitalizedCategory,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  backgroundColor: theme.colorScheme.primary,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          
                           Text(
-                            article!['content'] ?? 'No content available',
+                            article!.content,
                             style: theme.textTheme.bodyLarge,
                           ),
                         ],

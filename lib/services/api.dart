@@ -4,6 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+//Model Imports
+import 'package:armstrong/models/article/article.dart';
+
 class ApiRepository {
   final String baseUrl = 'https://armstrong-api.vercel.app/api';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -397,7 +400,8 @@ class ApiRepository {
   // Fetch completed appointments
   Future<List<dynamic>> getCompletedAppointments(String userId) async {
     final token = await _storage.read(key: 'token');
-    final url = Uri.parse('$baseUrl/appointment/appointments/completed/$userId');
+    final url =
+        Uri.parse('$baseUrl/appointment/appointments/completed/$userId');
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer $token'},
@@ -538,7 +542,7 @@ class ApiRepository {
   // Article API
 
   // Fetch all articles
-  Future<List<Map<String, dynamic>>> getAllArticles() async {
+  Future<List<Article>> getAllArticles() async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/articles');
 
@@ -549,15 +553,14 @@ class ApiRepository {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      return data.map((article) => Map<String, dynamic>.from(article)).toList();
+      return data.map((article) => Article.fromMap(article)).toList();
     } else {
       throw Exception('Failed to fetch articles: ${response.body}');
     }
   }
 
-  // Fetch all articles by a specific specialist
-  Future<List<Map<String, dynamic>>> getArticlesBySpecialist(
-      String specialistId) async {
+  // Fetch articles by specialist
+  Future<List<Article>> getArticlesBySpecialist(String specialistId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/specialist/$specialistId');
 
@@ -568,14 +571,14 @@ class ApiRepository {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      return data.map((article) => Map<String, dynamic>.from(article)).toList();
+      return data.map((article) => Article.fromMap(article)).toList();
     } else {
       throw Exception('Failed to fetch specialist articles: ${response.body}');
     }
   }
 
   // Fetch a single article by ID
-  Future<Map<String, dynamic>> getArticleById(String articleId) async {
+  Future<Article> getArticleById(String articleId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/$articleId');
 
@@ -585,11 +588,13 @@ class ApiRepository {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final Map<String, dynamic> data = json.decode(response.body);
+      return Article.fromMap(data);
     } else {
       throw Exception('Failed to fetch article: ${response.body}');
     }
   }
+
 
   // Create a new article
   Future<Map<String, dynamic>> createArticle({
@@ -598,6 +603,7 @@ class ApiRepository {
     required String heroImage,
     List<String>? additionalImages,
     required String specialistId,
+    required List<String> categories, 
   }) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/create-article');
@@ -614,6 +620,7 @@ class ApiRepository {
         'heroImage': heroImage,
         'additionalImages': additionalImages ?? [],
         'specialistId': specialistId,
+        'categories': categories, 
       }),
     );
 

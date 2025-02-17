@@ -1,3 +1,4 @@
+import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/universal/articles/add_articles.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/specialist_article_card.dart';
@@ -42,7 +43,7 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
             },
           ),
           Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
+            child: FutureBuilder<List<Article>>(
               future:
                   ApiRepository().getArticlesBySpecialist(widget.specialistId),
               builder: (context, snapshot) {
@@ -79,25 +80,27 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
 
                 final articles = snapshot.data!;
                 final filteredArticles = articles.where((article) {
-                  return article['title'].toLowerCase().contains(searchQuery);
+                  return article.title
+                      .toLowerCase()
+                      .contains(searchQuery.toLowerCase());
                 }).toList();
 
                 if (filteredArticles.isEmpty) {
                   return const Center(
-                    child: Text("No matching articles found."),
-                  );
+                      child: Text("No matching articles found."));
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  physics: BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  physics: const BouncingScrollPhysics(),
                   itemCount: filteredArticles.length,
                   itemBuilder: (context, index) {
                     final article = filteredArticles[index];
                     return SpecialistArticleCard(
-                      articleId: article['_id'],
-                      imageUrl: article['heroImage'],
-                      title: article['title'],
+                      articleId: article.id,
+                      imageUrl: article.heroImage,
+                      title: article.title,
                     );
                   },
                 );
