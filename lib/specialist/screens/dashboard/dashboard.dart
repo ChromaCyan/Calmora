@@ -127,7 +127,9 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
       height: 250,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[900]
+          : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(

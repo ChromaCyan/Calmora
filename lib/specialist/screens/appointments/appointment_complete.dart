@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class AppointmentCompleteScreen extends StatefulWidget {
   final String appointmentId;
@@ -77,28 +78,125 @@ class _AppointmentCompleteScreenState extends State<AppointmentCompleteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Complete Appointment')),
+      // appBar: UniversalAppBar(title: "Complete Appointment"),
+      appBar: AppBar(title: Text("Complete Appointmnet"),),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
+            const SizedBox(height: 30,),
+            Text("Your feedback about your appointment",
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)
+            ),
+            const SizedBox(height: 10,),
+            TextFormField(
               controller: _feedbackController,
-              decoration: const InputDecoration(labelText: 'Feedback'),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              decoration: InputDecoration(
+                labelText: 'Type here',
+                labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                hintText: 'Share your thoughts',
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                prefixIcon: Icon(Icons.feedback, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline, width: 1),
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              ),
               maxLines: 3,
             ),
+
+            const SizedBox(height: 25),
+            Text("Share your memory with your client (^_^)",
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 10),
-            _image == null
-                ? const Text('No image selected')
-                : Image.file(_image!, height: 150),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: const Text('Pick Image'),
+
+            // Image Picker
+            GestureDetector(
+              onTap: _pickImage,
+              child: Stack(
+                children: [
+                  Container(
+                    height: 250,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      image: _image != null
+                          ? DecorationImage(image: FileImage(_image!), fit: BoxFit.cover)
+                          : null,
+                    ),
+                    child: _image == null
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.image, size: 50, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              SizedBox(height: 8),
+                              Text('Add image cover',
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                            ],
+                          )
+                        : null,
+                  ),
+
+                  // Remove Button (only shown when an image is selected)
+                  if (_image != null)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _image = null;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.background.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.close, color: Theme.of(context).colorScheme.onBackground, size: 20),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _submitCompletion,
-              child: const Text('Complete Appointment'),
+
+            const SizedBox(height: 20),
+
+            // Complete Button
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _submitCompletion,
+                    icon: Icon(Icons.check_circle),
+                    label: Text('Complete Appointment'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

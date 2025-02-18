@@ -8,6 +8,8 @@ import 'package:armstrong/services/api.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
+import 'package:armstrong/universal/profile/profile_picture.dart';
+import 'package:armstrong/universal/profile/common_fields.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -48,7 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         profileData = data;
         isLoading = false;
 
-        // Set initial values
         firstNameController.text = data["firstName"] ?? "";
         lastNameController.text = data["lastName"] ?? "";
         phoneNumberController.text = data["phoneNumber"] ?? "";
@@ -75,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       initialDate: _selectedDateOfBirth ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now()
-          .subtract(const Duration(days: 365 * 18)), // Minimum age 18
+          .subtract(const Duration(days: 365 * 18)),
     );
 
     if (pickedDate != null && pickedDate != _selectedDateOfBirth) {
@@ -114,8 +115,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await _storage.delete(key: 'jwt');
     await _storage.delete(key: 'userId');
 
-    print("✅ User logged out successfully!");
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -125,13 +124,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveProfile() async {
     setState(() => isLoading = true);
 
-    await _uploadImage(); // Upload image first
+    await _uploadImage();
 
     final updatedData = {
       "firstName": firstNameController.text,
       "lastName": lastNameController.text,
       "phoneNumber": phoneNumberController.text,
-      "profileImage": _imageUrl ?? "", // Send empty string if no new image
+      "profileImage": _imageUrl ?? "",
       "dateOfBirth": _selectedDateOfBirth != null
           ? DateFormat('yyyy-MM-dd').format(_selectedDateOfBirth!)
           : "",
@@ -143,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isEditing = false;
         isLoading = false;
       });
-      _fetchProfile(); // Refresh data
+      _fetchProfile();
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -165,102 +164,123 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Profile Picture
-                      Center(
-                        child: GestureDetector(
-                          onTap: _pickImage,
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: _selectedImage != null
-                                ? FileImage(_selectedImage!)
-                                : (_imageUrl != null
-                                        ? NetworkImage(_imageUrl!)
-                                        : const AssetImage(
-                                            "assets/default-avatar.png"))
-                                    as ImageProvider,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Center(
-                        child: TextButton(
-                          onPressed: _pickImage,
-                          child: const Text("Change Profile Picture"),
-                        ),
+                      // Profile Picture Widget
+                      ProfilePictureWidget(
+                        selectedImage: _selectedImage,
+                        imageUrl: _imageUrl,
+                        onPickImage: _pickImage,
                       ),
                       const SizedBox(height: 20),
 
-                      // Common Fields (Both Patient & Specialist)
-                      TextField(
-                        controller: firstNameController,
-                        decoration:
-                            const InputDecoration(labelText: "First Name"),
-                        enabled: isEditing,
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: lastNameController,
-                        decoration:
-                            const InputDecoration(labelText: "Last Name"),
-                        enabled: isEditing,
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: phoneNumberController,
-                        decoration:
-                            const InputDecoration(labelText: "Phone Number"),
-                        enabled: isEditing,
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: dateOfBirthController,
-                        decoration: const InputDecoration(
-                          labelText: "Date of Birth",
-                          suffixIcon: Icon(Icons.calendar_today),
-                        ),
-                        readOnly: true,
-                        onTap: isEditing ? _pickDateOfBirth : null,
-                      ),
-                      const SizedBox(height: 20),
-
-                      isEditing
-                          ? ElevatedButton(
+                    isEditing
+                    ? LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Center( // Centers the button
+                            child: ElevatedButton(
                               onPressed: _saveProfile,
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(constraints.maxWidth * 0.5, 50), // 50% of screen width
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                backgroundColor: Colors.green, // Green color for Save Changes button
+                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                              ),
                               child: const Text("Save Changes"),
-                            )
-                          : ElevatedButton(
+                            ),
+                          );
+                        },
+                      )
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Center( // Centers the button
+                            child: ElevatedButton(
                               onPressed: () => setState(() => isEditing = true),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(constraints.maxWidth * 0.5, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                              ),
                               child: const Text("Edit Profile"),
                             ),
+                          );
+                        },
+                      ),
 
+
+                      const SizedBox(height: 20),
+
+                      // Common Fields Widget
+                      CommonFieldsWidget(
+                        firstNameController: firstNameController,
+                        lastNameController: lastNameController,
+                        phoneNumberController: phoneNumberController,
+                        dateOfBirthController: dateOfBirthController,
+                        isEditing: isEditing,
+                        onPickDateOfBirth: _pickDateOfBirth,
+                      ),
+
+                      //Appointment History Button
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const CompletedAppointmentsScreen()),
+                              builder: (context) => const CompletedAppointmentsScreen(),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
+                          minimumSize: Size(
+                            MediaQuery.of(context).size.width * 0.35,45,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                         ),
-                        child: const Text("Appointment History"),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.history,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                            const SizedBox(width: 5),
+                            const Text("Your Appointments"),
+                          ],
+                        ),
                       ),
-
-                       const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Logout Button
-                      ElevatedButton(
-                        onPressed: () async {
-                          await _logout(context);
-                        }, // Call the logout function
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
+                      const SizedBox(height: 30,),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await _logout(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(MediaQuery.of(context).size.width * 0.4, 40),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text("Logout"),
                         ),
-                        child: const Text("Logout"),
                       ),
                     ],
                   ),
