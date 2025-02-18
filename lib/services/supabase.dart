@@ -38,7 +38,7 @@ class SupabaseService {
 
       // Generate a signed URL
       final signedUrl =
-          await supabase.storage.from(folder).createSignedUrl(fileName, 60 * 60 * 24 * 7);
+          await supabase.storage.from(folder).createSignedUrl(fileName, 60 * 60 * 24 * 365);
       return signedUrl;
     } catch (e) {
       print('Error uploading image to $folder: $e');
