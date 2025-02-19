@@ -1,15 +1,16 @@
 import 'dart:io';
-import 'package:armstrong/specialist/screens/appointments/appointment_complete.dart';
 import 'package:armstrong/universal/appointments/appointment_history.dart';
+import 'package:armstrong/widgets/forms/patient_form.dart';
+import 'package:armstrong/widgets/forms/specialist_form.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:armstrong/services/supabase.dart';
-import 'package:armstrong/services/api.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/services/supabase.dart';
+import 'package:armstrong/services/api.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
-import 'package:armstrong/universal/profile/profile_picture.dart';
-import 'package:armstrong/universal/profile/common_fields.dart';
+import 'package:armstrong/widgets/forms/profile_picture.dart';
+import 'package:armstrong/widgets/forms/common_fields.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -26,14 +27,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final ApiRepository _apiRepository = ApiRepository();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
+  // Common Fields
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
   DateTime? _selectedDateOfBirth;
 
+  // Specialist Fields
+  final TextEditingController specializationController =
+      TextEditingController();
+  final TextEditingController licenseNumberController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
+  final TextEditingController yearsOfExperienceController =
+      TextEditingController();
+  final TextEditingController languagesSpokenController =
+      TextEditingController();
+  final TextEditingController availabilityController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController clinicController = TextEditingController();
+
+  // Patient Fields
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController medicalHistoryController =
+      TextEditingController();
+  final TextEditingController therapyGoalsController = TextEditingController();
+  final TextEditingController emergencyContactNameController =
+      TextEditingController();
+  final TextEditingController emergencyContactPhoneController =
+      TextEditingController();
+  final TextEditingController emergencyContactRelationController =
+      TextEditingController();
+
   File? _selectedImage;
   String? _imageUrl;
+  String? _userType;
 
   @override
   void initState() {
@@ -49,17 +77,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         profileData = data;
         isLoading = false;
+        _userType = data["userType"];
 
+        // Common Fields
         firstNameController.text = data["firstName"] ?? "";
         lastNameController.text = data["lastName"] ?? "";
         phoneNumberController.text = data["phoneNumber"] ?? "";
         _imageUrl = (data["profileImage"]?.isNotEmpty ?? false)
             ? data["profileImage"]
             : null;
+
         if (data["dateOfBirth"] != null) {
           _selectedDateOfBirth = DateTime.parse(data["dateOfBirth"]);
           dateOfBirthController.text =
               DateFormat('yyyy-MM-dd').format(_selectedDateOfBirth!);
+        }
+
+        // Specialist Fields
+        if (_userType == "Specialist") {
+          specializationController.text = data["specialization"] ?? "";
+          licenseNumberController.text = data["licenseNumber"] ?? "";
+          bioController.text = data["bio"] ?? "";
+          yearsOfExperienceController.text =
+              data["yearsOfExperience"]?.toString() ?? "";
+          languagesSpokenController.text =
+              (data["languagesSpoken"] as List<dynamic>?)?.join(", ") ?? "";
+          availabilityController.text = data["availability"] ?? "";
+          locationController.text = data["location"] ?? "";
+          clinicController.text = data["clinic"] ?? "";
+        }
+
+        // Patient Fields
+        if (_userType == "Patient") {
+          addressController.text = data["address"] ?? "";
+          medicalHistoryController.text = data["medicalHistory"] ?? "";
+          therapyGoalsController.text =
+              (data["therapyGoals"] as List<dynamic>?)?.join(", ") ?? "";
+
+          final emergencyContact = data["emergencyContact"] ?? {};
+          emergencyContactNameController.text = emergencyContact["name"] ?? "";
+          emergencyContactPhoneController.text =
+              emergencyContact["phone"] ?? "";
+          emergencyContactRelationController.text =
+              emergencyContact["relation"] ?? "";
         }
       });
     } catch (e) {
@@ -75,8 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       initialDate: _selectedDateOfBirth ?? DateTime.now(),
       firstDate: DateTime(1900),
-      lastDate: DateTime.now()
-          .subtract(const Duration(days: 365 * 18)),
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
     );
 
     if (pickedDate != null && pickedDate != _selectedDateOfBirth) {
@@ -126,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     await _uploadImage();
 
-    final updatedData = {
+    final Map<String, dynamic> updatedData = {
       "firstName": firstNameController.text,
       "lastName": lastNameController.text,
       "phoneNumber": phoneNumberController.text,
@@ -135,6 +194,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? DateFormat('yyyy-MM-dd').format(_selectedDateOfBirth!)
           : "",
     };
+
+    if (_userType == "Specialist") {
+      updatedData.addAll({
+        "specialization": specializationController.text,
+        "licenseNumber": licenseNumberController.text,
+        "bio": bioController.text,
+        "yearsOfExperience": yearsOfExperienceController.text,
+        "languagesSpoken": languagesSpokenController.text,
+        "availability": availabilityController.text,
+        "clinic": clinicController.text,
+        "location": locationController.text,
+      });
+    } else if (_userType == "Patient") {
+      updatedData.addAll({
+        "address": addressController.text,
+        "medicalHistory": medicalHistoryController.text,
+        "therapyGoals": therapyGoalsController.text,
+        "emergencyContact": {
+          "name": emergencyContactNameController.text,
+          "phone": emergencyContactPhoneController.text,
+          "relation": emergencyContactRelationController.text,
+        },
+      });
+    }
 
     try {
       await _apiRepository.editProfile(updatedData);
@@ -151,16 +234,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Profile")),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : hasError
-              ? const Center(child: Text("Failed to load profile"))
-              : Padding(
-                  padding: const EdgeInsets.all(16),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(title: const Text("Profile")),
+    body: isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : hasError
+            ? const Center(child: Text("Failed to load profile"))
+            : Padding(
+                padding: const EdgeInsets.all(16),
+                child: SingleChildScrollView( // Wrap everything in a scroll view
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -172,79 +256,110 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                    isEditing
-                    ? LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Center( // Centers the button
-                            child: ElevatedButton(
-                              onPressed: _saveProfile,
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(constraints.maxWidth * 0.5, 50), // 50% of screen width
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                backgroundColor: Colors.green, // Green color for Save Changes button
-                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                              ),
-                              child: const Text("Save Changes"),
+                      // Edit/Save Button
+                      isEditing
+                          ? LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Center(
+                                  child: ElevatedButton(
+                                    onPressed: _saveProfile,
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize:
+                                          Size(constraints.maxWidth * 0.5, 50),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                    ),
+                                    child: const Text("Save Changes"),
+                                  ),
+                                );
+                              },
+                            )
+                          : LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Center(
+                                  child: ElevatedButton(
+                                    onPressed: () =>
+                                        setState(() => isEditing = true),
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize:
+                                          Size(constraints.maxWidth * 0.5, 50),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      foregroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                    ),
+                                    child: const Text("Edit Profile"),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      )
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Center( // Centers the button
-                            child: ElevatedButton(
-                              onPressed: () => setState(() => isEditing = true),
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(constraints.maxWidth * 0.5, 50),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                backgroundColor: Theme.of(context).colorScheme.secondary,
-                                foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                              ),
-                              child: const Text("Edit Profile"),
-                            ),
-                          );
-                        },
-                      ),
-
 
                       const SizedBox(height: 20),
 
                       // Common Fields Widget
-                      CommonFieldsWidget(
-                        firstNameController: firstNameController,
-                        lastNameController: lastNameController,
-                        phoneNumberController: phoneNumberController,
-                        dateOfBirthController: dateOfBirthController,
-                        isEditing: isEditing,
-                        onPickDateOfBirth: _pickDateOfBirth,
-                      ),
+                      CombinedForm(
+                          firstNameController: firstNameController,
+                          lastNameController: lastNameController,
+                          phoneNumberController: phoneNumberController,
+                          dateOfBirthController: dateOfBirthController,
+                          addressController: addressController,
+                          medicalHistoryController: medicalHistoryController,
+                          therapyGoalsController: therapyGoalsController,
+                          emergencyContactNameController:
+                              emergencyContactNameController,
+                          emergencyContactPhoneController:
+                              emergencyContactPhoneController,
+                          emergencyContactRelationController:
+                              emergencyContactRelationController,
+                          specializationController: specializationController,
+                          licenseNumberController: licenseNumberController,
+                          bioController: bioController,
+                          yearsOfExperienceController:
+                              yearsOfExperienceController,
+                          languagesSpokenController: languagesSpokenController,
+                          availabilityController: availabilityController,
+                          locationController: locationController,
+                          clinicController: clinicController,
+                          isEditing: isEditing,
+                          onPickDateOfBirth: _pickDateOfBirth,
+                          userType:
+                              _userType!, 
+                        ),
 
-                      //Appointment History Button
                       const SizedBox(height: 20),
+
+                      // Appointment History Button
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const CompletedAppointmentsScreen(),
-                            ),
+                                builder: (context) => const CompletedAppointmentsScreen()),
                           );
                         },
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           minimumSize: Size(
-                            MediaQuery.of(context).size.width * 0.35,45,
+                            MediaQuery.of(context).size.width * 0.35, 45,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                         ),
                         child: Row(
@@ -261,17 +376,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 20),
 
                       // Logout Button
-                      const SizedBox(height: 30,),
                       Center(
                         child: ElevatedButton(
                           onPressed: () async {
                             await _logout(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            minimumSize: Size(MediaQuery.of(context).size.width * 0.4, 40),
+                            minimumSize: Size(
+                                MediaQuery.of(context).size.width * 0.4, 40),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -285,6 +401,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-    );
-  }
+              ),
+  );
+}
 }
