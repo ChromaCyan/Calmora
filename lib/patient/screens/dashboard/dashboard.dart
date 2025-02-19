@@ -57,27 +57,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               const SizedBox(height: 30),
 
-              // Highlight Survey Card
-              Showcase(
-                key: _quickTestKey,
-                description:
-                    "Tap here to take a quick mental health assessment.",
-                textColor: theme.colorScheme.onPrimary,
-                tooltipBackgroundColor: theme.colorScheme.primary,
-                targetPadding: const EdgeInsets.all(16),
-                targetShapeBorder: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                descTextStyle: TextStyle(
-                  fontSize: 18,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.white,
-                ),
-                child: const Center(child: QuickTestButton()),
-              ),
-              const SizedBox(height: 30),
-
               Center(
                 child: Text(
                   'Write about your day!',
@@ -87,6 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
 
               // Highlight Journal Card
               Showcase(
