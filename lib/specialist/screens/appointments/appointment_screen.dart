@@ -57,6 +57,7 @@ class _SpecialistAppointmentListScreenState
                   children: [
                     const SizedBox(height: 10),
                     _buildCategorySelector(),
+                    const SizedBox(height: 10),
                     Expanded(
                       child: _buildAppointmentList(),
                     ),

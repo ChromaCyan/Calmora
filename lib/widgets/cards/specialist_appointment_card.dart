@@ -55,6 +55,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
     final theme = Theme.of(context).colorScheme;
     final patient = appointment['patient'];
     final patientName = '${patient['firstName']} ${patient['lastName']}';
+    final PatientProfile = '${patient['profileImage']}';
     final startTime = appointment['startTime'];
     final endTime = appointment['endTime'];
     final status = appointment['status'];
@@ -107,17 +108,21 @@ class SpecialistAppointmentCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
+                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                      color: theme.primary,
                       shape: BoxShape.circle,
-                      image: const DecorationImage(
-                        image: AssetImage("images/splash/logo_placeholder.png"),
-                        filterQuality: FilterQuality.high,
+                      image: DecorationImage(
+                        image: patient['profileImage'] != null &&
+                                patient['profileImage'].isNotEmpty
+                            ? NetworkImage(patient[
+                                'profileImage']) 
+                            : const AssetImage(
+                                    "lib/icons/profile_placeholder.png")
+                                as ImageProvider, 
                         fit: BoxFit.cover,
                       ),
                     ),

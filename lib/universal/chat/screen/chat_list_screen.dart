@@ -112,6 +112,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                               final recipient = participants.isNotEmpty ? participants[0] : {};
                               final recipientId = recipient['_id'] ?? '';
                               final recipientName = recipient['firstName'] ?? 'No Name';
+                              final recipientImage = recipient['profileImage'] ?? '';
                               final lastMessage = chat['lastMessage'] ?? {};
                               final messageContent = lastMessage['content'] ?? 'No message';
 
@@ -119,6 +120,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                 chatId: chatId,
                                 recipientId: recipientId,
                                 recipientName: recipientName,
+                                recipientImage: recipientImage,
                                 lastMessage: messageContent,
                                 onTap: () {
                                   Navigator.push(

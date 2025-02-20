@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 class AppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
 
-  const AppointmentCard({Key? key, required this.appointment}) : super(key: key);
+  const AppointmentCard({Key? key, required this.appointment})
+      : super(key: key);
 
   String _formatDate(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
@@ -20,7 +21,9 @@ class AppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final specialist = appointment['specialist'];
-    final specialistName = '${specialist['firstName']} ${specialist['lastName']}';
+    final specialistName =
+        '${specialist['firstName']} ${specialist['lastName']}';
+    final specialistProfile = '${specialist['profileImage']}';
     final startTime = appointment['startTime'];
     final endTime = appointment['endTime'];
     final status = appointment['status'];
@@ -82,11 +85,15 @@ class AppointmentCard extends StatelessWidget {
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                      color: theme.primary,
                       shape: BoxShape.circle,
-                      image: const DecorationImage(
-                        image: AssetImage("lib/icons/profile_placeholder.png"),
-                        filterQuality: FilterQuality.high,
+                      image: DecorationImage(
+                        image: specialist['profileImage'] != null &&
+                                specialist['profileImage'].isNotEmpty
+                            ? NetworkImage(specialist[
+                                'profileImage']) 
+                            : const AssetImage(
+                                    "lib/icons/profile_placeholder.png")
+                                as ImageProvider, 
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -101,14 +108,16 @@ class AppointmentCard extends StatelessWidget {
                 const SizedBox(width: 8.0),
                 Text(
                   formattedStartDate,
-                  style: TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
+                  style:
+                      TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
                 ),
                 const SizedBox(width: 12.0),
                 Icon(Icons.lock_clock, color: theme.secondary, size: 18.0),
                 const SizedBox(width: 8.0),
                 Text(
                   formattedCombinedTime,
-                  style: TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
+                  style:
+                      TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
                 ),
               ],
             ),
