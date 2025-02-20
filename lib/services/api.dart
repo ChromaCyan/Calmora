@@ -104,7 +104,7 @@ class ApiRepository {
     }
   }
 
-// Verify OTP (Reset Password)
+  // Verify OTP (Reset Password)
   Future<Map<String, dynamic>> verifyResetOTP(String email, String otp) async {
     final url = Uri.parse('$baseUrl/auth/verify-reset-otp');
     final response = await http.post(
@@ -128,7 +128,7 @@ class ApiRepository {
     }
   }
 
-// Reset Password (Only if OTP was verified)
+  // Reset Password (Only if OTP was verified)
   Future<Map<String, dynamic>> resetPassword(
       String email, String newPassword) async {
     final url = Uri.parse('$baseUrl/auth/reset-password');
@@ -193,6 +193,7 @@ class ApiRepository {
     }
   }
 
+  // Get Specialist by ID
   Future<Map<String, dynamic>> getSpecialistById(String specialistId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/auth/specialists/$specialistId');

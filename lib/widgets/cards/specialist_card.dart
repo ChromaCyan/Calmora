@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 class Specialist {
   final String name;
   final String specialization;
-  final String imageUrl; 
+  final String imageUrl;
+  final String location; // Added location field
 
-  Specialist({required this.name, required this.specialization, required this.imageUrl});
+  Specialist({
+    required this.name,
+    required this.specialization,
+    required this.imageUrl,
+    required this.location, // Required location
+  });
 }
 
 class SpecialistCard extends StatelessWidget {
@@ -16,13 +22,11 @@ class SpecialistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width to adjust padding and font size
     double screenWidth = MediaQuery.of(context).size.width;
 
-    // Define padding and font size based on screen size
-    double padding = screenWidth > 600 ? 16.0 : 12.0; // More padding for wide screens
-    double nameFontSize = screenWidth > 600 ? 18.0 : 16.0; // Larger font size for wide screens
-    double specializationFontSize = screenWidth > 600 ? 14.0 : 12.0; // Smaller font for narrow screens
+    double padding = screenWidth > 600 ? 16.0 : 12.0;
+    double nameFontSize = screenWidth > 600 ? 18.0 : 16.0;
+    double specializationFontSize = screenWidth > 600 ? 14.0 : 12.0;
 
     return GestureDetector(
       onTap: onTap,
@@ -36,13 +40,13 @@ class SpecialistCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  specialist.imageUrl, 
+                  specialist.imageUrl,
                   height: 120,
-                  width: double.infinity, 
-                  fit: BoxFit.cover, 
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(height: 10), 
+              const SizedBox(height: 10),
               Text(
                 specialist.name,
                 style: TextStyle(
@@ -51,7 +55,7 @@ class SpecialistCard extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 8), 
+              const SizedBox(height: 8),
               Text(
                 specialist.specialization,
                 style: TextStyle(
@@ -59,6 +63,24 @@ class SpecialistCard extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Location with Icon
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.location_on, color: Colors.blue, size: 18),
+                  const SizedBox(width: 4),
+                  Text(
+                    specialist.location,
+                    style: TextStyle(
+                      fontSize: specializationFontSize,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ],
           ),

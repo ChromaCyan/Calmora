@@ -293,6 +293,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           itemBuilder: (context, index) {
             final specialist = filteredSpecialists[index];
             final name = '${specialist['firstName']} ${specialist['lastName']}';
+            final location = specialist['location'] ?? 'Unknown';
             final specialization = specialist['specialization'] ?? 'Unknown';
             final image = specialist['profileImage']?.isEmpty ?? true
                 ? 'images/splash/doc1.jpg'
@@ -301,6 +302,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             return SpecialistCard(
               specialist: Specialist(
                 name: name,
+                location: location,
                 specialization: specialization,
                 imageUrl: image,
               ),

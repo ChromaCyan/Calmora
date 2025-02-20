@@ -15,6 +15,7 @@ import 'package:armstrong/widgets/cards/specialist_bio_card.dart';
 import 'package:armstrong/widgets/buttons/toggle_button.dart';
 import 'package:armstrong/patient/screens/discover/contact_info_card.dart';
 import 'package:armstrong/patient/screens/discover/pro_deets_card.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class SpecialistDetailScreen extends StatefulWidget {
   final String specialistId;
@@ -82,7 +83,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
             final languagesSpoken = specialist['languagesSpoken'] ?? [];
             final licenseNumber =
                 specialist['licenseNumber'] ?? 'Not available';
-            final reviews = specialist['reviews'] ?? [];
+            final location = specialist['location'] ?? 'Unknown';
+            final clinic = specialist['clinic'] ?? 'Unknown';
 
             return BlocListener<AppointmentBloc, AppointmentState>(
               listener: (context, state) {
@@ -136,6 +138,38 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(LucideIcons.mapPin,
+                            color: Colors.blue, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          location,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(LucideIcons.cross,
+                            color: Colors.green, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          clinic,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 24),
 
                     // Bio
@@ -145,12 +179,11 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
 
                     // Contact Information
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.30, // 35% of screen height
-
+                      height: MediaQuery.of(context).size.height * 0.30,
                       margin: const EdgeInsets.symmetric(horizontal: 10),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor, // Matches theme
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -179,12 +212,16 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                               child: showContactInfo
                                   ? ContactInfoCard(
                                       email: specialist['email'] ?? 'No email',
-                                      phoneNumber: specialist['phoneNumber'] ?? 'No phone',
+                                      phoneNumber: specialist['phoneNumber'] ??
+                                          'No phone',
                                     )
                                   : ProDeetsCard(
-                                      yearsOfExperience: specialist['yearsOfExperience'] ?? 0,
-                                      languagesSpoken: specialist['languagesSpoken'] ?? [],
-                                      licenseNumber: specialist['licenseNumber'] ?? 'N/A',
+                                      yearsOfExperience:
+                                          specialist['yearsOfExperience'] ?? 0,
+                                      languagesSpoken:
+                                          specialist['languagesSpoken'] ?? [],
+                                      licenseNumber:
+                                          specialist['licenseNumber'] ?? 'N/A',
                                     ),
                             ),
                           ),
@@ -195,16 +232,12 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     const SizedBox(height: 16),
 
                     // Availability
-                    _buildSectionTitle('Availability:'),
-                    Text(
-                      availability,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: availability == 'Available'
-                            ? Colors.green
-                            : Colors.red,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle('Availability:'),
+                        _buildAvailabilityCard(availability),
+                      ],
                     ),
 
                     const SizedBox(height: 24),
@@ -241,7 +274,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     SpecialistActionButtons(
                       specialistId: widget.specialistId,
                       name: name,
-                      onBookAppointment: () => _bookAppointment(context, widget.specialistId),
+                      onBookAppointment: () =>
+                          _bookAppointment(context, widget.specialistId),
                     ),
                   ],
                 ),
@@ -287,4 +321,42 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
       ),
     );
   }
+}
+
+// Availability Section as a Card
+Widget _buildAvailabilityCard(String availability) {
+  Color bgColor =
+      availability == 'Available' ? Colors.green[100]! : Colors.red[100]!;
+  Color textColor =
+      availability == 'Available' ? Colors.green[800]! : Colors.red[800]!;
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Card(
+      color: bgColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              availability == 'Available' ? Icons.check_circle : Icons.cancel,
+              color: textColor,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              availability,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
