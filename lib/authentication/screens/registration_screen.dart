@@ -116,6 +116,7 @@ Widget build(BuildContext context) {
           );
 
           final userType = state.userData['userType'];
+          final userId = state.userData['userId'];
 
           // Check if the user is a Specialist or Patient
           if (userType == 'Specialist') {
@@ -126,9 +127,9 @@ Widget build(BuildContext context) {
           } else if (userType == 'Patient') {
             // Check if the survey is completed (if not, navigate to the survey screen)
             final FlutterSecureStorage storage = FlutterSecureStorage();
-            final hasCompletedSurvey = await storage.read(key: 'hasCompletedSurvey');
+            final hasCompletedSurvey = await storage.read(key: 'hasCompletedSurvey_$userId');
             final surveyOnboardingCompleted =
-                await storage.read(key: 'survey_onboarding_completed');
+                await storage.read(key: 'survey_onboarding_completed_$userId');
 
             // If survey is completed, navigate to the Patient Home screen
             if (hasCompletedSurvey == 'true' && surveyOnboardingCompleted == 'true') {
