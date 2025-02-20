@@ -90,6 +90,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     }
                   }
+                   else if (state is AuthError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Email or password is incorrect"),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 },
                 child: Center(
                   child: Container(
@@ -154,6 +162,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  _showForgotPasswordDialog(context);
+                                },
+                                child: Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                ),
+                              ),
+                            ),
                             const SizedBox(height: 40),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,

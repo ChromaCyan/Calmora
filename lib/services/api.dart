@@ -9,6 +9,7 @@ import 'package:armstrong/models/article/article.dart';
 
 class ApiRepository {
   final String baseUrl = 'https://armstrong-api.vercel.app/api';
+  //final String baseUrl = 'http://localhost:3000/api';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +85,74 @@ class ApiRepository {
       throw Exception('Failed to verify OTP: ${response.body}');
     }
   }
+
+  // Send OTP (Reset Password)
+  Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    final url = Uri.parse('$baseUrl/auth/forgot-password');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email.toLowerCase()}), 
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else {
+      throw Exception(responseBody['message'] ?? 'Failed to send OTP');
+    }
+  }
+
+// Verify OTP (Reset Password)
+  Future<Map<String, dynamic>> verifyResetOTP(String email, String otp) async {
+    final url = Uri.parse('$baseUrl/auth/verify-reset-otp');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(
+          {'email': email.toLowerCase(), 'otp': otp}), 
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else if (responseBody['message'] == "OTP has expired") {
+      throw Exception("Your OTP has expired. Please request a new one.");
+    } else if (responseBody['message'] ==
+        "OTP expired after 3 failed attempts. Request a new one.") {
+      throw Exception("Too many failed attempts. Request a new OTP.");
+    } else {
+      throw Exception(responseBody['message'] ?? 'OTP verification failed');
+    }
+  }
+
+// Reset Password (Only if OTP was verified)
+  Future<Map<String, dynamic>> resetPassword(
+      String email, String newPassword) async {
+    final url = Uri.parse('$baseUrl/auth/reset-password');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'email': email.toLowerCase(),
+        'newPassword': newPassword
+      }),
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else if (responseBody['message'] ==
+        "OTP verification required before resetting password") {
+      throw Exception("Please verify OTP before resetting your password.");
+    } else {
+      throw Exception(responseBody['message'] ?? 'Failed to reset password');
+    }
+  }
+
   /////////////////////////////////////////////////////////////////////////////////
   // Profile (API)
 
