@@ -270,7 +270,7 @@ Column onBoardingItems(Size size, int index, BuildContext context) {
           TextSpan(
             style: TextStyle(
               fontSize: 35,
-              color: colorScheme.primary, // Use primary color from the theme
+              color: colorScheme.primary, 
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
@@ -285,8 +285,8 @@ Column onBoardingItems(Size size, int index, BuildContext context) {
         onBoardData[index].text,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 15.5,
-          color: colorScheme.onBackground, // Use onBackground color for text
+          fontSize: 18,
+          color: colorScheme.onBackground, 
         ),
       ),
     ],

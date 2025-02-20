@@ -6,15 +6,15 @@ class OnBoards {
 
 List<OnBoards> onBoardData = [
   OnBoards(
-    text: "Welcome to Armstrong!\nA dedicated app for men's mental health and well-being.",
-    image: "images/armstrong_transparent.png",
+    text: "Understanding your mental health\nis the first step toward positive change.\n\nThis survey helps us get to know\nyour situation and mental health.",
+    image: "images/icons/mental-disorder.png",
   ),
   OnBoards(
-    text: "This survey will help us personalize your dashboard\nto suggest the most relevant resources for your needs.",
-    image: "images/splash/survey_intro.png",
+    text: "By answering honestly,\nwe can personalize your dashboard\nwith articles\ntailored just for you.",
+    image: "images/icons/hopeless.png",
   ),
   OnBoards(
-    text: "Your answers will guide us in providing the best tools,\narticles, and support for your mental health journey.",
-    image: "images/splash/survey.png",
+    text: "Your mental well-being matters.\n\nThe more we understand your challenges,\nthe better we can provide the right\nguidance and resources to support you.",
+    image: "images/icons/very-happy.png",
   ),
 ];

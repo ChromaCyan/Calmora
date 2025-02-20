@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // For handling back button event
+import 'package:flutter/services.dart';
 import 'package:armstrong/splash_screen/models/survey_message.dart';
 import 'package:armstrong/patient/screens/survey/questions_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SurveyScreen extends StatefulWidget {
   const SurveyScreen({super.key});
@@ -34,7 +35,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
     if (_userId == null) return;
 
     final storage = FlutterSecureStorage();
-    String? completed = await storage.read(key: 'survey_onboarding_completed_$_userId');
+    String? completed =
+        await storage.read(key: 'survey_onboarding_completed_$_userId');
     if (completed == 'true') {
       setState(() {
         surveyOnboardingCompleted = true;
@@ -162,6 +164,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 
   Column onBoardingItems(Size size, int index, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       children: [
         Container(
@@ -189,15 +194,39 @@ class _SurveyScreenState extends State<SurveyScreen> {
           ),
         ),
         const SizedBox(height: 30),
+        Text.rich(
+          TextSpan(
+            style: TextStyle(
+              fontSize: 35,
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            children: [
+              TextSpan(text: _getOnboardingTitle(index)),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 10),
         Text(
           onBoardData[index].text,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 15.5,
-            color: Theme.of(context).colorScheme.onBackground,
+            fontSize: 18,
+            color: colorScheme.onBackground,
           ),
         ),
       ],
     );
+  }
+
+  String _getOnboardingTitle(int index) {
+    const titles = [
+      "Why Survey?",
+      "To personalize your dashboard..",
+      "We care about you!",
+    ];
+    return titles[index];
   }
 }
