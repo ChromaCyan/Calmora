@@ -115,8 +115,7 @@ Widget build(BuildContext context) {
             const SnackBar(content: Text('Registration Successful!')),
           );
 
-          // Retrieve the user type after successful registration
-          final userType = state.userData['userType']; // Assuming `userType` is in the response
+          final userType = state.userData['userType'];
 
           // Check if the user is a Specialist or Patient
           if (userType == 'Specialist') {

@@ -40,17 +40,20 @@ void main() async {
   // Check if survey is completed for patient
   bool hasCompletedSurvey = false;
   bool surveyOnboardingCompleted = false;
-  if (token != null && role == 'Patient') {
-    hasCompletedSurvey =
-        await storage.read(key: 'hasCompletedSurvey') == 'true';
-    surveyOnboardingCompleted =
-        await storage.read(key: 'survey_onboarding_completed') == 'true';
-  }
 
   if (token != null) {
     try {
       final jwt = JWT.verify(token, SecretKey('your_jwt_secret_key'));
       role = jwt.payload['userType'];
+      final userId = jwt.payload['userId'];
+
+      if (token != null && role == 'Patient') {
+        hasCompletedSurvey =
+            await storage.read(key: 'hasCompletedSurvey_$userId') == 'true';
+        surveyOnboardingCompleted =
+            await storage.read(key: 'survey_onboarding_completed_$userId') == 'true';
+      }
+
     } catch (e) {
       print('Invalid token: $e');
       await storage.delete(key: 'jwt');
