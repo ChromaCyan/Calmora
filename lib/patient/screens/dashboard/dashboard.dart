@@ -1,11 +1,10 @@
 import 'package:armstrong/widgets/cards/welcome_card.dart';
+import 'package:armstrong/widgets/charts/survey_result.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/mood_graph.dart';
 import 'package:armstrong/widgets/cards/journal_card.dart';
-import 'package:armstrong/widgets/buttons/survey_button.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
-import 'package:showcaseview/showcaseview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -15,11 +14,25 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
+    _loadUserId();
   }
+
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+
+    if (_userId != null) {
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +45,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               // Welcome Card
               const WelcomeSection(),
 
               const SizedBox(height: 30),
+
+              // Pie chart for survey result
+              Center(
+                child: _userId != null
+                  ? SurveyScoreChart(patientId: _userId!)
+                  : Center(child: CircularProgressIndicator()),
+              ),
+
+              const SizedBox(height: 20),
 
               Center(
                 child: Text(
@@ -47,10 +68,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
 
               // Highlight Journal Card
-              
               const JournalSection(),
 
               const SizedBox(height: 30),
@@ -64,10 +83,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+              
 
               // Article List
               const ArticleList(),
-            
+
               const SizedBox(height: 30),
 
               Center(

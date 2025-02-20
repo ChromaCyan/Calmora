@@ -1,6 +1,5 @@
 import 'package:armstrong/universal/notification/notification_screen.dart';
 import 'package:armstrong/universal/profile/profile_screen.dart';
-import 'package:armstrong/widgets/navigation/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart';

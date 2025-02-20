@@ -92,7 +92,7 @@ class ApiRepository {
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email.toLowerCase()}), 
+      body: json.encode({'email': email.toLowerCase()}),
     );
 
     final responseBody = json.decode(response.body);
@@ -110,8 +110,7 @@ class ApiRepository {
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(
-          {'email': email.toLowerCase(), 'otp': otp}), 
+      body: json.encode({'email': email.toLowerCase(), 'otp': otp}),
     );
 
     final responseBody = json.decode(response.body);
@@ -135,10 +134,8 @@ class ApiRepository {
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'email': email.toLowerCase(),
-        'newPassword': newPassword
-      }),
+      body: json
+          .encode({'email': email.toLowerCase(), 'newPassword': newPassword}),
     );
 
     final responseBody = json.decode(response.body);
@@ -589,9 +586,8 @@ class ApiRepository {
     }
   }
 
-// Get survey results for a patient
-  Future<List<Map<String, dynamic>>> getPatientSurveyResults(
-      String patientId) async {
+  // Get survey results for a patient
+  Future<Map<String, dynamic>> getPatientSurveyResults(String patientId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/survey/results/$patientId');
 
@@ -601,8 +597,8 @@ class ApiRepository {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body)['data'];
-      return data.map((result) => Map<String, dynamic>.from(result)).toList();
+      final Map<String, dynamic> data = json.decode(response.body)['data'];
+      return data;
     } else {
       throw Exception('Failed to fetch survey results: ${response.body}');
     }
