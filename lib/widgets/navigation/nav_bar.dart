@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTapped;
   final int notificationCount;
   final int chatNotificationCount;
+  final bool showcaseCompleted; // <-- Add this
+  final VoidCallback completeShowcase; // <-- Add this
+
+  final GlobalKey homeKey;
+  final GlobalKey discoverKey;
+  final GlobalKey chatKey;
+  final GlobalKey appointmentsKey;
 
   const CustomBottomNavBar({
     Key? key,
@@ -12,37 +20,13 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.onItemTapped,
     this.notificationCount = 0,
     this.chatNotificationCount = 0,
+    required this.showcaseCompleted, // <-- Initialize
+    required this.completeShowcase, // <-- Initialize
+    required this.homeKey,
+    required this.discoverKey,
+    required this.chatKey,
+    required this.appointmentsKey,
   }) : super(key: key);
-
-  Widget _buildBadge(int count, Color badgeColor) {
-    return count > 0
-        ? Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: badgeColor,
-                shape: BoxShape.circle,
-              ),
-              constraints: const BoxConstraints(
-                minWidth: 18,
-                minHeight: 18,
-              ),
-              child: Center(
-                child: Text(
-                  '$count',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          )
-        : const SizedBox.shrink();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +36,8 @@ class CustomBottomNavBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: theme.bottomNavigationBarTheme.backgroundColor ?? theme.cardColor,
+        color:
+            theme.bottomNavigationBarTheme.backgroundColor ?? theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -65,87 +50,162 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.home_filled, "Home", 0, colorScheme.primary),
-          _buildNavItem(Icons.search, "Discover", 1, colorScheme.primary),
+          _buildNavItem(
+              Icons.home_filled,
+              "Home",
+              0,
+              colorScheme.primary,
+              homeKey,
+              context,
+              "Dashboard with personalized recommended articles, add your mood, and view your upcoming appointments"),
+          _buildNavItem(
+              Icons.search,
+              "Discover",
+              1,
+              colorScheme.primary,
+              discoverKey,
+              context,
+              "Browse for articles and specialists you can chat and book an appointment."),
           _buildNavItemWithBadge(
-              Icons.message_outlined, "Messages", 2, chatNotificationCount, colorScheme.primary, colorScheme.secondary),
+              Icons.message_outlined,
+              "Messages",
+              2,
+              chatNotificationCount,
+              colorScheme.primary,
+              colorScheme.secondary,
+              chatKey,
+              context,
+              "View existing chats you had with a specialist"),
           _buildNavItemWithBadge(
-              Icons.checklist, "Appointments", 3, notificationCount, colorScheme.primary, colorScheme.secondary),
+              Icons.checklist,
+              "Appointments",
+              3,
+              notificationCount,
+              colorScheme.primary,
+              colorScheme.secondary,
+              appointmentsKey,
+              context,
+              "Check your existing appointment status"),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index, Color primaryColor) {
+  Widget _buildNavItem(
+      IconData icon,
+      String label,
+      int index,
+      Color primaryColor,
+      GlobalKey key,
+      BuildContext context,
+      String description) {
     bool isSelected = selectedIndex == index;
+    final theme = Theme.of(context);
     return GestureDetector(
-      onTap: () => onItemTapped(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: primaryColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              )
-            : null,
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? primaryColor : Colors.grey,
-            ),
-            if (isSelected)
-              Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
+      onTap: () {
+        onItemTapped(index);
+        // Mark showcase as completed when the user interacts with the item
+        if (!showcaseCompleted) {
+          // <-- Use the passed showcaseCompleted variable
+          completeShowcase(); // <-- Call the passed completeShowcase function
+        }
+      },
+      child: Showcase(
+        key: key,
+        description: description,
+        textColor: theme.colorScheme.onPrimary,
+        tooltipBackgroundColor: theme.colorScheme.primary,
+        targetPadding: const EdgeInsets.all(16),
+        targetShapeBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        descTextStyle: TextStyle(
+          fontSize: 18,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black
+              : Colors.white,
+        ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: isSelected
+              ? BoxDecoration(
+                  color: primaryColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                )
+              : null,
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? primaryColor : Colors.grey,
+              ),
+              if (isSelected)
+                Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildNavItemWithBadge(
-      IconData icon, String label, int index, int count, Color primaryColor, Color badgeColor) {
+      IconData icon,
+      String label,
+      int index,
+      int count,
+      Color primaryColor,
+      Color badgeColor,
+      GlobalKey key,
+      BuildContext context,
+      String description) {
     bool isSelected = selectedIndex == index;
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => onItemTapped(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: primaryColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              )
-            : null,
-        child: Row(
+      child: Showcase(
+        key: key,
+        description: description,
+        textColor: theme.colorScheme.onPrimary,
+        tooltipBackgroundColor: theme.colorScheme.primary,
+        targetPadding: const EdgeInsets.all(16),
+        targetShapeBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        descTextStyle: TextStyle(
+          fontSize: 18,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black
+              : Colors.white,
+        ),
+        child: Stack(
           children: [
-            Stack(
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected ? badgeColor : Colors.grey,
-                ),
-                _buildBadge(count, badgeColor),
-              ],
+            Icon(
+              icon,
+              color: isSelected ? primaryColor : Colors.grey,
             ),
-            if (isSelected)
-              Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+            if (count > 0)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration:
+                      BoxDecoration(color: badgeColor, shape: BoxShape.circle),
+                  child: Text('$count',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold)),
                 ),
               ),
           ],

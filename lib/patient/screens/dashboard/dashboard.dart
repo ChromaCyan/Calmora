@@ -15,30 +15,10 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final GlobalKey _journalKey = GlobalKey();
-  final GlobalKey _articleKey = GlobalKey();
-  final GlobalKey _quickTestKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    _checkOnboarding();
-  }
-
-  void _checkOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool hasCompletedOnboarding =
-        prefs.getBool('hasCompletedOnboarding') ?? false;
-
-    if (!hasCompletedOnboarding) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ShowCaseWidget.of(context)
-            .startShowCase([_journalKey, _articleKey, _quickTestKey]);
-      });
-
-      // Set onboarding as completed
-      await prefs.setBool('hasCompletedOnboarding', true);
-    }
   }
 
   @override
@@ -52,6 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              
               // Welcome Card
               const WelcomeSection(),
 
@@ -69,24 +50,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 20),
 
               // Highlight Journal Card
-              Showcase(
-                key: _journalKey,
-                description:
-                    "Write your thoughts and feelings in your personal journal.",
-                textColor: theme.colorScheme.onPrimary,
-                tooltipBackgroundColor: theme.colorScheme.primary,
-                targetPadding: const EdgeInsets.all(16),
-                targetShapeBorder: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                descTextStyle: TextStyle(
-                  fontSize: 18,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.white,
-                ),
-                child: const JournalSection(),
-              ),
+              
+              const JournalSection(),
 
               const SizedBox(height: 30),
 
@@ -100,26 +65,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
-              // Highlight Article List
-              Showcase(
-                key: _articleKey,
-                description:
-                    "Check out the latest articles recommended for you.",
-                textColor: theme.colorScheme.onPrimary,
-                tooltipBackgroundColor: theme.colorScheme.primary,
-                targetPadding: const EdgeInsets.all(16),
-                targetShapeBorder: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                descTextStyle: TextStyle(
-                  fontSize: 18,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.white,
-                ),
-                child: const ArticleList(),
-              ),
-
+              // Article List
+              const ArticleList(),
+            
               const SizedBox(height: 30),
 
               Center(

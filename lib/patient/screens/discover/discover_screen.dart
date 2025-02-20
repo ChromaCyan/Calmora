@@ -23,37 +23,18 @@ class DiscoverScreen extends StatefulWidget {
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
-  final GlobalKey _searchKey = GlobalKey();
-  final GlobalKey _categoryKey = GlobalKey();
-  final GlobalKey _specialistKey = GlobalKey();
   final ApiRepository _apiRepository = ApiRepository();
 
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
   String selectedCategory = 'Specialist';
   String selectedArticleCategory = '';
+  String selectedSpecialistType = '';
 
   @override
   void initState() {
     super.initState();
-    _checkOnboarding();
     _fetchSpecialists();
-  }
-
-  void _checkOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool hasCompletedOnboarding2 =
-        prefs.getBool('hasCompletedOnboarding2') ?? false;
-
-    if (!hasCompletedOnboarding2) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ShowCaseWidget.of(context)
-            .startShowCase([_searchKey, _categoryKey, _specialistKey]);
-      });
-
-      // Set onboarding as completed for the discovery screen
-      await prefs.setBool('hasCompletedOnboarding2', true);
-    }
   }
 
   @override
@@ -80,101 +61,98 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   child: HealthAdviceSection(items: carouselData),
                 ),
                 const SizedBox(height: 20),
-                Showcase(
-                  key: _searchKey,
-                  description: "Search for specialists or articles here.",
-                  textColor: theme.colorScheme.onBackground,
-                  tooltipBackgroundColor: theme.colorScheme.primary,
-                  targetPadding: const EdgeInsets.all(16),
-                  targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  descTextStyle: TextStyle(
-                    fontSize: 18,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black
-                        : Colors.white,
-                  ),
-                  child: CustomSearchBar(
-                    hintText: 'Search',
-                    searchController: searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        searchQuery = value;
-                      });
-                    },
-                    onClear: () {
-                      setState(() {
-                        searchController.clear();
-                        searchQuery = '';
-                      });
-                    },
-                  ),
+
+                CustomSearchBar(
+                  hintText: 'Search',
+                  searchController: searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                  onClear: () {
+                    setState(() {
+                      searchController.clear();
+                      searchQuery = '';
+                    });
+                  },
                 ),
+
                 const SizedBox(height: 20),
-                Showcase(
-                  key: _categoryKey,
-                  description: "Select the category of your choice.",
-                  textColor: theme.colorScheme.onBackground,
-                  tooltipBackgroundColor: theme.colorScheme.primary,
-                  targetPadding: const EdgeInsets.all(16),
-                  targetShapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  descTextStyle: TextStyle(
-                    fontSize: 18,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black
-                        : Colors.white,
-                  ),
-                  child: CategoryChip(
-                    categories: ['Specialist', 'Articles'],
-                    selectedCategory: selectedCategory,
-                    onSelected: (String category) {
+
+                // Category Selection
+                CategoryChip(
+                  categories: ['Specialist', 'Articles'],
+                  selectedCategory: selectedCategory,
+                  onSelected: (String category) {
+                    setState(() {
+                      selectedCategory = category;
+                      selectedArticleCategory = '';
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                // Specialist Type Dropdown
+                if (selectedCategory == 'Specialist')
+                  DropdownButton<String>(
+                    value: selectedSpecialistType.isEmpty
+                        ? null
+                        : selectedSpecialistType,
+                    icon: Icon(Icons.arrow_drop_down,
+                        color: theme.colorScheme.primary),
+                    isExpanded: true,
+                    elevation: 16,
+                    hint: Text("Select Specialist Type"),
+                    onChanged: (String? newType) {
                       setState(() {
-                        selectedCategory = category;
-                        selectedArticleCategory =
-                            ''; // Reset article category filter when switching to Specialist
+                        selectedSpecialistType =
+                            newType == "Clear Filter" ? '' : newType ?? '';
+                        _fetchSpecialists(); 
                       });
                     },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Category filter for articles
-                if (selectedCategory == 'Articles')
-                  Showcase(
-                    key: GlobalKey(),
-                    description: "Filter articles by category.",
-                    textColor: theme.colorScheme.onBackground,
-                    tooltipBackgroundColor: theme.colorScheme.primary,
-                    targetPadding: const EdgeInsets.all(16),
-                    targetShapeBorder: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    descTextStyle: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    child: DropdownButton<String>(
-                      value: selectedArticleCategory.isEmpty
-                          ? null
-                          : selectedArticleCategory,
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary, 
+                    items: [
+                      DropdownMenuItem<String>(
+                        value: "Clear Filter",
+                        child: Text("Clear Filter",
+                            style: TextStyle(color: Colors.red)),
                       ),
-                      isExpanded: true,
-                      elevation: 16,
-                      onChanged: (String? newCategory) {
-                        setState(() {
-                          selectedArticleCategory = newCategory ?? '';
-                        });
-                      },
-                      items: [
+                      ...['Psychologist', 'Psychiatrist', 'Counselor']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value, style: TextStyle(fontSize: 16)),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+
+                // Article Category Dropdown
+                if (selectedCategory == 'Articles')
+                  DropdownButton<String>(
+                    value: selectedArticleCategory.isEmpty
+                        ? null
+                        : selectedArticleCategory,
+                    icon: Icon(Icons.arrow_drop_down,
+                        color: theme.colorScheme.primary),
+                    isExpanded: true,
+                    elevation: 16,
+                    hint: Text("Select Article Category"),
+                    onChanged: (String? newCategory) {
+                      setState(() {
+                        selectedArticleCategory = newCategory == "Clear Filter"
+                            ? ''
+                            : newCategory ?? '';
+                      });
+                    },
+                    items: [
+                      DropdownMenuItem<String>(
+                        value: "Clear Filter",
+                        child: Text("Clear Filter",
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                      ...[
                         'health',
                         'social',
                         'growth',
@@ -184,53 +162,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Container(
-                            width: double.infinity,
-                            height: 45, // Similar height as CategoryChip
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            decoration: BoxDecoration(
-                              color: selectedArticleCategory == value
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.surface,
-                              borderRadius:
-                                  BorderRadius.circular(10), // Rounded corners
-                              border: Border.all(
-                                color: selectedArticleCategory == value
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.outline,
-                                width: 1.5,
-                              ),
-                              boxShadow: selectedArticleCategory == value
-                                  ? [
-                                      BoxShadow(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.2),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 3),
-                                      )
-                                    ]
-                                  : [],
-                            ),
-                            child: Center(
-                              child: Text(
-                                value[0].toUpperCase() + value.substring(1),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: selectedArticleCategory == value
-                                      ? Colors.white
-                                      : Theme.of(context).colorScheme.onSurface,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
+                          child: Text(value, style: TextStyle(fontSize: 16)),
                         );
                       }).toList(),
-                    ),
+                    ],
                   ),
+
                 const SizedBox(height: 20),
+
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -245,10 +184,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ],
                   ),
                   child: selectedCategory == 'Specialist'
-                      ? _buildSpecialistList()
-                      : _buildArticleList(searchQuery,
-                          selectedArticleCategory), // Pass the article category filter
+                      ? _buildSpecialistList(
+                          searchQuery, selectedSpecialistType)
+                      : _buildArticleList(searchQuery, selectedArticleCategory),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),
@@ -258,7 +198,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  Widget _buildSpecialistList() {
+  Widget _buildSpecialistList(
+      String searchQuery, String selectedSpecialistType) {
     return FutureBuilder<List<dynamic>>(
       future: ApiRepository().getSpecialistList(),
       builder: (context, snapshot) {
@@ -273,7 +214,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         final specialists = snapshot.data!;
         final filteredSpecialists = specialists.where((specialist) {
           final name = '${specialist['firstName']} ${specialist['lastName']}';
-          return name.toLowerCase().contains(searchQuery.toLowerCase());
+          bool matchesSearchQuery =
+              name.toLowerCase().contains(searchQuery.toLowerCase());
+          bool matchesSpecialistType = selectedSpecialistType.isEmpty ||
+              specialist['specialization'] == selectedSpecialistType;
+
+          return matchesSearchQuery && matchesSpecialistType;
         }).toList();
 
         if (filteredSpecialists.isEmpty) {

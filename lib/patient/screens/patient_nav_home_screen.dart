@@ -8,6 +8,7 @@ import 'package:armstrong/patient/screens/pages.dart';
 import 'package:armstrong/widgets/navigation/nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -21,13 +22,21 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   String? _userId;
-  int _unreadCount = 0; // Add this variable to track unread notifications
+  int _unreadCount = 0;
+
+  final GlobalKey _homeKey = GlobalKey();
+  final GlobalKey _discoverKey = GlobalKey();
+  final GlobalKey _chatKey = GlobalKey();
+  final GlobalKey _appointmentsKey = GlobalKey();
+
+  bool _showcaseCompleted = false;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
     _loadUserId();
+    _checkShowcaseStatus();
   }
 
   // Method to load the userId from secure storage
@@ -40,6 +49,34 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     if (_userId != null) {
       await _fetchUnreadNotificationsCount();
     }
+  }
+
+  // Method to check if the showcase has been completed
+  Future<void> _checkShowcaseStatus() async {
+    final showcaseCompleted = await _storage.read(key: 'showcase_completed');
+    setState(() {
+      _showcaseCompleted = showcaseCompleted == 'true';
+    });
+
+    // Start showcase if it hasn't been completed
+    if (!_showcaseCompleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context).startShowCase([
+          _homeKey,
+          _discoverKey,
+          _chatKey,
+          _appointmentsKey,
+        ]);
+      });
+    }
+  }
+
+  // Method to mark the showcase as completed
+  Future<void> _completeShowcase() async {
+    await _storage.write(key: 'showcase_completed', value: 'true');
+    setState(() {
+      _showcaseCompleted = true;
+    });
   }
 
   Future<void> _fetchUnreadNotificationsCount() async {
@@ -202,6 +239,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         bottomNavigationBar: CustomBottomNavBar(
           selectedIndex: _selectedIndex,
           onItemTapped: _onTabSelected,
+          notificationCount: _unreadCount,
+          chatNotificationCount: _unreadCount,
+          showcaseCompleted: _showcaseCompleted, 
+          completeShowcase: _completeShowcase,
+          homeKey: _homeKey,
+          discoverKey: _discoverKey,
+          chatKey: _chatKey,
+          appointmentsKey: _appointmentsKey,
         ),
       ),
     );
