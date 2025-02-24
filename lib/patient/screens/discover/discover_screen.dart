@@ -233,7 +233,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             crossAxisCount: 2,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
-            childAspectRatio: 0.75,
+            childAspectRatio: 0.65,
           ),
           itemCount: filteredSpecialists.length,
           itemBuilder: (context, index) {

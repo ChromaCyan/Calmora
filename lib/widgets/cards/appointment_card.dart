@@ -20,10 +20,11 @@ class AppointmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     final specialist = appointment['specialist'];
     final specialistName =
         '${specialist['firstName']} ${specialist['lastName']}';
-    final specialistProfile = '${specialist['profileImage']}';
     final startTime = appointment['startTime'];
     final endTime = appointment['endTime'];
     final status = appointment['status'];
@@ -35,95 +36,101 @@ class AppointmentCard extends StatelessWidget {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(12),
-        width: MediaQuery.of(context).size.width * 0.9,
+        padding: EdgeInsets.all(screenWidth * 0.04), // Responsive padding
+        width: screenWidth * 0.9, // 90% of screen width
         decoration: BoxDecoration(
           color: theme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: theme.outlineVariant),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Allows dynamic height adjustment
+          mainAxisSize: MainAxisSize.min, // Adapts to content size
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          specialistName,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                            color: theme.onSurface,
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Specialist Name (Responsive Text)
+                      Text(
+                        specialistName,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.bold,
+                          color: theme.onSurface,
                         ),
-                        Text(
-                          'Status: ${status[0].toUpperCase() + status.substring(1)}',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: status == 'pending'
-                                ? theme.tertiary
-                                : status == 'accepted'
-                                    ? theme.primary
-                                    : theme.error,
-                          ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      // Status with color-coded text
+                      Text(
+                        'Status: ${status[0].toUpperCase() + status.substring(1)}',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.w500,
+                          color: status == 'pending'
+                              ? theme.tertiary
+                              : status == 'accepted'
+                                  ? theme.primary
+                                  : theme.error,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
 
-                // SPECIALIST PROFILE IMAGE
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: specialist['profileImage'] != null &&
-                                specialist['profileImage'].isNotEmpty
-                            ? NetworkImage(specialist[
-                                'profileImage']) 
-                            : const AssetImage(
-                                    "lib/icons/profile_placeholder.png")
-                                as ImageProvider, 
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                // Profile Image (Responsive size)
+                ClipOval(
+                  child: Image.network(
+                    specialist['profileImage'].isNotEmpty
+                        ? specialist['profileImage']
+                        : "https://via.placeholder.com/50", // Placeholder if empty
+                    width: screenWidth * 0.14, // 14% of screen width
+                    height: screenWidth * 0.14,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],
             ),
+
             const SizedBox(height: 8),
+
+            // Date & Time Row
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.calendar_today, color: theme.primary, size: 18.0),
-                const SizedBox(width: 8.0),
-                Text(
-                  formattedStartDate,
-                  style:
-                      TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
-                ),
-                const SizedBox(width: 12.0),
-                Icon(Icons.lock_clock, color: theme.secondary, size: 18.0),
-                const SizedBox(width: 8.0),
-                Text(
-                  formattedCombinedTime,
-                  style:
-                      TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
-                ),
+                _buildIconText(
+                    Icons.calendar_today, formattedStartDate, theme, screenWidth),
+                _buildIconText(
+                    Icons.access_time, formattedCombinedTime, theme, screenWidth),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // Helper widget for icon + text layout
+  Widget _buildIconText(IconData icon, String text, ColorScheme theme, double screenWidth) {
+    return Row(
+      children: [
+        Icon(icon, color: theme.primary, size: screenWidth * 0.05),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: screenWidth * 0.04,
+            color: theme.onSurfaceVariant,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }

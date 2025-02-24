@@ -15,7 +15,7 @@ class WelcomeSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome Back Josh Brian!',
+                'Welcome Back',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

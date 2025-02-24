@@ -35,27 +35,33 @@ class SpecialistAppointmentCard extends StatelessWidget {
   Future<void> _acceptAppointment(BuildContext context, String appointmentId) async {
     try {
       await _apiRepository.acceptAppointment(appointmentId);
-      onStatusChanged(); // Refresh the appointment list after accepting
+      onStatusChanged(); 
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error accepting appointment')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error accepting appointment')),
+      );
     }
   }
 
   Future<void> _declineAppointment(BuildContext context, String appointmentId) async {
     try {
       await _apiRepository.declineAppointment(appointmentId);
-      onStatusChanged(); // Refresh the appointment list after declining
+      onStatusChanged(); 
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error declining appointment')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error declining appointment')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     final patient = appointment['patient'];
     final patientName = '${patient['firstName']} ${patient['lastName']}';
-    final PatientProfile = '${patient['profileImage']}';
     final startTime = appointment['startTime'];
     final endTime = appointment['endTime'];
     final status = appointment['status'];
@@ -66,11 +72,11 @@ class SpecialistAppointmentCard extends StatelessWidget {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(12),
-        width: MediaQuery.of(context).size.width * 0.9,
+        padding: EdgeInsets.all(screenWidth * 0.04), 
+        width: screenWidth * 0.9, 
         decoration: BoxDecoration(
           color: theme.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(screenWidth * 0.04), 
           border: Border.all(color: theme.outlineVariant),
         ),
         child: Column(
@@ -80,14 +86,14 @@ class SpecialistAppointmentCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(screenWidth * 0.02),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           patientName,
                           style: TextStyle(
-                            fontSize: 18.0,
+                            fontSize: screenWidth * 0.045, 
                             fontWeight: FontWeight.bold,
                             color: theme.onSurface,
                           ),
@@ -95,7 +101,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                         Text(
                           'Status: ${status[0].toUpperCase() + status.substring(1)}',
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: screenWidth * 0.04, 
                             fontWeight: FontWeight.w500,
                             color: status == 'pending'
                                 ? theme.tertiary
@@ -108,21 +114,19 @@ class SpecialistAppointmentCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.02),
                   child: Container(
-                    height: 50,
-                    width: 50,
+                    height: screenWidth * 0.15, 
+                    width: screenWidth * 0.15,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         image: patient['profileImage'] != null &&
                                 patient['profileImage'].isNotEmpty
-                            ? NetworkImage(patient[
-                                'profileImage']) 
-                            : const AssetImage(
-                                    "lib/icons/profile_placeholder.png")
-                                as ImageProvider, 
+                            ? NetworkImage(patient['profileImage'])
+                            : const AssetImage("lib/icons/profile_placeholder.png")
+                                as ImageProvider,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -130,66 +134,67 @@ class SpecialistAppointmentCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: screenHeight * 0.01),
             Row(
               children: [
-                Icon(Icons.calendar_today, color: theme.primary, size: 18.0),
-                const SizedBox(width: 8.0),
+                Icon(Icons.calendar_today, color: theme.primary, size: screenWidth * 0.04),
+                SizedBox(width: screenWidth * 0.02),
                 Text(
                   formattedStartDate,
-                  style: TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
+                  style: TextStyle(fontSize: screenWidth * 0.04, color: theme.onSurfaceVariant),
                 ),
-                const SizedBox(width: 12.0),
-                Icon(Icons.access_time, color: theme.secondary, size: 18.0),
-                const SizedBox(width: 8.0),
+                SizedBox(width: screenWidth * 0.05),
+                Icon(Icons.access_time, color: theme.secondary, size: screenWidth * 0.04),
+                SizedBox(width: screenWidth * 0.02),
                 Text(
                   timeRange,
-                  style: TextStyle(fontSize: 16.0, color: theme.onSurfaceVariant),
+                  style: TextStyle(fontSize: screenWidth * 0.04, color: theme.onSurfaceVariant),
                 ),
               ],
             ),
-            const SizedBox(height: 12.0),
+            SizedBox(height: screenHeight * 0.015),
             if (status == 'pending') ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        _acceptAppointment(context, appointmentId);
-                      },
+                      onPressed: () => _acceptAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
                         ),
                       ),
-                      child: const Text('Accept', style: TextStyle(color: Colors.white)),
+                      child: Text(
+                        'Accept',
+                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12.0),
+                  SizedBox(width: screenWidth * 0.03),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        _declineAppointment(context, appointmentId);
-                      },
+                      onPressed: () => _declineAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.error,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
                         ),
                       ),
-                      child: const Text('Decline', style: TextStyle(color: Colors.white)),
+                      child: Text(
+                        'Decline',
+                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                      ),
                     ),
                   ),
                 ],
               ),
             ],
             if (status == 'accepted') ...[
-              const SizedBox(height: 12.0),
+              SizedBox(height: screenHeight * 0.015),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to the AppointmentCompleteScreen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -200,10 +205,13 @@ class SpecialistAppointmentCard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.02),
                   ),
                 ),
-                child: const Text('Proceed to Complete', style: TextStyle(color: Colors.white)),
+                child: Text(
+                  'Proceed to Complete',
+                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                ),
               ),
             ],
           ],
@@ -212,3 +220,4 @@ class SpecialistAppointmentCard extends StatelessWidget {
     );
   }
 }
+
