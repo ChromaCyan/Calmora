@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:armstrong/patient/models/widgets/banner_model.dart';
+import 'package:armstrong/models/banner_model.dart';
 
 class BannerCard extends StatelessWidget {
   final CarouselItem item;

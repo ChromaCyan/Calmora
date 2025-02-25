@@ -26,12 +26,12 @@ class SpecialistActionButtons extends StatelessWidget {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch, // Ensures buttons take full width
+      crossAxisAlignment: CrossAxisAlignment.stretch, 
       children: [
         // Book Appointment Button
         SizedBox(
           height: 45,
-          width: double.infinity, // Forces button to take full width
+          width: double.infinity, 
           child: ElevatedButton.icon(
             onPressed: onBookAppointment,
             style: ElevatedButton.styleFrom(
@@ -50,12 +50,12 @@ class SpecialistActionButtons extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 10), // Space between buttons
+        const SizedBox(height: 10), 
 
         // Chat with Specialist Button
         SizedBox(
           height: 45,
-          width: double.infinity, // Ensures button takes full width
+          width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () async {
               final token = await _storage.read(key: 'token');

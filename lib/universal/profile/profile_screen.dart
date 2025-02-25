@@ -244,7 +244,7 @@ Widget build(BuildContext context) {
             ? const Center(child: Text("Failed to load profile"))
             : Padding(
                 padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView( // Wrap everything in a scroll view
+                child: SingleChildScrollView( 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

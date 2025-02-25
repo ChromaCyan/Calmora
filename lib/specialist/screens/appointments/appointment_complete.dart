@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 // import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class AppointmentCompleteScreen extends StatefulWidget {
@@ -38,7 +39,18 @@ class _AppointmentCompleteScreenState extends State<AppointmentCompleteScreen> {
   Future<void> _submitCompletion() async {
     if (_feedbackController.text.isEmpty || _image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please provide feedback and Add Image or selfie during appointment')),
+        const SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Try Again!',
+            message:
+                'Please provide feedback and Add Image or selfie during appointment',
+            contentType: ContentType.help,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
       );
       return;
     }
@@ -46,7 +58,18 @@ class _AppointmentCompleteScreenState extends State<AppointmentCompleteScreen> {
     final imageUrl = await _uploadImageToSupabase(_image!);
     if (imageUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to upload image')),
+        const SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Try Again!',
+            message:
+                'Failed to upload image, Please check your network connection',
+            contentType: ContentType.failure,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
       );
       return;
     }
@@ -60,17 +83,50 @@ class _AppointmentCompleteScreenState extends State<AppointmentCompleteScreen> {
 
       if (response.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Appointment marked as completed!')),
-        );
+          const SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Appointment Completion submitted!',
+            message:
+                'Appointment marked as completed!',
+            contentType: ContentType.success,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to complete appointment')),
-        );
+          const SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Failed to Complete Appointment!',
+            message:
+                'Failed to complete appointment, Check your form and try again!',
+            contentType: ContentType.failure,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+      SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'An error has occured!',
+            message:
+                'Error: $e',
+            contentType: ContentType.failure,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
       );
     }
   }

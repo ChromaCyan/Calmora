@@ -11,6 +11,7 @@ import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -89,12 +90,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             builder: (context) => SpecialistHomeScreen()),
                       );
                     }
-                  }
-                   else if (state is AuthError) {
+                  } else if (state is AuthError) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("Email or password is incorrect"),
-                        duration: const Duration(seconds: 2),
+                        elevation: 0,
+                        behavior: SnackBarBehavior
+                            .floating, 
+                        backgroundColor: Colors
+                            .transparent, 
+                        content: AwesomeSnackbarContent(
+                          title: 'Try Again!',
+                          message: 'Email or password is incorrect',
+                          contentType:
+                              ContentType.failure, 
+                        ),
+                        duration: const Duration(seconds: 3),
                       ),
                     );
                   }

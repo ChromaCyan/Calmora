@@ -5,6 +5,7 @@ import 'package:armstrong/widgets/forms/question_form.dart';
 import 'package:armstrong/patient/screens/survey/submission_page.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class QuestionScreen extends StatefulWidget {
   @override
@@ -94,7 +95,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
     if (_userId == null || responses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Missing required data')));
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message: 'Missing required data',
+            contentType: ContentType.failure,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
       return;
     }
 
@@ -115,7 +127,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error submitting answers: $e')));
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Error!',
+            message: 'Error submitting answers: $e',
+            contentType: ContentType.failure,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -136,19 +159,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
           : Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    "This survey will help personalize your dashboard to recommend the most suitable articles for your mental health needs.",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                // Add skip button on top
-                Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
                     alignment: Alignment.topRight,
@@ -161,7 +171,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         );
                       },
                       child: Text(
-                        "Skip for Test",
+                        "Skip for Testing purposes",
                         style: TextStyle(fontSize: 16, color: Colors.blue),
                       ),
                     ),

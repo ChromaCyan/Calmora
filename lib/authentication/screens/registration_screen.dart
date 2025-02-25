@@ -10,6 +10,7 @@ import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -37,23 +38,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _licenseNumberController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
-  final DateTime now = DateTime.now();
-  final DateTime minAllowedDate = DateTime(1900);
-  final DateTime maxAllowedDate = DateTime(now.year - 12, now.month, now.day);
+    final DateTime now = DateTime.now();
+    final DateTime minAllowedDate = DateTime(1900);
+    final DateTime maxAllowedDate = DateTime(now.year - 12, now.month, now.day);
 
-  final DateTime? pickedDate = await showDatePicker(
-    context: context,
-    initialDate: maxAllowedDate, 
-    firstDate: minAllowedDate,
-    lastDate: maxAllowedDate, 
-  );
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: maxAllowedDate,
+      firstDate: minAllowedDate,
+      lastDate: maxAllowedDate,
+    );
 
-  if (pickedDate != null) {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-    _dateOfBirthController.text = formattedDate;
+    if (pickedDate != null) {
+      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+      _dateOfBirthController.text = formattedDate;
+    }
   }
-}
-
 
   void _onRegisterButtonPressed() {
     if (_formKey.currentState!.validate()) {
@@ -106,55 +106,79 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) async {
-        if (state is AuthSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration Successful!')),
-          );
-
-          final userType = state.userData['userType'];
-          final userId = state.userData['userId'];
-
-          // Check if the user is a Specialist or Patient
-          if (userType == 'Specialist') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const SpecialistHomeScreen()),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) async {
+          if (state is AuthSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.transparent,
+                content: AwesomeSnackbarContent(
+                  title: 'Account Created!',
+                  message: 'Registration Successful!',
+                  contentType: ContentType.success,
+                ),
+                duration: const Duration(seconds: 3),
+              ),
             );
-          } else if (userType == 'Patient') {
-            // Check if the survey is completed (if not, navigate to the survey screen)
-            final FlutterSecureStorage storage = FlutterSecureStorage();
-            final hasCompletedSurvey = await storage.read(key: 'hasCompletedSurvey_$userId');
-            final surveyOnboardingCompleted =
-                await storage.read(key: 'survey_onboarding_completed_$userId');
 
-            // If survey is completed, navigate to the Patient Home screen
-            if (hasCompletedSurvey == 'true' && surveyOnboardingCompleted == 'true') {
+            final userType = state.userData['userType'];
+            final userId = state.userData['userId'];
+
+            // Check if the user is a Specialist or Patient
+            if (userType == 'Specialist') {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const PatientHomeScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const SpecialistHomeScreen()),
               );
-            } else {
-              // If survey not completed, navigate to the survey (Splash) screen
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => SurveyScreen()),
-              );
+            } else if (userType == 'Patient') {
+              // Check if the survey is completed (if not, navigate to the survey screen)
+              final FlutterSecureStorage storage = FlutterSecureStorage();
+              final hasCompletedSurvey =
+                  await storage.read(key: 'hasCompletedSurvey_$userId');
+              final surveyOnboardingCompleted = await storage.read(
+                  key: 'survey_onboarding_completed_$userId');
+
+              // If survey is completed, navigate to the Patient Home screen
+              if (hasCompletedSurvey == 'true' &&
+                  surveyOnboardingCompleted == 'true') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PatientHomeScreen()),
+                );
+              } else {
+                // If survey not completed, navigate to the survey (Splash) screen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SurveyScreen()),
+                );
+              }
             }
+          } else if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.transparent,
+                content: AwesomeSnackbarContent(
+                  title: 'Error',
+                  message: 'Registration Failed: ${state.message}',
+                  contentType: ContentType.failure,
+                ),
+                duration: const Duration(seconds: 3),
+              ),
+            );
           }
-        } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Registration Failed: ${state.message}')),
-          );
-        }
-      },
-      builder: (context, state) {
-        if (state is AuthLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
           return Stack(
             children: [

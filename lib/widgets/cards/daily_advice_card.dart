@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/banners/patient_banner_card.dart';
-import 'package:armstrong/patient/models/widgets/banner_model.dart';
+import 'package:armstrong/models/banner_model.dart';
 import 'package:armstrong/config/colors.dart';
 
 class HealthAdviceSection extends StatefulWidget {

@@ -16,6 +16,7 @@ import 'package:armstrong/widgets/buttons/toggle_button.dart';
 import 'package:armstrong/patient/screens/discover/contact_info_card.dart';
 import 'package:armstrong/patient/screens/discover/pro_deets_card.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class SpecialistDetailScreen extends StatefulWidget {
   final String specialistId;
@@ -91,14 +92,29 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                 if (state is AppointmentBooked) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Appointment booked successfully!'),
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Appointment Booked successfully!',
+                        message: 'Your appointment has been successfully booked!',
+                        contentType: ContentType.success,
+                      ),
+                      duration: const Duration(seconds: 3),
                     ),
                   );
                 } else if (state is AppointmentError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message ?? 'An error occurred!'),
-                      backgroundColor: Colors.red, // Make the error stand out
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error!',
+                        message: 'An error has occured while booking your appointment, please try again.',
+                        contentType: ContentType.failure,
+                      ),
+                      duration: const Duration(seconds: 3),
                     ),
                   );
                 }
@@ -116,7 +132,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                             radius: 60,
                             backgroundImage: profileImage.isNotEmpty
                                 ? NetworkImage(profileImage)
-                                : const AssetImage('assets/default_profile.png')
+                                : const AssetImage('images/logo2.png')
                                     as ImageProvider,
                           ),
                           const SizedBox(height: 16),
@@ -241,34 +257,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                     ),
 
                     const SizedBox(height: 24),
-
-                    // // Reviews
-                    // _buildSectionTitle('Reviews'),
-                    // if (reviews.isEmpty) const Text('No reviews yet.'),
-                    // if (reviews.isNotEmpty)
-                    //   Column(
-                    //     children: reviews.map<Widget>((review) {
-                    //       return ListTile(
-                    //         leading:
-                    //             const Icon(Icons.person, color: Colors.blue),
-                    //         title: Text(review['reviewerName'] ?? 'Anonymous'),
-                    //         subtitle: Text(review['comment'] ?? 'No comment'),
-                    //         trailing: Row(
-                    //           mainAxisSize: MainAxisSize.min,
-                    //           children: List.generate(
-                    //             5,
-                    //             (index) => Icon(
-                    //               Icons.star,
-                    //               color: index < (review['rating'] ?? 0)
-                    //                   ? Colors.amber
-                    //                   : Colors.grey,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       );
-                    //     }).toList(),
-                    //   ),
-                    // const SizedBox(height: 24),
 
                     // Action Buttons
                     SpecialistActionButtons(

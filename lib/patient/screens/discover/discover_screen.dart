@@ -1,6 +1,6 @@
 import 'package:armstrong/models/article/article.dart';
+import 'package:armstrong/models/banner_model.dart';
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
-import 'package:armstrong/patient/models/widgets/banner_model.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
