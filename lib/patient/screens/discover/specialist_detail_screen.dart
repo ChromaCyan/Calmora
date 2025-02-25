@@ -97,7 +97,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
                         title: 'Appointment Booked successfully!',
-                        message: 'Your appointment has been successfully booked!',
+                        message:
+                            'Your appointment has been successfully booked!',
                         contentType: ContentType.success,
                       ),
                       duration: const Duration(seconds: 3),
@@ -111,7 +112,9 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       backgroundColor: Colors.transparent,
                       content: AwesomeSnackbarContent(
                         title: 'Error!',
-                        message: 'An error has occured while booking your appointment, please try again.',
+                        message: state.message.isNotEmpty
+                            ? state.message
+                            : 'An error has occurred while booking your appointment, please try again.',
                         contentType: ContentType.failure,
                       ),
                       duration: const Duration(seconds: 3),

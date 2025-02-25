@@ -23,9 +23,13 @@ class CombinedForm extends StatelessWidget {
   final TextEditingController availabilityController;
   final TextEditingController locationController;
   final TextEditingController clinicController;
+  final TextEditingController workingHoursStartController;
+  final TextEditingController workingHoursEndController;
 
   final bool isEditing;
   final VoidCallback onPickDateOfBirth;
+  final VoidCallback onPickStartTime;
+  final VoidCallback onPickEndTime;
   final String userType;
 
   const CombinedForm({
@@ -48,6 +52,10 @@ class CombinedForm extends StatelessWidget {
     required this.availabilityController,
     required this.locationController,
     required this.clinicController,
+    required this.workingHoursStartController,
+    required this.workingHoursEndController,
+    required this.onPickStartTime,
+    required this.onPickEndTime,
     required this.isEditing,
     required this.onPickDateOfBirth,
     required this.userType,
@@ -203,7 +211,7 @@ class CombinedForm extends StatelessWidget {
                     ? (value) {
                         locationController.text = value!;
                       }
-                    : null, 
+                    : null,
               ),
 
               const SizedBox(height: 16),
@@ -211,6 +219,29 @@ class CombinedForm extends StatelessWidget {
                   controller: clinicController,
                   decoration: customInputDecoration("Clinic", isDarkMode),
                   enabled: isEditing),
+
+              // Add Working Hours Fields
+              const SizedBox(height: 16),
+              TextField(
+                controller: workingHoursStartController,
+                readOnly: true,
+                decoration:
+                    customInputDecoration("Clinic Appointment Start Time", isDarkMode).copyWith(
+                  suffixIcon: Icon(Icons.access_time),
+                ),
+                onTap: isEditing ? onPickStartTime : null,
+              ),
+
+              const SizedBox(height: 16),
+              TextField(
+                controller: workingHoursEndController,
+                readOnly: true,
+                decoration:
+                    customInputDecoration("Clinic Appointment End Time", isDarkMode).copyWith(
+                  suffixIcon: Icon(Icons.access_time),
+                ),
+                onTap: isEditing ? onPickEndTime : null, 
+              ),
             ] else if (userType.toLowerCase() == "patient") ...[
               // Patient Fields
               TextField(

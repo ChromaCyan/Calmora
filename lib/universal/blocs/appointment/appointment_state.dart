@@ -64,3 +64,12 @@ class AppointmentDeclined extends AppointmentState {
   @override
   List<Object> get props => [appointment];
 }
+
+class AvailableTimeSlotsLoaded extends AppointmentState {
+  final List<DateTime> availableSlots;
+
+  const AvailableTimeSlotsLoaded({required this.availableSlots});
+
+  @override
+  List<Object> get props => [availableSlots];
+}

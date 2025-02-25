@@ -3,13 +3,14 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 
 //Model Imports
 import 'package:armstrong/models/article/article.dart';
 
 class ApiRepository {
-  final String baseUrl = 'https://armstrong-api.vercel.app/api';
-  //final String baseUrl = 'http://localhost:3000/api';
+  final String baseUrl = 'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
+  //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -336,7 +337,40 @@ class ApiRepository {
   /////////////////////////////////////////////////////////////////////////////////
   // Appointments (API)
 
-  // Create a new appointment
+  // Get available time slots from specialist
+  Future<List<DateTime>> getAvailableTimeSlots(
+      String specialistId, DateTime date) async {
+    final token = await _storage.read(key: 'token');
+    String formattedDate =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    final url = Uri.parse(
+        '$baseUrl/appointment/available-slots/$specialistId/$formattedDate');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data["availableSlots"] is List) {
+        return (data["availableSlots"] as List).map((slot) {
+          // Extract "HH:MM" and convert to DateTime
+          final timeParts = slot["start"].split(":").map(int.parse).toList();
+          return DateTime(
+              date.year, date.month, date.day, timeParts[0], timeParts[1]);
+        }).toList();
+      } else {
+        throw Exception("Invalid data format: Expected list of slots.");
+      }
+    } else {
+      throw Exception('Failed to fetch available slots: ${response.body}');
+    }
+  }
+
+// Create a new appointment
   Future<Map<String, dynamic>> createAppointment(
     String patientId,
     String specialistId,
@@ -345,6 +379,17 @@ class ApiRepository {
   ) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/appointment/create-appointment');
+
+    // Ensure correct format for backend comparison
+    String formattedStartTime = startTime.toUtc().toIso8601String();
+
+    // Print the request body before making the API call
+    print("Creating appointment with the following details:");
+    print("Patient ID: $patientId");
+    print("Specialist ID: $specialistId");
+    print("Start Time: $formattedStartTime");
+    print("Message: $message");
+
     final response = await http.post(
       url,
       headers: {
@@ -354,7 +399,7 @@ class ApiRepository {
       body: json.encode({
         'patientId': patientId,
         'specialistId': specialistId,
-        'startTime': startTime.toIso8601String(),
+        'startTime': formattedStartTime,
         'message': message,
       }),
     );

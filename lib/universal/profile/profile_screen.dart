@@ -46,6 +46,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController availabilityController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController clinicController = TextEditingController();
+  final TextEditingController workingHoursStartController =
+      TextEditingController();
+  final TextEditingController workingHoursEndController =
+      TextEditingController();
+  TimeOfDay? _selectedStartTime;
+  TimeOfDay? _selectedEndTime;
 
   // Patient Fields
   final TextEditingController addressController = TextEditingController();
@@ -105,6 +111,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           availabilityController.text = data["availability"] ?? "";
           locationController.text = data["location"] ?? "";
           clinicController.text = data["clinic"] ?? "";
+
+          //Formating Time to display properly on the form later on (I'm not sure if it works yet please test before changing yung frontend, thanks - josh)
+          String formatTime(String time) {
+            if (time.isEmpty) return "";
+            final parts = time.split(":");
+            int hour = int.parse(parts[0]);
+            int minute = int.parse(parts[1]);
+
+            String period = hour >= 12 ? "PM" : "AM";
+            hour = hour % 12 == 0 ? 12 : hour % 12;
+
+            return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period";
+          }
+
+          workingHoursStartController.text =
+              formatTime(data["workingHours"]?["start"] ?? "");
+          workingHoursEndController.text =
+              formatTime(data["workingHours"]?["end"] ?? "");
         }
 
         // Patient Fields
@@ -126,6 +150,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         hasError = true;
         isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _pickTime(bool isStartTime) async {
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: isStartTime
+          ? (_selectedStartTime ?? TimeOfDay.now())
+          : (_selectedEndTime ?? TimeOfDay.now()),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        if (isStartTime) {
+          _selectedStartTime = pickedTime;
+          workingHoursStartController.text = pickedTime.format(context);
+        } else {
+          _selectedEndTime = pickedTime;
+          workingHoursEndController.text = pickedTime.format(context);
+        }
       });
     }
   }
@@ -205,6 +250,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         "availability": availabilityController.text,
         "clinic": clinicController.text,
         "location": locationController.text,
+        "workingHours": {
+          "start": workingHoursStartController.text,
+          "end": workingHoursEndController.text,
+        },
       });
     } else if (_userType == "Patient") {
       updatedData.addAll({
@@ -234,84 +283,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(title: const Text("Profile")),
-    body: isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : hasError
-            ? const Center(child: Text("Failed to load profile"))
-            : Padding(
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView( 
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Picture Widget
-                      ProfilePictureWidget(
-                        selectedImage: _selectedImage,
-                        imageUrl: _imageUrl,
-                        onPickImage: _pickImage,
-                      ),
-                      const SizedBox(height: 20),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Profile")),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : hasError
+              ? const Center(child: Text("Failed to load profile"))
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Picture Widget
+                        ProfilePictureWidget(
+                          selectedImage: _selectedImage,
+                          imageUrl: _imageUrl,
+                          onPickImage: _pickImage,
+                        ),
+                        const SizedBox(height: 20),
 
-                      // Edit/Save Button
-                      isEditing
-                          ? LayoutBuilder(
-                              builder: (context, constraints) {
-                                return Center(
-                                  child: ElevatedButton(
-                                    onPressed: _saveProfile,
-                                    style: ElevatedButton.styleFrom(
-                                      minimumSize:
-                                          Size(constraints.maxWidth * 0.5, 50),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                        // Edit/Save Button
+                        isEditing
+                            ? LayoutBuilder(
+                                builder: (context, constraints) {
+                                  return Center(
+                                    child: ElevatedButton(
+                                      onPressed: _saveProfile,
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: Size(
+                                            constraints.maxWidth * 0.5, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16),
                                       ),
-                                      backgroundColor: Colors.green,
-                                      foregroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
+                                      child: const Text("Save Changes"),
                                     ),
-                                    child: const Text("Save Changes"),
-                                  ),
-                                );
-                              },
-                            )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                return Center(
-                                  child: ElevatedButton(
-                                    onPressed: () =>
-                                        setState(() => isEditing = true),
-                                    style: ElevatedButton.styleFrom(
-                                      minimumSize:
-                                          Size(constraints.maxWidth * 0.5, 50),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                  );
+                                },
+                              )
+                            : LayoutBuilder(
+                                builder: (context, constraints) {
+                                  return Center(
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          setState(() => isEditing = true),
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: Size(
+                                            constraints.maxWidth * 0.5, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16),
                                       ),
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      foregroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
+                                      child: const Text("Edit Profile"),
                                     ),
-                                    child: const Text("Edit Profile"),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                },
+                              ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      // Common Fields Widget
-                      CombinedForm(
+                        // Common Fields Widget
+                        CombinedForm(
                           firstNameController: firstNameController,
                           lastNameController: lastNameController,
                           phoneNumberController: phoneNumberController,
@@ -334,74 +385,83 @@ Widget build(BuildContext context) {
                           availabilityController: availabilityController,
                           locationController: locationController,
                           clinicController: clinicController,
+                          workingHoursStartController:
+                              workingHoursStartController,
+                          workingHoursEndController: workingHoursEndController,
                           isEditing: isEditing,
+                          onPickStartTime: () => _pickTime(true),
+                          onPickEndTime: () => _pickTime(false),
                           onPickDateOfBirth: _pickDateOfBirth,
-                          userType:
-                              _userType!, 
+                          userType: _userType!,
                         ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      // Appointment History Button
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const CompletedAppointmentsScreen()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                          minimumSize: Size(
-                            MediaQuery.of(context).size.width * 0.35, 45,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.history,
-                              size: 18,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                            const SizedBox(width: 5),
-                            const Text("Your Appointments"),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Logout Button
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await _logout(context);
+                        // Appointment History Button
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CompletedAppointmentsScreen()),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
                             minimumSize: Size(
-                                MediaQuery.of(context).size.width * 0.4, 40),
+                              MediaQuery.of(context).size.width * 0.35,
+                              45,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
                           ),
-                          child: const Text("Logout"),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.history,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              const SizedBox(width: 5),
+                              const Text("Your Appointments"),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(height: 20),
+
+                        // Logout Button
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await _logout(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(
+                                  MediaQuery.of(context).size.width * 0.4, 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text("Logout"),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-  );
-}
+    );
+  }
 }
