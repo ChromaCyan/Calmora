@@ -117,7 +117,7 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
         if (pickedDate != null) {
           setState(() {
             _selectedDate = pickedDate;
-            _selectedTimeSlot = null; // Reset the selected time slot
+            _selectedTimeSlot = null; 
           });
           context.read<AppointmentBloc>().add(
                 FetchAvailableTimeSlotsEvent(
@@ -139,7 +139,7 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
           final List<DateTime> availableSlots = state.availableSlots;
 
           if (availableSlots.isEmpty) {
-            _selectedTimeSlot = null; // Reset the time slot when there are no available slots
+            _selectedTimeSlot = null; 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Text(
@@ -153,9 +153,9 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
           }
 
           return DropdownButtonFormField<DateTime>(
-            value: _selectedTimeSlot, // Store DateTime directly
+            value: _selectedTimeSlot,
             items: availableSlots.map((DateTime slot) {
-              String formattedTime = DateFormat('hh:mm a').format(slot); // 12-hour format
+              String formattedTime = DateFormat('hh:mm a').format(slot); 
 
               return DropdownMenuItem<DateTime>(
                 value: slot,
@@ -164,7 +164,7 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
             }).toList(),
             onChanged: (DateTime? value) {
               setState(() {
-                _selectedTimeSlot = value; // Store DateTime object
+                _selectedTimeSlot = value; 
               });
             },
             decoration: InputDecoration(
