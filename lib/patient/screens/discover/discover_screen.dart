@@ -109,7 +109,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       setState(() {
                         selectedSpecialistType =
                             newType == "Clear Filter" ? '' : newType ?? '';
-                        _fetchSpecialists(); 
+                        _fetchSpecialists();
                       });
                     },
                     items: [
@@ -160,9 +160,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         'coping strategies',
                         'self-care'
                       ].map<DropdownMenuItem<String>>((String value) {
+                        // Capitalize each word in the category
+                        String capitalizedValue = value
+                            .split(' ')
+                            .map((word) =>
+                                word[0].toUpperCase() + word.substring(1))
+                            .join(' ');
+
                         return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value, style: TextStyle(fontSize: 16)),
+                          value: value, // Keep value unchanged for filtering
+                          child: Text(capitalizedValue,
+                              style: TextStyle(fontSize: 16)),
                         );
                       }).toList(),
                     ],
@@ -174,7 +182,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? theme.cardColor.withOpacity(0.65) // Make it slightly lighter
+                        ? theme.cardColor
+                            .withOpacity(0.65) // Make it slightly lighter
                         : theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -182,16 +191,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         color: Theme.of(context).brightness == Brightness.dark
                             ? Colors.white12 // Softer shadow in dark mode
                             : Colors.black12,
-                        blurRadius: 10, // Slightly increased blur for a softer glow
+                        blurRadius:
+                            10, // Slightly increased blur for a softer glow
                         spreadRadius: 3, // More spread for visibility
                       ),
                     ],
                   ),
                   child: selectedCategory == 'Specialist'
-                      ? _buildSpecialistList(searchQuery, selectedSpecialistType)
+                      ? _buildSpecialistList(
+                          searchQuery, selectedSpecialistType)
                       : _buildArticleList(searchQuery, selectedArticleCategory),
                 ),
-
 
                 const SizedBox(height: 20),
               ],
