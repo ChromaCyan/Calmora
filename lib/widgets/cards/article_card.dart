@@ -19,6 +19,13 @@ class ArticleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Responsive card width
+    double cardWidth = screenWidth * 0.5; // Default: 50% of screen width
+    if (screenWidth > 600) cardWidth = screenWidth * 0.35; // Tablet size
+    if (screenWidth > 900) cardWidth = screenWidth * 0.25; // Larger screens
+    cardWidth = cardWidth.clamp(220, 400); // Min 220, Max 400
 
     return GestureDetector(
       onTap: () {
@@ -44,7 +51,7 @@ class ArticleCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 220, 
+        width: cardWidth,
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: colorScheme.surface,
@@ -62,19 +69,19 @@ class ArticleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(15)),
-              child: Image.network(
-                imageUrl,
-                height: 130,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 130,
-                  color: Colors.grey[300],
-                  child: const Center(
-                      child: Icon(Icons.image_not_supported,
-                          size: 40, color: Colors.grey)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              child: AspectRatio(
+                aspectRatio: 16 / 9, // Ensures image scales properly
+                child: Image.network(
+                  imageUrl,
+                  width: double.infinity,
+                  fit: BoxFit.cover, // Prevents zoom-in/zoom-out issues
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                        child: Icon(Icons.image_not_supported,
+                            size: 40, color: Colors.grey)),
+                  ),
                 ),
               ),
             ),
@@ -90,6 +97,7 @@ class ArticleCard extends StatelessWidget {
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    softWrap: true, // Ensures long words break properly
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -97,6 +105,8 @@ class ArticleCard extends StatelessWidget {
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
+                    maxLines: 1, // Prevents overflow
+                    overflow: TextOverflow.ellipsis, // Ensures truncation
                   ),
                 ],
               ),

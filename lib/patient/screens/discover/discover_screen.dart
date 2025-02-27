@@ -173,21 +173,25 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? theme.cardColor.withOpacity(0.65) // Make it slightly lighter
+                        : theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 8,
-                        spreadRadius: 2,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white12 // Softer shadow in dark mode
+                            : Colors.black12,
+                        blurRadius: 10, // Slightly increased blur for a softer glow
+                        spreadRadius: 3, // More spread for visibility
                       ),
                     ],
                   ),
                   child: selectedCategory == 'Specialist'
-                      ? _buildSpecialistList(
-                          searchQuery, selectedSpecialistType)
+                      ? _buildSpecialistList(searchQuery, selectedSpecialistType)
                       : _buildArticleList(searchQuery, selectedArticleCategory),
                 ),
+
 
                 const SizedBox(height: 20),
               ],

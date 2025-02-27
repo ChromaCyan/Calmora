@@ -25,7 +25,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
     _loadChats();
   }
 
-  void _loadChats() async {
+  Future<void> _loadChats() async {
+    setState(() => _isLoading = true);
     final token = await _storage.read(key: 'token');
     if (token != null) {
       try {
@@ -68,77 +69,88 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          CustomSearchBar(
-            hintText: 'Search chats...',
-            searchController: _searchController,
-            onChanged: _filterChats,
-            onClear: () {
-              _searchController.clear();
-              _filterChats('');
-            },
+      body: SafeArea(
+        child: Column(
+          children: [
+            /// Search Bar
+            Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16), // Added vertical padding
+            child: CustomSearchBar(
+              hintText: 'Search chats...',
+              searchController: _searchController,
+              onChanged: _filterChats,
+              onClear: () {
+                _searchController.clear();
+                _filterChats('');
+              },
+            ),
           ),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage.isNotEmpty
-                    ? Center(
-                        child: Text(
-                          _errorMessage,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.error,
-                          ),
-                        ),
-                      )
-                    : _filteredChats.isEmpty
-                        ? Center(
-                            child: Text(
-                              'No chats found.',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontSize: 18,
-                                color: theme.colorScheme.onBackground.withOpacity(0.6),
-                              ),
+
+            /// Chat List with Pull-to-Refresh
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _errorMessage.isNotEmpty
+                      ? Center(
+                          child: Text(
+                            _errorMessage,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.error,
                             ),
-                          )
-                        : ListView.builder(
-                            itemCount: _filteredChats.length,
-                            itemBuilder: (context, index) {
-                              final chat = _filteredChats[index];
-
-                              final participants = chat['participants'] ?? [];
-                              final chatId = chat['chatId'] ?? '';
-                              final recipient = participants.isNotEmpty ? participants[0] : {};
-                              final recipientId = recipient['_id'] ?? '';
-                              final recipientName = recipient['firstName'] ?? 'No Name';
-                              final recipientImage = recipient['profileImage'] ?? '';
-                              final lastMessage = chat['lastMessage'] ?? {};
-                              final messageContent = lastMessage['content'] ?? 'No message';
-
-                              return ChatCard(
-                                chatId: chatId,
-                                recipientId: recipientId,
-                                recipientName: recipientName,
-                                recipientImage: recipientImage,
-                                lastMessage: messageContent,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatScreen(
-                                        chatId: chatId,
-                                        recipientId: recipientId,
-                                        recipientName: recipientName,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
+                            textAlign: TextAlign.center,
                           ),
-          ),
-        ],
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _loadChats,
+                          child: _filteredChats.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No chats found.',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: theme.colorScheme.onBackground.withOpacity(0.6),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: _filteredChats.length,
+                                  itemBuilder: (context, index) {
+                                    final chat = _filteredChats[index];
+
+                                    final participants = chat['participants'] ?? [];
+                                    final chatId = chat['chatId'] ?? '';
+                                    final recipient = participants.isNotEmpty ? participants[0] : {};
+                                    final recipientId = recipient['_id'] ?? '';
+                                    final recipientName = recipient['firstName'] ?? 'No Name';
+                                    final recipientImage = recipient['profileImage'] ?? '';
+                                    final lastMessage = chat['lastMessage'] ?? {};
+                                    final messageContent = lastMessage['content'] ?? 'No message';
+
+                                    return ChatCard(
+                                      chatId: chatId,
+                                      recipientId: recipientId,
+                                      recipientName: recipientName,
+                                      recipientImage: recipientImage,
+                                      lastMessage: messageContent,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ChatScreen(
+                                              chatId: chatId,
+                                              recipientId: recipientId,
+                                              recipientName: recipientName,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }
