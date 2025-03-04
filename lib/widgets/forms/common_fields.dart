@@ -61,17 +61,19 @@ class CombinedForm extends StatelessWidget {
     required this.userType,
   }) : super(key: key);
 
-  InputDecoration customInputDecoration(String label, bool isDarkMode) {
+   InputDecoration customInputDecoration(String label, bool isDarkMode) {
     return InputDecoration(
       labelText: label,
-      labelStyle:
-          TextStyle(color: isDarkMode ? Colors.white70 : Colors.blueGrey),
+      labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
       filled: true,
-      fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      border: OutlineInputBorder(
+      fillColor: isDarkMode ? Colors.grey[900] : Colors.white,
+      enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: isDarkMode ? Colors.blue : Colors.blue),
       ),
     );
   }

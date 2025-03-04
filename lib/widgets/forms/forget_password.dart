@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 
@@ -7,11 +8,12 @@ class ForgotPasswordDialog extends StatefulWidget {
 }
 
 class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
-  String currentStep = "verify"; 
+  String currentStep = "verify";
   final TextEditingController emailController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final ApiRepository _apiRepository = ApiRepository();
   bool isLoading = false;
   String? errorMessage;
@@ -40,8 +42,11 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               _buildNextButton(),
             ] else if (currentStep == "reset_password") ...[
               _buildHeader("Enter your new password"),
-              _buildTextField("New password:", newPasswordController, isPassword: true),
-              _buildTextField("Confirm new password:", confirmPasswordController, isPassword: true),
+              _buildTextField("New password:", newPasswordController,
+                  isPassword: true),
+              _buildTextField(
+                  "Confirm new password:", confirmPasswordController,
+                  isPassword: true),
               _buildNextButton(),
             ] else if (currentStep == "success") ...[
               Icon(Icons.check_circle, size: 80, color: colorScheme.primary),
@@ -50,7 +55,9 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: _buttonStyle(),
-                child: Text("Close", style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onPrimary)),
+                child: Text("Close",
+                    style: theme.textTheme.bodyLarge
+                        ?.copyWith(color: colorScheme.onPrimary)),
               ),
             ],
             if (errorMessage != null) ...[
@@ -71,29 +78,22 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onBackground),
+          style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold, color: colorScheme.onBackground),
         ),
         const SizedBox(height: 20),
       ],
     );
   }
 
-  Widget _buildTextField(String hintText, TextEditingController controller, {bool isPassword = false}) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool isPassword = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
+      child: CustomTextField(
+        label: label,
         controller: controller,
         obscureText: isPassword,
-        decoration: InputDecoration(
-          hintText: hintText,
-          filled: true,
-          fillColor: colorScheme.surface,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
-          ),
-        ),
       ),
     );
   }
@@ -102,7 +102,11 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
     return ElevatedButton(
       onPressed: () => _handleNextStep(),
       style: _buttonStyle(),
-      child: Text("Next", style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+      child: Text("Next",
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
     );
   }
 
@@ -115,50 +119,57 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   }
 
   Future<void> _handleNextStep() async {
-  setState(() {
-    isLoading = true;
-    errorMessage = null;
-  });
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
 
-  try {
-    if (currentStep == "verify") {
-      if (emailController.text.isEmpty) {
-        throw Exception("Email field cannot be empty.");
-      }
-      await _apiRepository.requestPasswordReset(emailController.text.toLowerCase()); // Ensure lowercase email
-      setState(() => currentStep = "enter_code");
-    } else if (currentStep == "enter_code") {
-      if (otpController.text.isEmpty) {
-        throw Exception("Please enter the OTP code.");
-      }
+    try {
+      if (currentStep == "verify") {
+        if (emailController.text.isEmpty) {
+          throw Exception("Email field cannot be empty.");
+        }
+        await _apiRepository
+            .requestPasswordReset(emailController.text.toLowerCase());
+        setState(() => currentStep = "enter_code");
+      } else if (currentStep == "enter_code") {
+        if (otpController.text.isEmpty) {
+          throw Exception("Please enter the OTP code.");
+        }
 
-      final response = await _apiRepository.verifyResetOTP(emailController.text.toLowerCase(), otpController.text);
-      
-      if (response.containsKey("message") && response["message"] == "OTP verified, proceed to reset password") {
-        setState(() => currentStep = "reset_password");
-      } else {
-        throw Exception(response["message"] ?? "OTP verification failed. Try again.");
-      }
-    } else if (currentStep == "reset_password") {
-      if (newPasswordController.text.isEmpty || confirmPasswordController.text.isEmpty) {
-        throw Exception("Password fields cannot be empty.");
-      }
-      if (newPasswordController.text != confirmPasswordController.text) {
-        throw Exception("Passwords do not match!");
-      }
+        final response = await _apiRepository.verifyResetOTP(
+            emailController.text.toLowerCase(), otpController.text);
 
-      final response = await _apiRepository.resetPassword(emailController.text.toLowerCase(), newPasswordController.text);
-      
-      if (response.containsKey("message") && response["message"] == "Password reset successfully") {
-        setState(() => currentStep = "success");
-      } else {
-        throw Exception(response["message"] ?? "Failed to reset password.");
+        if (response.containsKey("message") &&
+            response["message"] == "OTP verified, proceed to reset password") {
+          setState(() => currentStep = "reset_password");
+        } else {
+          throw Exception(
+              response["message"] ?? "OTP verification failed. Try again.");
+        }
+      } else if (currentStep == "reset_password") {
+        if (newPasswordController.text.isEmpty ||
+            confirmPasswordController.text.isEmpty) {
+          throw Exception("Password fields cannot be empty.");
+        }
+        if (newPasswordController.text != confirmPasswordController.text) {
+          throw Exception("Passwords do not match!");
+        }
+
+        final response = await _apiRepository.resetPassword(
+            emailController.text.toLowerCase(), newPasswordController.text);
+
+        if (response.containsKey("message") &&
+            response["message"] == "Password reset successfully") {
+          setState(() => currentStep = "success");
+        } else {
+          throw Exception(response["message"] ?? "Failed to reset password.");
+        }
       }
+    } catch (e) {
+      setState(() => errorMessage = e.toString().replaceAll("Exception: ", ""));
+    } finally {
+      setState(() => isLoading = false);
     }
-  } catch (e) {
-    setState(() => errorMessage = e.toString().replaceAll("Exception: ", ""));
-  } finally {
-    setState(() => isLoading = false);
   }
-}
 }

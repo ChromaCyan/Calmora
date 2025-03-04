@@ -1,5 +1,8 @@
 import 'package:armstrong/patient/screens/survey/questions_screen.dart';
 import 'package:armstrong/splash_screen/screens/survey_screen.dart';
+import 'package:armstrong/widgets/buttons/login_button.dart';
+import 'package:armstrong/widgets/text/register_built_text_field.dart';
+import 'package:armstrong/widgets/text/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
@@ -94,15 +97,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         elevation: 0,
-                        behavior: SnackBarBehavior
-                            .floating, 
-                        backgroundColor: Colors
-                            .transparent, 
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
                           title: 'Try Again!',
                           message: 'Email or password is incorrect',
-                          contentType:
-                              ContentType.failure, 
+                          contentType: ContentType.failure,
                         ),
                         duration: const Duration(seconds: 3),
                       ),
@@ -145,31 +145,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             const SizedBox(height: 20),
-                            TextField(
+                            // Email Field
+                            CustomTextField(
+                              label: "Email:",
                               controller: emailController,
-                              decoration: InputDecoration(
-                                hintText: "Enter your email:",
-                                filled: true,
-                                fillColor:
-                                    Theme.of(context).colorScheme.background,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
+                              obscureText: false,
                             ),
-                            const SizedBox(height: 20),
-                            TextField(
+                            const SizedBox(height: 16),
+
+                            // Password Field
+                            CustomTextField(
+                              label: "Password:",
                               controller: passwordController,
                               obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: "Enter your password:",
-                                filled: true,
-                                fillColor:
-                                    Theme.of(context).colorScheme.background,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
                             ),
                             const SizedBox(height: 10),
                             Align(
@@ -219,8 +207,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ValueListenableBuilder<bool>(
                               valueListenable: isButtonEnabled,
                               builder: (context, isEnabled, child) {
-                                return ElevatedButton(
-                                  onPressed: isEnabled
+                                return LoginButton(
+                                  onTap: isEnabled
                                       ? () {
                                           context.read<AuthBloc>().add(
                                                 LoginEvent(
@@ -231,30 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                               );
                                         }
                                       : null,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.secondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 50,
-                                      vertical: 15,
-                                    ),
-                                    child: Text(
-                                      "Login",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary,
-                                          ),
-                                    ),
-                                  ),
                                 );
                               },
                             ),

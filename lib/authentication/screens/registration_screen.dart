@@ -36,6 +36,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _therapyGoalsController = TextEditingController();
   final _specializationController = TextEditingController();
   final _licenseNumberController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _clinicController = TextEditingController();
+
+  InputDecoration customInputDecoration(String label, BuildContext context) {
+    final theme = Theme.of(context);
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: theme.colorScheme.onSurface),
+      filled: true,
+      fillColor: theme.colorScheme.background,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: theme.colorScheme.primary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+      ),
+    );
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now();
@@ -96,6 +116,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               password: _passwordController.text,
               otherDetails: {
                 "specialization": _specializationController.text,
+                "location": _locationController.text,
+                "clinic": _clinicController.text,
                 "licenseNumber": _licenseNumberController.text,
               },
               profileImage: '',
@@ -310,13 +332,61 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     controller: _therapyGoalsController,
                                     isRequired: false),
                               ] else ...[
+                                DropdownButtonFormField<String>(
+                                  value:
+                                      _specializationController.text.isNotEmpty
+                                          ? _specializationController.text
+                                          : null,
+                                  decoration: customInputDecoration(
+                                      "Specialization", context),
+                                  items: [
+                                    "Psychologist",
+                                    "Psychiatrist",
+                                    "Counselor"
+                                  ].map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (newValue) {
+                                    _specializationController.text = newValue!;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Location Dropdown
+                                DropdownButtonFormField<String>(
+                                  value: _locationController.text.isNotEmpty
+                                      ? _locationController.text
+                                      : null,
+                                  decoration: customInputDecoration(
+                                      "Location", context),
+                                  items: ["Dagupan City", "Urdaneta City"]
+                                      .map((city) => DropdownMenuItem(
+                                            value: city,
+                                            child: Text(city),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    _locationController.text = value!;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Clinic TextField
                                 CustomTextField(
-                                    label: "Specialization",
-                                    controller: _specializationController),
+                                  label: "Clinic",
+                                  controller: _clinicController,
+                                ),
+                                const SizedBox(height: 16),
+
+                                // License Number
+                                CustomTextField(
+                                  label: "License Number",
+                                  controller: _licenseNumberController,
+                                ),
                                 const SizedBox(height: 20),
-                                CustomTextField(
-                                    label: "License Number",
-                                    controller: _licenseNumberController),
                               ],
                               const SizedBox(height: 20),
                               ElevatedButton(

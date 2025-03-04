@@ -28,6 +28,7 @@ class CustomTextField extends StatelessWidget {
       onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
+        hintText: label,
         labelStyle: TextStyle(color: theme.colorScheme.onSurface),
         filled: true,
         fillColor: theme.colorScheme.background,
