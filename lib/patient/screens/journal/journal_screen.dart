@@ -4,7 +4,7 @@ import 'package:armstrong/config/colors.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'dart:convert';
-
+import 'package:armstrong/widgets/buttons/mood_select.dart';
 
 class JournalPage extends StatefulWidget {
   const JournalPage({Key? key}) : super(key: key);
@@ -12,6 +12,7 @@ class JournalPage extends StatefulWidget {
   @override
   _JournalPageState createState() => _JournalPageState();
 }
+
 class _JournalPageState extends State<JournalPage> {
   String? _userId;
   int? _selectedMood;
@@ -44,7 +45,6 @@ class _JournalPageState extends State<JournalPage> {
       setState(() {
         hasAnsweredMoodToday = true;
       });
-      // Fetch mood entries if already filled for today
       await _fetchMoodEntries();
     } else {
       setState(() {
@@ -60,7 +60,7 @@ class _JournalPageState extends State<JournalPage> {
     if (savedMood != null) {
       setState(() {
         final moodData = Map<String, dynamic>.from(jsonDecode(savedMood));
-        _moods = [moodData];  
+        _moods = [moodData];
       });
     }
   }
@@ -77,7 +77,6 @@ class _JournalPageState extends State<JournalPage> {
         _daySummaryController.text,
       );
 
-      // Save the mood entry locally to secure storage
       final moodData = {
         'moodScale': _selectedMood,
         'moodDescription': _daySummaryController.text,
@@ -87,7 +86,6 @@ class _JournalPageState extends State<JournalPage> {
       await storage.write(key: 'savedMood', value: jsonEncode(moodData));
       await _saveLastMoodDate();
 
-      // Update UI and show success message
       setState(() {
         _moods = [moodData];
       });
@@ -118,52 +116,52 @@ class _JournalPageState extends State<JournalPage> {
     );
   }
 
-  Widget _buildMoodSelector() {
-    return Column(
-      children: [
-        _moodRadio('Very Happy 😊', 4, Colors.green),
-        _moodRadio('Happy 🙂', 3, Colors.lightGreen),
-        _moodRadio('Sad ☹️', 2, Colors.orange),
-        _moodRadio('Very Sad 😭', 1, Colors.red),
-      ],
-    );
-  }
-
-   Widget _moodRadio(String label, int mood, Color color) {
-    return RadioListTile<int>(
-      title: Text(label),
-      value: mood,
-      groupValue: _selectedMood,
-      onChanged: (int? selected) {
-        if (selected != null) {
-          setState(() {
-            _selectedMood = selected;
-          });
-        }
-      },
-      secondary: CircleAvatar(
-        backgroundColor: color,
-        child: Text(mood.toString(), style: TextStyle(color: Colors.white)),
-      ),
-    );
-  }
-
   Widget _journalTextField(BuildContext context, {required TextEditingController controller}) {
     final theme = Theme.of(context);
-    return TextField(
-      controller: controller,
-      maxLines: 6,
-      decoration: InputDecoration(
-        hintText: 'Write your journal entry...',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.all(12),
-        filled: true,
-        fillColor: theme.colorScheme.surfaceVariant,
-      ),
+    bool isDarkMode = theme.brightness == Brightness.dark;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double fontSize = (constraints.maxWidth * 0.04).clamp(12.0, 18.0); // Min 12px, Max 18px
+
+        return TextFormField(
+          controller: controller,
+          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: fontSize),
+          decoration: InputDecoration(
+            labelText: 'Day Summary',
+            labelStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: fontSize * 0.9),
+            hintText: 'Write about your day...',
+            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: fontSize * 0.9),
+            prefixIcon: Icon(Icons.book, color: theme.colorScheme.onSurfaceVariant, size: fontSize * 1.2),
+            filled: true,
+            fillColor: isDarkMode ? Colors.grey[900] : Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: theme.colorScheme.outline,
+                width: 1,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: fontSize * 2, horizontal: fontSize),
+          ),
+          minLines: 5,
+          maxLines: 7,
+        );
+      },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +178,7 @@ class _JournalPageState extends State<JournalPage> {
         },
         actions: [],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,51 +188,42 @@ class _JournalPageState extends State<JournalPage> {
               style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            if (!hasAnsweredMoodToday) ...[
-              _buildMoodSelector(),
-              const SizedBox(height: 20),
-              Text(
-                'Day Summary:',
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              _journalTextField(context, controller: _daySummaryController),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveMoodEntry,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: Text(
-                  'Save Entry',
-                  style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-            if (hasAnsweredMoodToday) ...[
-              Text(
-                'You have already answered your mood for today.',
-                style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
-              ),
-              const SizedBox(height: 20),
-              if (_moods.isEmpty)
-                Text('No mood data available.', style: theme.textTheme.bodyLarge)
-              else
-                ..._moods.map((mood) {
-                  DateTime date = DateTime.parse(mood['createdAt']);
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'Mood: ${mood['moodScale']}, Summary: ${mood['moodDescription']} (Date: ${date.toLocal().toString().split(' ')[0]})',
-                      style: theme.textTheme.bodyMedium,
+            MoodSelect(
+              selectedMood: _selectedMood,
+              onMoodSelected: (int mood) {
+                setState(() {
+                  _selectedMood = mood;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            _journalTextField(context, controller: _daySummaryController),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _saveMoodEntry,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 14),
                     ),
-                  );
-                }).toList(),
-            ],
+                    child: FittedBox(
+                      child: Text(
+                        'Save Entry',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        maxLines: 1, // Ensures text stays in one line
+                        overflow: TextOverflow.ellipsis, // Prevents overflow issues
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),

@@ -7,13 +7,18 @@ class JournalSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     
+    // Set maximum height based on screen height to avoid overflow
+    double sectionHeight = screenHeight * 0.2; // 20% of screen height, you can tweak this
+
     return Container(
       width: double.infinity,
-      height: 140,
-      padding: const EdgeInsets.all(16),
+      height: sectionHeight,
+      padding: EdgeInsets.all(screenWidth * 0.04), // 4% of screen width for padding
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer, 
+        color: theme.colorScheme.primaryContainer,
         image: const DecorationImage(
           image: AssetImage('images/splash/image1.png'),
           fit: BoxFit.cover,
@@ -28,10 +33,11 @@ class JournalSection extends StatelessWidget {
           Text(
             'Daily Journal',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.white,
-              fontSize: 20,
+              color: Colors.white, // Always light-colored
+              fontSize: screenWidth * 0.05, // Adaptive font size based on screen width
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center, // Center text
           ),
           const SizedBox(height: 15),
           ElevatedButton(
@@ -43,7 +49,10 @@ class JournalSection extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              padding: EdgeInsets.symmetric(
+                vertical: screenHeight * 0.015, // 1.5% of screen height for padding
+                horizontal: screenWidth * 0.1,  // 10% of screen width for padding
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -52,8 +61,8 @@ class JournalSection extends StatelessWidget {
             child: Text(
               'Log Your Mood',
               style: theme.textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontSize: 18,
+                color: theme.colorScheme.onPrimary,
+                fontSize: screenWidth * 0.045, // Adaptive font size based on screen width
                 fontWeight: FontWeight.bold,
               ),
             ),
