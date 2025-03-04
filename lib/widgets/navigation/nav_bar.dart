@@ -6,8 +6,8 @@ class CustomBottomNavBar extends StatelessWidget {
   final ValueChanged<int> onItemTapped;
   final int notificationCount;
   final int chatNotificationCount;
-  final bool showcaseCompleted; // <-- Add this
-  final VoidCallback completeShowcase; // <-- Add this
+  final bool showcaseCompleted; 
+  final VoidCallback completeShowcase; 
 
   final GlobalKey homeKey;
   final GlobalKey discoverKey;
@@ -20,8 +20,8 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.onItemTapped,
     this.notificationCount = 0,
     this.chatNotificationCount = 0,
-    required this.showcaseCompleted, // <-- Initialize
-    required this.completeShowcase, // <-- Initialize
+    required this.showcaseCompleted, 
+    required this.completeShowcase, 
     required this.homeKey,
     required this.discoverKey,
     required this.chatKey,

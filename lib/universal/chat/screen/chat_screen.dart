@@ -58,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {});
     }
 
-    _initializeSocket();
+    //_initializeSocket();
     _loadMessages();
   }
 

@@ -238,8 +238,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         bottomNavigationBar: CustomBottomNavBar(
           selectedIndex: _selectedIndex,
           onItemTapped: _onTabSelected,
-          notificationCount: _unreadCount,
-          chatNotificationCount: _unreadCount,
           showcaseCompleted: _showcaseCompleted, 
           completeShowcase: _completeShowcase,
           homeKey: _homeKey,

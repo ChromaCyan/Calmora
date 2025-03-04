@@ -11,6 +11,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:armstrong/widgets/forms/profile_picture.dart';
 import 'package:armstrong/widgets/forms/common_fields.dart';
+import 'package:armstrong/models/user/user.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -20,7 +21,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, dynamic>? profileData;
+  //Map<String, dynamic>? profileData;
+  Profile? profileData;
   bool isLoading = true;
   bool isEditing = false;
   bool hasError = false;
@@ -77,48 +79,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchProfile() async {
     try {
-      final response = await _apiRepository.getProfile();
-      final data = response["data"];
-
+      final user = await _apiRepository.getProfile(); // Fetching the Profile
       setState(() {
-        profileData = data;
+        profileData = user; // Assign the Profile object to profileData
         isLoading = false;
-        _userType = data["userType"];
+        _userType = user.userType;
 
         // Common Fields
-        firstNameController.text = data["firstName"] ?? "";
-        lastNameController.text = data["lastName"] ?? "";
-        phoneNumberController.text = data["phoneNumber"] ?? "";
-        _imageUrl = (data["profileImage"]?.isNotEmpty ?? false)
-            ? data["profileImage"]
-            : null;
+        firstNameController.text = user.firstName ?? "";
+        lastNameController.text = user.lastName ?? "";
+        phoneNumberController.text = user.phoneNumber ?? "";
+        _imageUrl =
+            user.profileImage?.isNotEmpty ?? false ? user.profileImage : null;
 
-        if (data["dateOfBirth"] != null) {
-          _selectedDateOfBirth = DateTime.parse(data["dateOfBirth"]);
+        if (user.dateOfBirth != null) {
+          _selectedDateOfBirth = user.dateOfBirth;
           dateOfBirthController.text =
               DateFormat('yyyy-MM-dd').format(_selectedDateOfBirth!);
         }
 
         // Specialist Fields
         if (_userType == "Specialist") {
-          specializationController.text = data["specialization"] ?? "";
-          licenseNumberController.text = data["licenseNumber"] ?? "";
-          bioController.text = data["bio"] ?? "";
+          specializationController.text = user.specialization ?? "";
+          licenseNumberController.text = user.licenseNumber ?? "";
+          bioController.text = user.bio ?? "";
           yearsOfExperienceController.text =
-              data["yearsOfExperience"]?.toString() ?? "";
+              user.yearsOfExperience?.toString() ?? "";
           languagesSpokenController.text =
-              (data["languagesSpoken"] as List<dynamic>?)?.join(", ") ?? "";
-          availabilityController.text = data["availability"] ?? "";
-          locationController.text = data["location"] ?? "";
-          clinicController.text = data["clinic"] ?? "";
+              (user.languagesSpoken ?? []).join(", ");
+          availabilityController.text = user.availability ?? "";
 
-          //Formating Time to display properly on the form later on (I'm not sure if it works yet please test before changing yung frontend, thanks - josh)
+          // Formatting Time for working hours
           String formatTime(String time) {
             if (time.isEmpty) return "";
             final parts = time.split(":");
             int hour = int.parse(parts[0]);
             int minute = int.parse(parts[1]);
-
             String period = hour >= 12 ? "PM" : "AM";
             hour = hour % 12 == 0 ? 12 : hour % 12;
 
@@ -126,24 +122,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           workingHoursStartController.text =
-              formatTime(data["workingHours"]?["start"] ?? "");
+              formatTime(user.workingHoursStart ?? "");
           workingHoursEndController.text =
-              formatTime(data["workingHours"]?["end"] ?? "");
+              formatTime(user.workingHoursEnd ?? "");
         }
 
         // Patient Fields
         if (_userType == "Patient") {
-          addressController.text = data["address"] ?? "";
-          medicalHistoryController.text = data["medicalHistory"] ?? "";
-          therapyGoalsController.text =
-              (data["therapyGoals"] as List<dynamic>?)?.join(", ") ?? "";
+          addressController.text = user.address ?? "";
+          medicalHistoryController.text = user.medicalHistory ?? "";
+          therapyGoalsController.text = (user.therapyGoals ?? []).join(", ");
 
-          final emergencyContact = data["emergencyContact"] ?? {};
-          emergencyContactNameController.text = emergencyContact["name"] ?? "";
-          emergencyContactPhoneController.text =
-              emergencyContact["phone"] ?? "";
+          final emergencyContact = user.emergencyContact;
+          emergencyContactNameController.text = emergencyContact?.name ?? "";
+          emergencyContactPhoneController.text = emergencyContact?.phone ?? "";
           emergencyContactRelationController.text =
-              emergencyContact["relation"] ?? "";
+              emergencyContact?.relation ?? "";
         }
       });
     } catch (e) {

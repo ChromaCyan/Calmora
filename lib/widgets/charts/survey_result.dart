@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:armstrong/models/survey/survey_result.dart';
 
 class SurveyScoreChart extends StatefulWidget {
   final String patientId;
@@ -16,7 +17,7 @@ class SurveyScoreChart extends StatefulWidget {
 class _SurveyScoreChartState extends State<SurveyScoreChart> {
   final _storage = const FlutterSecureStorage();
   final ApiRepository _apiRepository = ApiRepository();
-  late Future<Map<String, dynamic>> surveyData;
+  late Future<SurveyResult> surveyData;
 
   @override
   void initState() {
@@ -24,34 +25,37 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
     surveyData = fetchSurveyData(widget.patientId);
   }
 
-  Future<Map<String, dynamic>> fetchSurveyData(String patientId) async {
+  Future<SurveyResult> fetchSurveyData(String patientId) async {
     try {
       return await _apiRepository.getPatientSurveyResults(patientId);
     } catch (e) {
-      return {'totalScore': 0, 'interpretation': 'No Data'};
+      return SurveyResult(totalScore: 0, interpretation: 'No Data');
     }
   }
 
   Map<String, dynamic> getInterpretation(int score, ColorScheme colorScheme) {
     if (score >= 85) {
       return {
-        'text': "Minimal or No Signs of Mental Health Problems",
+        'text': "Great job! You're in a strong place with your mental health.",
         'color': Colors.green
       };
     } else if (score >= 70) {
       return {
-        'text': "Mild Mental Health Concerns",
+        'text':
+            "You're doing well! A few areas to focus on, but you're on the right track.",
         'color': Colors.orange
       };
     } else if (score >= 50) {
       return {
-        'text': "Moderate Mental Health Concerns",
-        'color': Colors. purple
+        'text':
+            "Keep going! It's normal to have ups and downs, and you have the strength to work through them.",
+        'color': Colors.purple
       };
     } else {
       return {
-        'text': "Severe Mental Health Concerns",
-        'color': Colors. red
+        'text':
+            "You're not alone! Every step you take toward better mental health counts, and we're here to support you.",
+        'color': Colors.red
       };
     }
   }
@@ -61,7 +65,7 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return FutureBuilder<Map<String, dynamic>>(
+    return FutureBuilder<SurveyResult>(
       future: surveyData,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -70,17 +74,20 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
           return Center(
             child: Text(
               "No survey results found.",
-              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.error),
             ),
           );
         }
 
-        final int score = snapshot.data!['totalScore'];
+        final surveyResult = snapshot.data!;
+        final int score = surveyResult.totalScore;
         final interpretationData = getInterpretation(score, colorScheme);
 
         return Card(
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           color: colorScheme.surface,
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -90,7 +97,8 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.scrollText, color: colorScheme.primary, size: 30),
+                    Icon(LucideIcons.scrollText,
+                        color: colorScheme.primary, size: 30),
                     const SizedBox(width: 10),
                     Text(
                       "Survey Score",

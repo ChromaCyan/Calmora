@@ -10,17 +10,17 @@ import 'package:armstrong/providers/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:showcaseview/showcaseview.dart';
-import 'package:armstrong/services/socket_service.dart';
+// Comment out the socket import
+// import 'package:armstrong/services/socket_service.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'services/supabase.dart';
-import 'package:flutter/services.dart'; // Import the necessary package
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
-  final socketService = SocketService();
+  // Comment out socketService initialization
+  // final socketService = SocketService();
   await SupabaseService.initialize();
 
   print("🚀 Starting app...");
@@ -29,8 +29,8 @@ void main() async {
   await NotificationService.initNotifications();
 
   Future.delayed(Duration(seconds: 3), () {
-    socketService.showNotification(
-        "Welcome to Armstrong", "Men's Mental Health App!");
+    // socketService.showNotification(  
+    //     "Welcome to Armstrong", "Men's Mental Health App!"); 
   });
 
   String? token = await storage.read(key: 'jwt');
@@ -62,10 +62,10 @@ void main() async {
     }
   }
 
-  // Connect to Socket if Logged In
-  if (token != null) {
-    socketService.connect(token);
-  }
+  // Disabling the socket connection )(Temporary because of vercel)
+  // if (token != null) {
+  //   socketService.connect(token);  // Commented out
+  // }
 
   runApp(MyApp(
     isLoggedIn: token != null,

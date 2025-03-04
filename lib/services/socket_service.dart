@@ -49,7 +49,7 @@ class SocketService {
     if (socket != null && socket!.connected) return;
 
     socket = IO.io(
-        'http://192.168.18.253:5000',
+        'https://armstrong-api.vercel.app/api',
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .disableAutoConnect()

@@ -3,7 +3,7 @@ import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:armstrong/universal/chat/screen/chat_card.dart'; // Import ChatCard
+import 'package:armstrong/universal/chat/screen/chat_card.dart';
 
 class ChatListScreen extends StatefulWidget {
   @override

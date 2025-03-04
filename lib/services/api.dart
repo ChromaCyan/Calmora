@@ -7,9 +7,13 @@ import 'package:intl/intl.dart';
 
 //Model Imports
 import 'package:armstrong/models/article/article.dart';
+import 'package:armstrong/models/user/user.dart';
+import 'package:armstrong/models/survey/survey_result.dart';
+import 'package:armstrong/models/survey/survey.dart';
 
 class ApiRepository {
-  final String baseUrl = 'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
+  final String baseUrl =
+      'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
   //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
@@ -154,8 +158,24 @@ class ApiRepository {
   /////////////////////////////////////////////////////////////////////////////////
   // Profile (API)
 
+  // // Get Profile
+  // Future<Map<String, dynamic>> getProfile() async {
+  //   final token = await _storage.read(key: 'token');
+  //   final url = Uri.parse('$baseUrl/auth/profile');
+  //   final response = await http.get(
+  //     url,
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     return json.decode(response.body);
+  //   } else {
+  //     throw Exception('Failed to fetch profile: ${response.body}');
+  //   }
+  // }
+
   // Get Profile
-  Future<Map<String, dynamic>> getProfile() async {
+  Future<Profile> getProfile() async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/auth/profile');
     final response = await http.get(
@@ -164,7 +184,8 @@ class ApiRepository {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final data = json.decode(response.body)["data"];
+      return Profile.fromJson(data);
     } else {
       throw Exception('Failed to fetch profile: ${response.body}');
     }
@@ -570,8 +591,26 @@ class ApiRepository {
       throw Exception('Failed to fetch mood entries: ${response.body}');
     }
   }
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// Survey API
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Survey API
+
+  // // Get all surveys
+  // Future<List<Survey>> getSurveys() async {
+  //   final token = await _storage.read(key: 'token');
+  //   final url = Uri.parse('$baseUrl/survey/all');
+
+  //   final response = await http.get(
+  //     url,
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     final List<dynamic> data = json.decode(response.body)['data'];
+  //     return data.map((surveyJson) => Survey.fromJson(surveyJson)).toList();
+  //   } else {
+  //     throw Exception('Failed to fetch surveys: ${response.body}');
+  //   }
+  // }
 
   // Get all surveys
   Future<List<Map<String, dynamic>>> getSurveys() async {
@@ -632,7 +671,7 @@ class ApiRepository {
   }
 
   // Get survey results for a patient
-  Future<Map<String, dynamic>> getPatientSurveyResults(String patientId) async {
+  Future<SurveyResult> getPatientSurveyResults(String patientId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/survey/results/$patientId');
 
@@ -643,7 +682,7 @@ class ApiRepository {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body)['data'];
-      return data;
+      return SurveyResult.fromJson(data);
     } else {
       throw Exception('Failed to fetch survey results: ${response.body}');
     }

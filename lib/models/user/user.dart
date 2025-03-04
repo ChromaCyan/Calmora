@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class User {
+class Profile {
   final String id;
   final String firstName;
   final String lastName;
@@ -23,9 +23,12 @@ class User {
   final int? yearsOfExperience;
   final List<String>? languagesSpoken;
   final String? availability;
-  final List<Review>? reviews;
+  final String? workingHoursStart;
+  final String? workingHoursEnd;
+  final String? location;
+  final String? clinic;
 
-  User({
+  Profile({
     required this.id,
     required this.firstName,
     required this.lastName,
@@ -44,11 +47,14 @@ class User {
     this.yearsOfExperience,
     this.languagesSpoken,
     this.availability,
-    this.reviews,
+    this.workingHoursStart,
+    this.workingHoursEnd,
+    this.location,
+    this.clinic,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory Profile.fromJson(Map<String, dynamic> json) {
+    return Profile(
       id: json['_id'],
       firstName: json['firstName'],
       lastName: json['lastName'],
@@ -71,7 +77,10 @@ class User {
       yearsOfExperience: json['yearsOfExperience'],
       languagesSpoken: json['languagesSpoken'] != null ? List<String>.from(json['languagesSpoken']) : null,
       availability: json['availability'],
-      reviews: json['reviews'] != null ? (json['reviews'] as List).map((e) => Review.fromJson(e)).toList() : null,
+      workingHoursStart: json['workingHours']?['start'],
+      workingHoursEnd: json['workingHours']?['end'],
+      location: json['location'],
+      clinic: json['clinic'],
     );
   }
 
@@ -99,7 +108,12 @@ class User {
       'yearsOfExperience': yearsOfExperience,
       'languagesSpoken': languagesSpoken,
       'availability': availability,
-      'reviews': reviews?.map((e) => e.toJson()).toList(),
+      'workingHours': {
+        'start': workingHoursStart,
+        'end': workingHoursEnd,
+      },
+      'location': location,
+      'clinic': clinic,
     };
   }
 }
@@ -124,30 +138,6 @@ class EmergencyContact {
       'name': name,
       'phone': phone,
       'relation': relation,
-    };
-  }
-}
-
-class Review {
-  final int? rating;
-  final String? comment;
-  final String? reviewerName;
-
-  Review({this.rating, this.comment, this.reviewerName});
-
-  factory Review.fromJson(Map<String, dynamic> json) {
-    return Review(
-      rating: json['rating'],
-      comment: json['comment'],
-      reviewerName: json['reviewerName'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'rating': rating,
-      'comment': comment,
-      'reviewerName': reviewerName,
     };
   }
 }

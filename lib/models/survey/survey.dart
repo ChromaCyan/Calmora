@@ -1,45 +1,65 @@
-class Choice {
-  final String text;
-  final int score;
+class Survey {
   final String id;
+  final String category;
+  final List<Question> questions;
 
-  Choice({required this.text, required this.score, required this.id});
+  Survey({
+    required this.id,
+    required this.category,
+    required this.questions,
+  });
 
-  factory Choice.fromJson(Map<String, dynamic> json) {
-    return Choice(
-      text: json['text'],
-      score: json['score'],
+  factory Survey.fromJson(Map<String, dynamic> json) {
+    var questionsList = (json['questions'] as List)
+        .map((questionJson) => Question.fromJson(questionJson))
+        .toList();
+    return Survey(
       id: json['_id'],
+      category: json['category'] ?? '',
+      questions: questionsList,
     );
   }
 }
 
 class Question {
+  final String id;
   final String questionText;
   final List<Choice> choices;
-  final String id;
 
-  Question({required this.questionText, required this.choices, required this.id});
+  Question({
+    required this.id,
+    required this.questionText,
+    required this.choices,
+  });
 
   factory Question.fromJson(Map<String, dynamic> json) {
+    var choicesList = (json['choices'] as List)
+        .map((choiceJson) => Choice.fromJson(choiceJson))
+        .toList();
     return Question(
-      questionText: json['questionText'],
-      choices: (json['choices'] as List).map((choice) => Choice.fromJson(choice)).toList(),
       id: json['_id'],
+      questionText: json['questionText'],
+      choices: choicesList,
     );
   }
 }
 
-class SurveyResponse {
-  final String category;
-  final List<Question> questions;
+class Choice {
+  final String id;
+  final String choiceText;
+  final int score;
 
-  SurveyResponse({required this.category, required this.questions});
+  Choice({
+    required this.id,
+    required this.choiceText,
+    required this.score,
+  });
 
-  factory SurveyResponse.fromJson(Map<String, dynamic> json) {
-    return SurveyResponse(
-      category: json['category'],
-      questions: (json['questions'] as List).map((q) => Question.fromJson(q)).toList(),
+  factory Choice.fromJson(Map<String, dynamic> json) {
+    return Choice(
+      id: json['_id'],
+      choiceText: json['text'], 
+      score: json['score'] ?? 0,
     );
   }
 }
