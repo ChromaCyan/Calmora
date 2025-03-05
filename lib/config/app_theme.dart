@@ -50,8 +50,8 @@ abstract final class AppTheme {
   static ThemeData dark = FlexThemeData.dark(
   colors: const FlexSchemeColor(
     primary: Color(0xFFB1CFF5),
-    primaryContainer: Color(0xFF3873BA),
-    primaryLightRef: Color(0xFF00296B),
+    primaryContainer: Color(0xFF00296B),
+    primaryLightRef: Color(0xFF3873BA),
     secondary: Color(0xFFFFD270),
     secondaryContainer: Color(0xFFD26900),
     secondaryLightRef: Color(0xFFD26900),

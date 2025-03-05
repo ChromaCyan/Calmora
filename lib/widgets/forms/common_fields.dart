@@ -1,3 +1,4 @@
+// import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 class CombinedForm extends StatelessWidget {
@@ -61,229 +62,245 @@ class CombinedForm extends StatelessWidget {
     required this.userType,
   }) : super(key: key);
 
-   InputDecoration customInputDecoration(String label, bool isDarkMode) {
+  InputDecoration customInputDecoration(String label, BuildContext context, {bool readOnly = false}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-      filled: true,
-      fillColor: isDarkMode ? Colors.grey[900] : Colors.white,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+      labelStyle: TextStyle(
+        color: colorScheme.onBackground,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: isDarkMode ? Colors.blue : Colors.blue),
+      filled: false,
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: isEditing
+              ? colorScheme.onSurface.withOpacity(0.5)
+              : colorScheme.onSurface.withOpacity(0.1),
+          width: 1.5,
+        ),
+      ),
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: colorScheme.primaryContainer,
+          width: 2,
+        ),
+      ),
+      disabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: colorScheme.onSurface.withOpacity(0.1),
+          width: 1.5,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isWideScreen = constraints.maxWidth > 600;
 
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[900] : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 12,
-              spreadRadius: 3,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: firstNameController,
-              decoration: customInputDecoration("First Name", isDarkMode),
-              enabled: isEditing,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: lastNameController,
-              decoration: customInputDecoration("Last Name", isDarkMode),
-              enabled: isEditing,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: phoneNumberController,
-              decoration: customInputDecoration("Phone Number", isDarkMode),
-              enabled: isEditing,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: dateOfBirthController,
-              decoration:
-                  customInputDecoration("Date of Birth", isDarkMode).copyWith(
-                suffixIcon: const Icon(Icons.calendar_today),
-              ),
-              readOnly: true,
-              onTap: isEditing ? onPickDateOfBirth : null,
-            ),
-            const SizedBox(height: 16),
-            if (userType.toLowerCase() == "specialist") ...[
-              // Specialist Fields
-              DropdownButtonFormField<String>(
-                value: specializationController.text.isNotEmpty
-                    ? specializationController.text
-                    : null,
-                decoration: customInputDecoration("Specialization", isDarkMode),
-                items: ["Psychologist", "Psychiatrist", "Counselor"]
-                    .map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: isEditing
-                    ? (newValue) {
-                        specializationController.text = newValue!;
-                      }
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: bioController,
-                decoration: customInputDecoration("Bio", isDarkMode),
-                enabled: isEditing,
-                maxLines: 5,
-                minLines: 3,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: licenseNumberController,
-                  decoration:
-                      customInputDecoration("License Number", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: yearsOfExperienceController,
-                  decoration:
-                      customInputDecoration("Years of Experience", isDarkMode),
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Personal Information",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: firstNameController,
+                        decoration: customInputDecoration("First Name", context),
+                        enabled: isEditing,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextField(
+                        controller: lastNameController,
+                        decoration: customInputDecoration("Last Name", context),
+                        enabled: isEditing,
+                      ),
+                    ),
+                  ],
+                ),
+                TextField(
+                  controller: phoneNumberController,
+                  decoration: customInputDecoration("Phone Number", context),
                   enabled: isEditing,
-                  keyboardType: TextInputType.number),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: languagesSpokenController,
-                  decoration:
-                      customInputDecoration("Languages Spoken", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              // Availability Dropdown
-              DropdownButtonFormField<String>(
-                value: availabilityController.text.isNotEmpty
-                    ? availabilityController.text
-                    : null,
-                decoration: customInputDecoration("Availability", isDarkMode),
-                items: ["Available", "Not available at the moment"]
-                    .map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: isEditing
-                    ? (newValue) {
-                        availabilityController.text = newValue!;
-                      }
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: locationController.text.isNotEmpty
-                    ? locationController.text
-                    : null,
-                decoration: customInputDecoration("Location", isDarkMode),
-                items: ["Dagupan City", "Urdaneta City"]
-                    .map((city) => DropdownMenuItem(
-                          value: city,
-                          child: Text(city),
-                        ))
-                    .toList(),
-                onChanged: isEditing
-                    ? (value) {
-                        locationController.text = value!;
-                      }
-                    : null,
-              ),
-
-              const SizedBox(height: 16),
-              TextField(
-                  controller: clinicController,
-                  decoration: customInputDecoration("Clinic", isDarkMode),
-                  enabled: isEditing),
-
-              // Add Working Hours Fields
-              const SizedBox(height: 16),
-              TextField(
-                controller: workingHoursStartController,
-                readOnly: true,
-                decoration:
-                    customInputDecoration("Clinic Appointment Start Time", isDarkMode).copyWith(
-                  suffixIcon: Icon(Icons.access_time),
                 ),
-                onTap: isEditing ? onPickStartTime : null,
-              ),
-
-              const SizedBox(height: 16),
-              TextField(
-                controller: workingHoursEndController,
-                readOnly: true,
-                decoration:
-                    customInputDecoration("Clinic Appointment End Time", isDarkMode).copyWith(
-                  suffixIcon: Icon(Icons.access_time),
+                GestureDetector(
+                  onTap: isEditing ? onPickDateOfBirth : null,
+                  child: AbsorbPointer(
+                    child: TextField(
+                      controller: dateOfBirthController,
+                      readOnly: true,
+                      decoration: customInputDecoration("Date of Birth", context, readOnly: true).copyWith(
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
+                    ),
+                  ),
                 ),
-                onTap: isEditing ? onPickEndTime : null, 
-              ),
-            ] else if (userType.toLowerCase() == "patient") ...[
-              // Patient Fields
-              TextField(
-                  controller: addressController,
-                  decoration: customInputDecoration("Address", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: medicalHistoryController,
-                  decoration:
-                      customInputDecoration("Medical History", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: therapyGoalsController,
-                  decoration:
-                      customInputDecoration("Therapy Goals", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: emergencyContactNameController,
-                  decoration: customInputDecoration(
-                      "Emergency Contact Name", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: emergencyContactPhoneController,
-                  decoration: customInputDecoration(
-                      "Emergency Contact Phone", isDarkMode),
-                  enabled: isEditing),
-              const SizedBox(height: 16),
-              TextField(
-                  controller: emergencyContactRelationController,
-                  decoration: customInputDecoration(
-                      "Emergency Contact Relation", isDarkMode),
-                  enabled: isEditing),
-            ],
-          ],
-        ),
-      ),
+                const SizedBox(height: 20),
+
+                if (userType.toLowerCase() == "patient") ...[
+                  const Text(
+                    "Medical Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: addressController,
+                    decoration: customInputDecoration("Address", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: medicalHistoryController,
+                    decoration: customInputDecoration("Medical History", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: therapyGoalsController,
+                    decoration: customInputDecoration("Therapy Goals", context),
+                    enabled: isEditing,
+                  ),
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    "Contact Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: emergencyContactNameController,
+                    decoration: customInputDecoration("Emergency Contact Name", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: emergencyContactPhoneController,
+                    decoration: customInputDecoration("Emergency Contact Phone", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: emergencyContactRelationController,
+                    decoration: customInputDecoration("Emergency Contact Relation", context),
+                    enabled: isEditing,
+                  ),
+                ],
+
+                if (userType.toLowerCase() == "specialist") ...[
+                  const Text(
+                    "Professional Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: specializationController.text.isNotEmpty
+                        ? specializationController.text
+                        : null,
+                    decoration: customInputDecoration("Specialization", context),
+                    items: ["Psychologist", "Psychiatrist", "Counselor"]
+                        .map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: isEditing
+                        ? (newValue) {
+                            specializationController.text = newValue!;
+                          }
+                        : null,
+                  ),
+                  Container(
+                    constraints: BoxConstraints(maxHeight: isEditing ? double.infinity : 100), // Use constraints instead of fixed height
+                    child: SingleChildScrollView(
+                      child: TextField(
+                        controller: bioController,
+                        decoration: customInputDecoration("Bio", context),
+                        enabled: isEditing,
+                        maxLines: isEditing ? 4 : null,
+                        readOnly: !isEditing,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: licenseNumberController,
+                    decoration: customInputDecoration("License No.", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: yearsOfExperienceController,
+                    decoration: customInputDecoration("Years of Experience", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: languagesSpokenController,
+                    decoration: customInputDecoration("Languages Spoken", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: locationController,
+                    decoration: customInputDecoration("Location", context),
+                    enabled: isEditing,
+                  ),
+                  TextField(
+                    controller: clinicController,
+                    decoration: customInputDecoration("Clinic", context),
+                    enabled: isEditing,
+                  ),
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    "Work Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: availabilityController.text.isNotEmpty ? availabilityController.text : null,
+                    decoration: customInputDecoration("Availability", context),
+                    items: ["Available", "Not Available"].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: isEditing ? (newValue) => availabilityController.text = newValue! : null,
+                  ),
+                  GestureDetector(
+                    onTap: isEditing ? onPickStartTime : null,
+                    child: AbsorbPointer(
+                      child: TextField(
+                        controller: workingHoursStartController,
+                        readOnly: true,
+                        decoration: customInputDecoration("Working Hours Start", context, readOnly: true),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: isEditing ? onPickEndTime : null,
+                    child: AbsorbPointer(
+                      child: TextField(
+                        controller: workingHoursEndController,
+                        readOnly: true,
+                        decoration: customInputDecoration("Working Hours End", context, readOnly: true),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
