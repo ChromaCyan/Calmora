@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/authentication/blocs/auth_event.dart';
 import 'package:armstrong/authentication/blocs/auth_state.dart';
-import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -26,7 +25,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _dateOfBirthController = TextEditingController();
   final _emergencyContactNameController = TextEditingController();
@@ -38,6 +36,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _licenseNumberController = TextEditingController();
   final _locationController = TextEditingController();
   final _clinicController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  String _passwordStrength = "";
 
   InputDecoration customInputDecoration(String label, BuildContext context) {
     final theme = Theme.of(context);
@@ -55,6 +55,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
       ),
     );
+  }
+
+  void _checkPasswordStrength(String password) {
+    if (password.length < 8) {
+      setState(() => _passwordStrength = "Too Short");
+    } else if (!RegExp(r'^(?=.*[A-Z])').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs Uppercase");
+    } else if (!RegExp(r'^(?=.*[a-z])').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs Lowercase");
+    } else if (!RegExp(r'^(?=.*\d)').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs a Number");
+    } else if (!RegExp(r'^(?=.*[@$!%*?&])').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs a Special Character");
+    } else {
+      setState(() => _passwordStrength = "Strong Password ✅");
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -84,13 +100,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         return;
       }
 
+      // Password strength validation
+      final password = _passwordController.text;
+      final strongPasswordRegExp = RegExp(
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+      );
+
+      if (!strongPasswordRegExp.hasMatch(password)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.',
+            ),
+          ),
+        );
+        return;
+      }
+
       final event = isPatient
           ? RegisterEvent(
               firstName: _firstNameController.text,
               lastName: _lastNameController.text,
               email: _emailController.text,
               phoneNumber: _phoneNumberController.text,
-              password: _passwordController.text,
+              password: password,
               otherDetails: {
                 "dateOfBirth": _dateOfBirthController.text,
                 if (_emergencyContactNameController.text.isNotEmpty)
@@ -113,7 +146,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               lastName: _lastNameController.text,
               email: _emailController.text,
               phoneNumber: _phoneNumberController.text,
-              password: _passwordController.text,
+              password: password,
               otherDetails: {
                 "specialization": _specializationController.text,
                 "location": _locationController.text,
@@ -283,9 +316,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   controller: _phoneNumberController),
                               const SizedBox(height: 20),
                               CustomTextField(
-                                  label: "Password",
-                                  controller: _passwordController,
-                                  obscureText: true),
+                                label: "Password",
+                                controller: _passwordController,
+                                obscureText: true,
+                                onChanged: _checkPasswordStrength,
+                              ),
+                              Text(
+                                _passwordStrength,
+                                style: TextStyle(
+                                  color:
+                                      _passwordStrength == "Strong Password ✅"
+                                          ? Colors.green
+                                          : Colors.red,
+                                ),
+                              ),
                               const SizedBox(height: 20),
                               CustomTextField(
                                   label: "Confirm Password",

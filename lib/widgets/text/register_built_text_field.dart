@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final bool isRequired;
   final VoidCallback? onTap;
   final bool readOnly;
+  final ValueChanged<String>? onChanged; 
 
   const CustomTextField({
     Key? key,
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
     this.isRequired = true,
     this.onTap,
     this.readOnly = false,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -26,6 +28,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       readOnly: readOnly,
       onTap: onTap,
+      onChanged: onChanged, 
       decoration: InputDecoration(
         labelText: label,
         hintText: label,
