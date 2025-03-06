@@ -138,6 +138,8 @@ class CombinedForm extends StatelessWidget {
                   decoration: customInputDecoration("Phone Number", context),
                   enabled: isEditing,
                 ),
+                // Only show the date picker for patients
+              if (userType.toLowerCase() == "patient") ...[
                 GestureDetector(
                   onTap: isEditing ? onPickDateOfBirth : null,
                   child: AbsorbPointer(
@@ -150,6 +152,7 @@ class CombinedForm extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
                 const SizedBox(height: 20),
 
                 if (userType.toLowerCase() == "patient") ...[
@@ -176,7 +179,7 @@ class CombinedForm extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   const Text(
-                    "Contact Information",
+                    "Emergency Contact Information",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -248,11 +251,28 @@ class CombinedForm extends StatelessWidget {
                     decoration: customInputDecoration("Languages Spoken", context),
                     enabled: isEditing,
                   ),
-                  TextField(
-                    controller: locationController,
-                    decoration: customInputDecoration("Location", context),
-                    enabled: isEditing,
-                  ),
+                  // TextField(
+                  //   controller: locationController,
+                  //   decoration: customInputDecoration("Location", context),
+                  //   enabled: isEditing,
+                  // ),
+                                DropdownButtonFormField<String>(
+                value: locationController.text.isNotEmpty
+                    ? locationController.text
+                    : null,
+                decoration: customInputDecoration("Location", context),
+                items: ["Dagupan City", "Urdaneta City"]
+                    .map((city) => DropdownMenuItem(
+                          value: city,
+                          child: Text(city),
+                        ))
+                    .toList(),
+                onChanged: isEditing
+                    ? (value) {
+                        locationController.text = value!;
+                      }
+                    : null,
+              ),
                   TextField(
                     controller: clinicController,
                     decoration: customInputDecoration("Clinic", context),

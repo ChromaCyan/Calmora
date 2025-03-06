@@ -107,6 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               user.yearsOfExperience?.toString() ?? "";
           languagesSpokenController.text =
               (user.languagesSpoken ?? []).join(", ");
+          locationController.text = user.location ?? "";
+          clinicController.text = user.clinic ?? "";
           availabilityController.text = user.availability ?? "";
 
           // Formatting Time for working hours
