@@ -37,7 +37,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _locationController = TextEditingController();
   final _clinicController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
+  //Password Fields part
   String _passwordStrength = "";
+  String _passwordMatchMessage = "";
+  Color _passwordMatchColor = Colors.red;
+
+  // this for the register button lmao, ill add a logic to it later, just don't remove this part please for fuck sake
+  final ValueNotifier<bool> isRegisterButtonEnabled = ValueNotifier(false);
 
   InputDecoration customInputDecoration(String label, BuildContext context) {
     final theme = Theme.of(context);
@@ -57,6 +64,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
+  void _checkFields() {
+    final isCommonFieldsFilled = _firstNameController.text.isNotEmpty &&
+        _lastNameController.text.isNotEmpty &&
+        _emailController.text.isNotEmpty &&
+        _phoneNumberController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty &&
+        _confirmPasswordController.text.isNotEmpty;
+
+    final isPatientFieldsFilled =
+        isPatient ? _dateOfBirthController.text.isNotEmpty : true;
+
+    final isSpecialistFieldsFilled = !isPatient
+        ? _specializationController.text.isNotEmpty &&
+            _locationController.text.isNotEmpty &&
+            _clinicController.text.isNotEmpty &&
+            _licenseNumberController.text.isNotEmpty
+        : true;
+
+    isRegisterButtonEnabled.value = isCommonFieldsFilled &&
+        isPatientFieldsFilled &&
+        isSpecialistFieldsFilled;
+  }
+
   void _checkPasswordStrength(String password) {
     if (password.length < 8) {
       setState(() => _passwordStrength = "Too Short");
@@ -70,6 +100,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() => _passwordStrength = "Needs a Special Character");
     } else {
       setState(() => _passwordStrength = "Strong Password ✅");
+    }
+  }
+
+  void _checkPasswordMatch() {
+    if (_confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _passwordMatchMessage = "";
+      });
+      return;
+    }
+
+    if (_passwordController.text == _confirmPasswordController.text) {
+      setState(() {
+        _passwordMatchMessage = "Passwords Match ✅";
+        _passwordMatchColor = Colors.green;
+      });
+    } else {
+      setState(() {
+        _passwordMatchMessage = "Passwords Do Not Match ❌";
+        _passwordMatchColor = Colors.red;
+      });
     }
   }
 
@@ -92,72 +143,125 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void _onRegisterButtonPressed() {
-    if (_formKey.currentState!.validate()) {
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passwords do not match')),
-        );
-        return;
-      }
-
-      // Password strength validation
-      final password = _passwordController.text;
-      final strongPasswordRegExp = RegExp(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
-      );
-
-      if (!strongPasswordRegExp.hasMatch(password)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.',
-            ),
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Missing Fields!',
+            message: 'Please fill out all required fields before proceeding.',
+            contentType: ContentType.warning,
           ),
-        );
-        return;
-      }
-
-      final event = isPatient
-          ? RegisterEvent(
-              firstName: _firstNameController.text,
-              lastName: _lastNameController.text,
-              email: _emailController.text,
-              phoneNumber: _phoneNumberController.text,
-              password: password,
-              otherDetails: {
-                "dateOfBirth": _dateOfBirthController.text,
-                if (_emergencyContactNameController.text.isNotEmpty)
-                  "emergencyContactName": _emergencyContactNameController.text,
-                if (_emergencyContactPhoneController.text.isNotEmpty)
-                  "emergencyContactPhone":
-                      _emergencyContactPhoneController.text,
-                if (_emergencyContactRelationController.text.isNotEmpty)
-                  "emergencyContactRelation":
-                      _emergencyContactRelationController.text,
-                if (_medicalHistoryController.text.isNotEmpty)
-                  "medicalHistory": _medicalHistoryController.text,
-                if (_therapyGoalsController.text.isNotEmpty)
-                  "therapyGoals": _therapyGoalsController.text,
-              },
-              profileImage: '',
-            )
-          : RegisterEvent(
-              firstName: _firstNameController.text,
-              lastName: _lastNameController.text,
-              email: _emailController.text,
-              phoneNumber: _phoneNumberController.text,
-              password: password,
-              otherDetails: {
-                "specialization": _specializationController.text,
-                "location": _locationController.text,
-                "clinic": _clinicController.text,
-                "licenseNumber": _licenseNumberController.text,
-              },
-              profileImage: '',
-            );
-
-      BlocProvider.of<AuthBloc>(context).add(event);
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
     }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Password Do Not Match!',
+            message: 'Your password does not match, please type it properly...',
+            contentType: ContentType.warning,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // Password strength checker
+    final password = _passwordController.text;
+    final strongPasswordRegExp = RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+    );
+
+    if (!strongPasswordRegExp.hasMatch(password)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Weak Password!',
+            message:
+                'Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.',
+            contentType: ContentType.warning,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // Bro don't keep fucking removing this part, this shit checks which fields are empty for fuck sake
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneNumberController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Missing Required Fields!',
+            message: 'Please ensure all required fields are filled in.',
+            contentType: ContentType.warning,
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // Will go to registration if all shit are good..
+    final event = isPatient
+        ? RegisterEvent(
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            email: _emailController.text,
+            phoneNumber: _phoneNumberController.text,
+            password: password,
+            otherDetails: {
+              "dateOfBirth": _dateOfBirthController.text,
+              if (_emergencyContactNameController.text.isNotEmpty)
+                "emergencyContactName": _emergencyContactNameController.text,
+              if (_emergencyContactPhoneController.text.isNotEmpty)
+                "emergencyContactPhone": _emergencyContactPhoneController.text,
+              if (_emergencyContactRelationController.text.isNotEmpty)
+                "emergencyContactRelation":
+                    _emergencyContactRelationController.text,
+              if (_medicalHistoryController.text.isNotEmpty)
+                "medicalHistory": _medicalHistoryController.text,
+              if (_therapyGoalsController.text.isNotEmpty)
+                "therapyGoals": _therapyGoalsController.text,
+            },
+            profileImage: '',
+          )
+        : RegisterEvent(
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            email: _emailController.text,
+            phoneNumber: _phoneNumberController.text,
+            password: password,
+            otherDetails: {
+              "specialization": _specializationController.text,
+              "location": _locationController.text,
+              "clinic": _clinicController.text,
+              "licenseNumber": _licenseNumberController.text,
+            },
+            profileImage: '',
+          );
+
+    BlocProvider.of<AuthBloc>(context).add(event);
   }
 
   @override
@@ -301,25 +405,38 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               ),
                               const SizedBox(height: 20),
                               CustomTextField(
-                                  label: "First Name",
-                                  controller: _firstNameController),
+                                label: "First Name",
+                                controller: _firstNameController,
+                                onChanged: (_) => _checkFields(),
+                              ),
                               const SizedBox(height: 20),
                               CustomTextField(
-                                  label: "Last Name",
-                                  controller: _lastNameController),
+                                label: "Last Name",
+                                controller: _lastNameController,
+                                onChanged: (_) => _checkFields(),
+                              ),
                               const SizedBox(height: 20),
                               CustomTextField(
-                                  label: "Email", controller: _emailController),
+                                label: "Email",
+                                controller: _emailController,
+                                onChanged: (_) => _checkFields(),
+                              ),
                               const SizedBox(height: 20),
                               CustomTextField(
-                                  label: "Phone Number",
-                                  controller: _phoneNumberController),
+                                label: "Phone Number",
+                                controller: _phoneNumberController,
+                                onChanged: (_) => _checkFields(),
+                              ),
                               const SizedBox(height: 20),
                               CustomTextField(
                                 label: "Password",
                                 controller: _passwordController,
                                 obscureText: true,
-                                onChanged: _checkPasswordStrength,
+                                onChanged: (value) {
+                                  _checkPasswordStrength(value);
+                                  _checkPasswordMatch();
+                                  _checkFields();
+                                },
                               ),
                               Text(
                                 _passwordStrength,
@@ -332,9 +449,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               ),
                               const SizedBox(height: 20),
                               CustomTextField(
-                                  label: "Confirm Password",
-                                  controller: _confirmPasswordController,
-                                  obscureText: true),
+                                label: "Confirm Password",
+                                controller: _confirmPasswordController,
+                                obscureText: true,
+                                onChanged: (_) { 
+                                  _checkFields();
+                                  _checkPasswordMatch();} ,
+                              ),
+                              Text(
+                                _passwordMatchMessage,
+                                style: TextStyle(color: _passwordMatchColor),
+                              ),
                               const SizedBox(height: 20),
                               if (isPatient) ...[
                                 GestureDetector(
@@ -344,6 +469,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       label: "Date of Birth",
                                       controller: _dateOfBirthController,
                                       readOnly: true,
+                                      onChanged: (_) => _checkFields(),
                                     ),
                                   ),
                                 ),
@@ -395,6 +521,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   }).toList(),
                                   onChanged: (newValue) {
                                     _specializationController.text = newValue!;
+                                    _checkFields();
                                   },
                                 ),
                                 const SizedBox(height: 16),
@@ -414,6 +541,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       .toList(),
                                   onChanged: (value) {
                                     _locationController.text = value!;
+                                    _checkFields();
                                   },
                                 ),
                                 const SizedBox(height: 16),
@@ -422,6 +550,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 CustomTextField(
                                   label: "Clinic",
                                   controller: _clinicController,
+                                  onChanged: (_) => _checkFields(),
                                 ),
                                 const SizedBox(height: 16),
 
@@ -429,34 +558,45 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 CustomTextField(
                                   label: "License Number",
                                   controller: _licenseNumberController,
+                                  onChanged: (_) => _checkFields(),
                                 ),
                                 const SizedBox(height: 20),
                               ],
                               const SizedBox(height: 20),
-                              ElevatedButton(
-                                onPressed: _onRegisterButtonPressed,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.secondary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 50, vertical: 15),
-                                  child: Text(
-                                    "Sign up",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: Theme.of(context)
+                              ValueListenableBuilder<bool>(
+                                valueListenable: isRegisterButtonEnabled,
+                                builder: (context, isEnabled, child) {
+                                  return ElevatedButton(
+                                    onPressed: isEnabled
+                                        ? _onRegisterButtonPressed
+                                        : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isEnabled
+                                          ? Theme.of(context)
                                               .colorScheme
-                                              .onSecondary,
-                                        ),
-                                  ),
-                                ),
+                                              .secondary
+                                          : Colors.grey,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 50, vertical: 15),
+                                      child: Text(
+                                        "Sign up",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                            ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
