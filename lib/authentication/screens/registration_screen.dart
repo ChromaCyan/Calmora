@@ -43,7 +43,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String _passwordMatchMessage = "";
   Color _passwordMatchColor = Colors.red;
 
-  // this for the register button lmao, ill add a logic to it later, just don't remove this part please for fuck sake
+  // this for the register button, I'll add a logic to it later, just don't remove this part please for fuck sake
   final ValueNotifier<bool> isRegisterButtonEnabled = ValueNotifier(false);
 
   InputDecoration customInputDecoration(String label, BuildContext context) {

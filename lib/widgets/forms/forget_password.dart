@@ -18,6 +18,48 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   bool isLoading = false;
   String? errorMessage;
 
+  //Password Fields part
+  String _passwordStrength = "";
+  String _passwordMatchMessage = "";
+  Color _passwordMatchColor = Colors.red;
+
+  void _checkPasswordStrength(String password) {
+    if (password.length < 8) {
+      setState(() => _passwordStrength = "Too Short");
+    } else if (!RegExp(r'^(?=.*[A-Z])').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs Uppercase");
+    } else if (!RegExp(r'^(?=.*[a-z])').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs Lowercase");
+    } else if (!RegExp(r'^(?=.*\d)').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs a Number");
+    } else if (!RegExp(r'^(?=.*[@$!%*?&])').hasMatch(password)) {
+      setState(() => _passwordStrength = "Needs a Special Character");
+    } else {
+      setState(() => _passwordStrength = "Strong Password ✅");
+    }
+  }
+
+  void _checkPasswordMatch() {
+    if (confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _passwordMatchMessage = "";
+      });
+      return;
+    }
+
+    if (newPasswordController.text == confirmPasswordController.text) {
+      setState(() {
+        _passwordMatchMessage = "Passwords Match ✅";
+        _passwordMatchColor = Colors.green;
+      });
+    } else {
+      setState(() {
+        _passwordMatchMessage = "Passwords Do Not Match ❌";
+        _passwordMatchColor = Colors.red;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -42,11 +84,21 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               _buildNextButton(),
             ] else if (currentStep == "reset_password") ...[
               _buildHeader("Enter your new password"),
-              _buildTextField("New password:", newPasswordController,
-                  isPassword: true),
-              _buildTextField(
-                  "Confirm new password:", confirmPasswordController,
-                  isPassword: true),
+              _buildPasswordField("New password:", newPasswordController, true),
+              Text(
+                _passwordStrength,
+                style: TextStyle(
+                  color: _passwordStrength == "Strong Password ✅"
+                      ? Colors.green
+                      : Colors.red,
+                ),
+              ),
+              _buildPasswordField(
+                  "Confirm new password:", confirmPasswordController, false),
+              Text(
+                _passwordMatchMessage,
+                style: TextStyle(color: _passwordMatchColor),
+              ),
               _buildNextButton(),
             ] else if (currentStep == "success") ...[
               Icon(Icons.check_circle, size: 80, color: colorScheme.primary),
@@ -66,6 +118,22 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(
+      String label, TextEditingController controller, bool isNewPassword) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: CustomTextField(
+        label: label,
+        controller: controller,
+        obscureText: true,
+        onChanged: (value) {
+          if (isNewPassword) _checkPasswordStrength(value);
+          _checkPasswordMatch();
+        },
       ),
     );
   }
@@ -118,7 +186,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
     );
   }
 
-  Future<void> _handleNextStep() async {
+    Future<void> _handleNextStep() async {
     setState(() {
       isLoading = true;
       errorMessage = null;
@@ -148,16 +216,23 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               response["message"] ?? "OTP verification failed. Try again.");
         }
       } else if (currentStep == "reset_password") {
-        if (newPasswordController.text.isEmpty ||
-            confirmPasswordController.text.isEmpty) {
+        final password = newPasswordController.text;
+        final confirmPassword = confirmPasswordController.text;
+
+        if (password.isEmpty || confirmPassword.isEmpty) {
           throw Exception("Password fields cannot be empty.");
         }
-        if (newPasswordController.text != confirmPasswordController.text) {
+        if (password != confirmPassword) {
           throw Exception("Passwords do not match!");
         }
 
+        // **Enforce Password Strength**
+        if (_passwordStrength != "Strong Password ✅") {
+          throw Exception("Weak password! Must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.");
+        }
+
         final response = await _apiRepository.resetPassword(
-            emailController.text.toLowerCase(), newPasswordController.text);
+            emailController.text.toLowerCase(), password);
 
         if (response.containsKey("message") &&
             response["message"] == "Password reset successfully") {
