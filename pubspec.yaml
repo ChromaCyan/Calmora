@@ -60,6 +60,7 @@ dependencies:
   dart_jsonwebtoken: ^2.14.1
   connectivity_plus: ^6.0.5
   cached_network_image: ^3.4.1
+  youtube_player_flutter: ^9.1.1
 
   # Widget Dependencies
   image_picker: ^1.1.2
@@ -129,6 +130,8 @@ flutter:
     - images/splash/image5.png
     - images/splash/image6.png
     - images/splash/image7.png
+    - images/meditation.jpg
+    - images/breath.jpg
     - images/splash/doc1.jpg
     - images/wallpaper.jpg
     - images/article_detail_bg_img.png
