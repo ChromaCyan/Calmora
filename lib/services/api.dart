@@ -10,6 +10,7 @@ import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/models/user/user.dart';
 import 'package:armstrong/models/survey/survey_result.dart';
 import 'package:armstrong/models/survey/survey.dart';
+import 'package:armstrong/models/mood/mood.dart';
 
 class ApiRepository {
   final String baseUrl =
@@ -576,7 +577,7 @@ class ApiRepository {
   }
 
   // Get Mood Entries
-  Future<List<dynamic>> getMoodEntries(String userId) async {
+  Future<List<MoodEntry>> getMoodEntries(String userId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/mood/mood-entries/$userId');
 
@@ -586,7 +587,8 @@ class ApiRepository {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => MoodEntry.fromJson(item)).toList();
     } else {
       throw Exception('Failed to fetch mood entries: ${response.body}');
     }

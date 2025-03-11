@@ -29,10 +29,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _userId = userId;
     });
 
-    if (_userId != null) {
-    }
+    if (_userId != null) {}
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +51,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // Pie chart for survey result
               Center(
                 child: _userId != null
-                  ? SurveyScoreChart(patientId: _userId!)
-                  : Center(child: CircularProgressIndicator()),
+                    ? SurveyScoreChart(patientId: _userId!)
+                    : Center(child: CircularProgressIndicator()),
               ),
 
               const SizedBox(height: 20),
@@ -83,7 +81,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              
 
               // Article List
               const ArticleList(),
@@ -100,9 +97,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
-              SizedBox(
-                height: 300,
-                child: const MoodChartScreen(),
+              Center(
+                child: _userId != null
+                    ? MoodCalendarScreen(
+                        userId: _userId!) // Remove the SizedBox limit
+                    : const Center(child: CircularProgressIndicator()),
               ),
             ],
           ),

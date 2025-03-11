@@ -67,6 +67,7 @@ dependencies:
   flutter_svg: ^2.0.17
   flutter_local_notifications: ^18.0.1
   flutter_keyboard_visibility: ^6.0.0
+  table_calendar: ^3.1.3
   
   #Launcher Dependencies
   flutter_launcher_icons: ^0.14.3
@@ -139,6 +140,7 @@ flutter:
     - images/icons/bipolar-disorder.svg
     - images/icons/depression.svg
     - images/icons/depression2.svg
+    - images/icons/dunno.svg
     - images/icons/hoarding.svg
     - images/icons/hopeless.svg
     - images/icons/mental-disorder.svg
@@ -151,6 +153,7 @@ flutter:
     - images/icons/hoarding.png
     - images/icons/hopeless.png
     - images/icons/mental-disorder.png
+    - images/icons/dunno.png
     - images/icons/psychosis.png
     - images/icons/relax.png
     - images/icons/very-happy.png

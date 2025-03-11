@@ -1,300 +1,156 @@
-// import 'package:flutter/material.dart';
-// import 'package:armstrong/services/api.dart';
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-// class MoodChartScreen extends StatefulWidget {
-//   const MoodChartScreen({Key? key}) : super(key: key);
-
-//   @override
-//   _MoodChartScreenState createState() => _MoodChartScreenState();
-// }
-
-// class _MoodChartScreenState extends State<MoodChartScreen> {
-//   final ApiRepository _apiRepository = ApiRepository();
-//   String? _userId;
-//   List<Map<String, dynamic>> _moods = [];
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _loadMoods();
-//     _loadUserId();
-//   }
-
-//   Future<void> _loadUserId() async {
-//     final FlutterSecureStorage storage = FlutterSecureStorage();
-//     final userId = await storage.read(key: 'userId');
-//     setState(() {
-//       _userId = userId;
-//     });
-//   }
-
-//   Future<void> _loadMoods() async {
-//   try {
-//     final userId = _userId;
-//     if (userId != null) {
-//       final moodEntries = await _apiRepository.getMoodEntries(userId);
-//       print("Mood Data: $moodEntries");  // Log the response
-//       setState(() {
-//         _moods = List<Map<String, dynamic>>.from(moodEntries);
-//       });
-//     }
-//   } catch (e) {
-//     print("Error loading mood data: $e");
-//   }
-// }
-//   @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     body: Padding(
-//       padding: const EdgeInsets.all(16.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           const Text(
-//             'Mood Tracker - Last 7 Days',
-//             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//           ),
-//           const SizedBox(height: 20),
-//           if (_moods.isEmpty)
-//             const Center(child: CircularProgressIndicator())
-//           else if (_moods == null || _moods.isEmpty)
-//             const Center(child: Text("No mood data available."))
-//           else
-//             _buildBarChart(),
-//         ],
-//       ),
-//     ),
-//   );
-// }
-
-//   Widget _buildBarChart() {
-//     return Container(
-//       height: 300,
-//       width: double.infinity,
-//       child: BarChart(
-//         BarChartData(
-//           gridData: FlGridData(show: false),
-//           titlesData: FlTitlesData(
-//             leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-//             bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-//           ),
-//           borderData: FlBorderData(show: true),
-//           barGroups: _moods.map((mood) {
-//             DateTime date = DateTime.parse(mood['createdAt']);
-//             return BarChartGroupData(
-//               x: date.millisecondsSinceEpoch,
-//               barRods: [
-//                 BarChartRodData(
-//                   toY: mood['moodScale'].toDouble(),
-//                   color: _getMoodColor(mood['moodScale']),
-//                   width: 15,
-//                   borderRadius: BorderRadius.zero,
-//                 ),
-//               ],
-//             );
-//           }).toList(),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Color _getMoodColor(int moodScale) {
-//     switch (moodScale) {
-//       case 5:
-//         return Colors.green; // Very happy
-//       case 4:
-//         return Colors.lightGreen; // Happy
-//       case 3:
-//         return Colors.yellow; // Neutral
-//       case 2:
-//         return Colors.orange; // Sad
-//       case 1:
-//         return Colors.red; // Very sad
-//       default:
-//         return Colors.grey;
-//     }
-//   }
-// }
-
-import 'dart:math' as math;
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:armstrong/models/mood/mood.dart';
+import 'package:armstrong/services/api.dart';
+import 'package:intl/intl.dart';
 
-class MoodChartScreen extends StatefulWidget {
-  const MoodChartScreen({super.key});
+class MoodCalendarScreen extends StatefulWidget {
+  final String userId;
+  const MoodCalendarScreen({super.key, required this.userId});
 
   @override
-  State<MoodChartScreen> createState() => _MoodChartScreenState();
+  State<MoodCalendarScreen> createState() => _MoodCalendarScreenState();
 }
 
-class _MoodChartScreenState extends State<MoodChartScreen> {
-  List<Color> gradientColors = const [
-    Color(0xffEEF3FE),
-    Color(0xffEEF3FE),
-  ];
+class _MoodCalendarScreenState extends State<MoodCalendarScreen> {
+  late Future<List<MoodEntry>> futureMoods;
+  DateTime focusedDay = DateTime.now();
 
-  bool showAvg = false;
+  @override
+  void initState() {
+    super.initState();
+    futureMoods = ApiRepository().getMoodEntries(widget.userId);
+  }
 
-  // Mood labels corresponding to the Y-values
-  final List<String> moodLabels = [
-    'Very Sad', // Value 1
-    'Sad', // Value 2
-    'Happy', // Value 4
-    'Very Happy', // Value 5
-  ];
-
-  // Emoji icons for moods
-  final List<String> moodEmojis = [
-    '😞', // Very Sad
-    '😟', // Sad
-    '🙂', // Happy
-    '😊', // Very Happy
-  ];
+  List<DateTime> getWeekDays(DateTime date) {
+    DateTime startOfWeek = date.subtract(Duration(days: date.weekday % 7));
+    return List.generate(7, (index) => DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day + index));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Stack(
-        children: <Widget>[
-          AspectRatio(
-            aspectRatio: 1.70,
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 18,
-                left: 12,
-                top: 24,
-                bottom: 12,
-              ),
-              child: LineChart(
-                mainData(),
-              ),
-            ),
-          ),
-        ],
+    return Card(
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<List<MoodEntry>>(
+          future: futureMoods,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No mood data found.'));
+            }
+
+            // Normalize mood dates to remove time
+            Map<DateTime, int> moodData = {
+              for (var mood in snapshot.data!)
+                DateTime(mood.createdAt.year, mood.createdAt.month, mood.createdAt.day): mood.moodScale
+            };
+
+            int weekOfMonth = ((focusedDay.day - 1) ~/ 7) + 1;
+            List<DateTime> weekDays = getWeekDays(focusedDay);
+
+            // Filter moods to only those in the selected week
+            List<DateTime> weekMoods = moodData.keys.where((date) => weekDays.contains(date)).toList()
+              ..sort((a, b) => a.compareTo(b)); // Sort by date
+
+            return Column(
+              children: [
+                Text(
+                  'Week $weekOfMonth of ${DateFormat('MMMM yyyy').format(focusedDay)}',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+
+                TableCalendar(
+                  focusedDay: focusedDay,
+                  firstDay: DateTime.utc(2025, 1, 1),
+                  lastDay: DateTime.now(),
+                  calendarFormat: CalendarFormat.week,
+                  onPageChanged: (date) => setState(() => focusedDay = date),
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                weekMoods.isEmpty
+                    ? const Center(child: Text('No moods recorded this week.'))
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: weekMoods.length,
+                        itemBuilder: (context, index) {
+                          DateTime day = weekMoods[index];
+                          String weekday = DateFormat('EEEE').format(day);
+                          String formattedDate = DateFormat('MMMM d').format(day);
+                          int? moodScale = moodData[day];
+
+                          return Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            child: ListTile(
+                              leading: getMoodImage(moodScale),
+                              title: Text(
+                                '$weekday, $formattedDate',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                getMoodDescription(moodScale!),
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
-  // Days on top (Monday, Tuesday, etc.)
-  Widget topTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontSize: 12,
-      color: Colors.black,
-    );
-    List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return SideTitleWidget(
-      meta: meta,
-      child: Text(days[value.toInt()], style: style),
-    );
+  Widget getMoodImage(int? moodScale) {
+    String imagePath;
+    switch (moodScale) {
+      case 1:
+        imagePath = "images/icons/depression.png";
+        break;
+      case 2:
+        imagePath = "images/icons/mental-disorder.png";
+        break;
+      case 3:
+        imagePath = "images/icons/relax.png";
+        break;
+      case 4:
+        imagePath = "images/icons/very-happy.png";
+        break;
+      default:
+        imagePath = "images/icons/dunno.png";
+    }
+    return Image.asset(imagePath, width: 50, height: 50);
   }
 
-  // Using emoji icons instead of images
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
-    String emoji = moodEmojis[(value ~/ 2).toInt()]; 
-    return Text(
-      emoji,
-      style: TextStyle(fontSize: 24), // Adjust emoji size
-    );
-  }
-
-  // Show mood label when touching a point
-  List<TouchedSpotIndicatorData> getTouchedSpotIndicator(
-      LineChartBarData barData, List<int> spotIndexes) {
-    return spotIndexes.map((spotIndex) {
-      // Get the Y-value at the touched spot
-      double yValue = barData.spots[spotIndex].y;
-
-      // Map Y-value to mood label
-      String mood = moodLabels[(yValue ~/ 2).toInt()];
-
-      return TouchedSpotIndicatorData(
-        const FlLine(color: Colors.orange, strokeWidth: 3),
-        FlDotData(
-          show: true,
-          getDotPainter: (spot, percent, barData, index) =>
-              FlDotCirclePainter(
-            radius: 8,
-            color: Colors.orange,
-          ),
-        ),
-      );
-    }).toList();
-  }
-
-  LineChartData mainData() {
-    return LineChartData(
-      rangeAnnotations: RangeAnnotations(
-        verticalRangeAnnotations: [],
-      ),
-      gridData: const FlGridData(
-        show: true,
-        drawVerticalLine: false,
-        drawHorizontalLine: false,
-        verticalInterval: 1,
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 36,
-            getTitlesWidget: topTitleWidgets,
-            interval: 1,
-          ),
-        ),
-        leftTitles: AxisTitles(
-          drawBelowEverything: true,
-          sideTitles: SideTitles(
-            interval: 2,
-            showTitles: true,
-            getTitlesWidget: leftTitleWidgets,
-            reservedSize: 40,
-          ),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-      ),
-      lineTouchData: LineTouchData(
-        getTouchLineEnd: (data, index) => double.infinity,
-        getTouchedSpotIndicator: getTouchedSpotIndicator, 
-      ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(
-          color: Colors.grey,
-        ),
-      ),
-      minX: 0,
-      maxX: 6,
-      minY: 0,
-      maxY: 6,
-      lineBarsData: [
-        LineChartBarData(
-          spots: const [
-            FlSpot(0, 1),
-            FlSpot(1, 2),
-            FlSpot(2, 3),
-            FlSpot(3, 4),
-            FlSpot(4, 4),
-            FlSpot(5, 3),
-            FlSpot(6, 2),
-          ],
-          isCurved: true,
-          color: Colors.orange,
-          barWidth: 4,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(show: false),
-        ),
-      ],
-    );
+  String getMoodDescription(int moodScale) {
+    switch (moodScale) {
+      case 1:
+        return "Today might have been tough, but you're tougher. Keep going!";
+      case 2:
+        return "Not the best day, and that's okay. Tomorrow is a fresh start.";
+      case 3:
+        return "You were in a good place today. Keep finding those moments of joy!";
+      case 4:
+        return "You were feeling great today! Savor those good vibes.";
+      default:
+        return "No mood recorded, but every day is a step forward!";
+    }
   }
 }
