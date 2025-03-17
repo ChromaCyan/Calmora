@@ -409,6 +409,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       final choices = question['choices'] ?? [];
                       final answers = List<Map<String, dynamic>>.from(choices);
 
+                      double progress = (index + 1) / 20; // Calculate progress
+
                       return QuestionWidget(
                         question: question['questionText'],
                         choices: answers,
@@ -421,6 +423,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                             _nextQuestion(index);
                           });
                         },
+                        progress: progress,
+                        currentQuestion: index + 1,
+                        totalQuestions: _questions.length,
                       );
                     },
                   ),

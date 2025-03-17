@@ -11,7 +11,7 @@ import 'package:armstrong/widgets/buttons/specialist_action_button.dart';
 import 'package:armstrong/widgets/cards/specialist_bio_card.dart';
 import 'package:armstrong/widgets/buttons/toggle_button.dart';
 import 'package:armstrong/widgets/cards/contact_info_card.dart';
-import 'package:armstrong/widgets/cards/pro_deets_card.dart';
+import 'package:armstrong/widgets/cards/profession_card.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
