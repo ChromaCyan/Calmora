@@ -10,8 +10,6 @@ import 'package:armstrong/providers/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:showcaseview/showcaseview.dart';
-// Comment out the socket import
-// import 'package:armstrong/services/socket_service.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
 import 'services/supabase.dart';
@@ -19,8 +17,6 @@ import 'services/supabase.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
-  // Comment out socketService initialization
-  // final socketService = SocketService();
   await SupabaseService.initialize();
 
   print("🚀 Starting app...");
