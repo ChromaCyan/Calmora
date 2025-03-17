@@ -137,19 +137,22 @@ class _OnboardingItem extends StatelessWidget {
     return Column(
       children: [
         Container(
-          height: size.height * 0.4,  // Adjust image height dynamically
-          width: size.width * 0.9,    // Adjust image width dynamically
+          height: size.height * 0.3,  // Adjust image height dynamically
+          width: size.width * 0.7,    // Adjust image width dynamically
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
           child: Image.asset(onBoardData[index].image, fit: BoxFit.contain),
         ),
         SizedBox(height: size.height * 0.05),  // Adjust spacing between image and title dynamically
-        Text(
-          _getTitle(index),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: size.height * 0.05,  // Adjust font size dynamically
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.bold,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            _getTitle(index),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: size.height * 0.04,  // Adjust font size dynamically
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(height: 10),
@@ -168,8 +171,8 @@ class _OnboardingItem extends StatelessWidget {
   String _getTitle(int index) {
     const titles = [
       "Armstrong",
-      "It's Okay Not to Be Okay",
-      "Sorting through the Noise",
+      "It's Okay\nto\nNot be Okay",
+      "Sorting through\nthe Noise",
       "Browse Resources!",
       "Find a Specialist",
       "Join Us",

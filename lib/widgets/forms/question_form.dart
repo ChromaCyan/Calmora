@@ -97,7 +97,7 @@ class QuestionWidget extends StatelessWidget {
                   value: progress, // Progress value (0.0 - 1.0)
                   backgroundColor: Theme.of(context).brightness == Brightness.dark
                       ? Colors.grey[800] // Dark grey in dark mode
-                      : Colors.grey[300], // Light grey in light mode
+                      : Colors.grey[500], // Light grey in light mode
                   valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
                   minHeight: 8, // Set height for better visibility
                 ),
