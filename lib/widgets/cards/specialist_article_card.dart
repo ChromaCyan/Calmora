@@ -1,3 +1,4 @@
+import 'package:armstrong/widgets/cards/specialist_article_details.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/article_details.dart';
 
@@ -31,7 +32,7 @@ class SpecialistArticleCard extends StatelessWidget {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                ArticleDetailPage(articleId: articleId),
+                SpecialistArticleDetailPage(articleId: articleId),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               var tween = Tween<double>(begin: 0.95, end: 1.0)

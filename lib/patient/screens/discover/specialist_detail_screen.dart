@@ -1,13 +1,10 @@
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
-import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
-import 'package:armstrong/patient/blocs/profile/profile_event.dart';
-import 'package:armstrong/patient/blocs/profile/profile_state.dart';
+import 'package:armstrong/patient/blocs/specialist_list/specialist_bloc.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/buttons/specialist_action_button.dart';
@@ -36,8 +33,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
   @override
   void initState() {
     super.initState();
-    final profileBloc = BlocProvider.of<ProfileBloc>(context);
-    profileBloc.add(FetchSpecialistDetailsEvent(widget.specialistId));
+    final specialistBloc = BlocProvider.of<SpecialistBloc>(context);
+    specialistBloc.add(FetchSpecialistDetails(widget.specialistId));
   }
 
   void _bookAppointment(BuildContext context, String specialistId) {
@@ -57,35 +54,40 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
     return Scaffold(
       appBar: UniversalAppBar(
         title: "Specialist Details",
-        onBackPressed: () {
+        onBackPressed: () async {
+          final storage = FlutterSecureStorage();
+          final userId = await storage.read(key: 'userId');
+
+          if (userId != null) {
+            context.read<SpecialistBloc>().add(FetchSpecialists());
+          }
+
           Navigator.pop(context);
         },
       ),
-      body: BlocBuilder<ProfileBloc, ProfileState>(
+      body: BlocBuilder<SpecialistBloc, SpecialistState>(
         builder: (context, state) {
-          if (state is ProfileLoading) {
+          if (state is SpecialistLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is SpecialistDetailsLoaded) {
-            final specialist = state.specialistDetails;
+          } else if (state is SpecialistDetailLoaded) {
+            final specialist = state.specialist;
 
             // Extract specialist details
-            final firstName =
-                specialist['firstName'] ?? 'No first name available';
-            final lastName = specialist['lastName'] ?? 'No last name available';
+            final firstName = specialist.firstName ?? 'No first name available';
+            final lastName = specialist.lastName ?? 'No last name available';
             final name = '$firstName $lastName';
-            final specialization = specialist['specialization'] ?? 'Unknown';
-            final bio = specialist['bio'] ?? 'No bio available.';
-            final profileImage = specialist['profileImage'] ?? '';
-            final email = specialist['email'] ?? 'No email available';
+            final specialization = specialist.specialization ?? 'Unknown';
+            final bio = specialist.bio ?? 'No bio available.';
+            final profileImage = specialist.profileImage ?? '';
+            final email = specialist.email ?? 'No email available';
             final phoneNumber =
-                specialist['phoneNumber'] ?? 'No phone number available';
-            final availability = specialist['availability'] ?? 'Unknown';
-            final yearsOfExperience = specialist['yearsOfExperience'] ?? 0;
-            final languagesSpoken = specialist['languagesSpoken'] ?? [];
-            final licenseNumber =
-                specialist['licenseNumber'] ?? 'Not available';
-            final location = specialist['location'] ?? 'Unknown';
-            final clinic = specialist['clinic'] ?? 'Unknown';
+                specialist.phoneNumber ?? 'No phone number available';
+            final availability = specialist.availability ?? 'Unknown';
+            final yearsOfExperience = specialist.yearsOfExperience ?? 0;
+            final languagesSpoken = specialist.languagesSpoken ?? [];
+            final licenseNumber = specialist.licenseNumber ?? 'Not available';
+            final location = specialist.location ?? 'Unknown';
+            final clinic = specialist.clinic ?? 'Unknown';
 
             return BlocListener<AppointmentBloc, AppointmentState>(
               listener: (context, state) {
@@ -135,7 +137,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                             radius: 60,
                             backgroundImage: profileImage.isNotEmpty
                                 ? NetworkImage(profileImage)
-                                : const AssetImage('images/logo2.png')
+                                : const AssetImage('images/armstrong_transparent.png')
                                     as ImageProvider,
                           ),
                           const SizedBox(height: 16),
@@ -230,17 +232,17 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                             child: SingleChildScrollView(
                               child: showContactInfo
                                   ? ContactInfoCard(
-                                      email: specialist['email'] ?? 'No email',
-                                      phoneNumber: specialist['phoneNumber'] ??
-                                          'No phone',
+                                      email: specialist.email ?? 'No email',
+                                      phoneNumber:
+                                          specialist.phoneNumber ?? 'No phone',
                                     )
                                   : ProDeetsCard(
                                       yearsOfExperience:
-                                          specialist['yearsOfExperience'] ?? 0,
+                                          specialist.yearsOfExperience ?? 0,
                                       languagesSpoken:
-                                          specialist['languagesSpoken'] ?? [],
+                                          specialist.languagesSpoken ?? [],
                                       licenseNumber:
-                                          specialist['licenseNumber'] ?? 'N/A',
+                                          specialist.licenseNumber ?? 'N/A',
                                     ),
                             ),
                           ),
@@ -272,7 +274,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                 ),
               ),
             );
-          } else if (state is ProfileError) {
+          } else if (state is SpecialistError) {
             return Center(child: Text('Error: ${state.message}'));
           }
           return const Center(child: Text('No data available.'));

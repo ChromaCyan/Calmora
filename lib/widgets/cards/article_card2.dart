@@ -1,6 +1,5 @@
 import 'package:armstrong/widgets/cards/article_details_2.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/widgets/cards/article_details.dart';
 
 class ArticleCard2 extends StatelessWidget {
   final String articleId;

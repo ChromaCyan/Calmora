@@ -1,26 +1,28 @@
-import 'package:armstrong/models/article/article.dart';
-import 'package:armstrong/universal/articles/add_articles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/widgets/cards/specialist_article_card.dart';
-import 'package:armstrong/services/api.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
+import 'package:armstrong/universal/articles/add_articles.dart';
 
 class SpecialistArticleScreen extends StatefulWidget {
   final String specialistId;
 
-  const SpecialistArticleScreen({
-    Key? key,
-    required this.specialistId,
-  }) : super(key: key);
+  const SpecialistArticleScreen({Key? key, required this.specialistId}) : super(key: key);
 
   @override
-  _SpecialistArticleScreenState createState() =>
-      _SpecialistArticleScreenState();
+  _SpecialistArticleScreenState createState() => _SpecialistArticleScreenState();
 }
 
 class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ArticleBloc>().add(FetchArticlesBySpecialist(widget.specialistId));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,67 +45,38 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
             },
           ),
           Expanded(
-            child: FutureBuilder<List<Article>>(
-              future:
-                  ApiRepository().getArticlesBySpecialist(widget.specialistId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: BlocBuilder<ArticleBloc, ArticleState>(
+              builder: (context, state) {
+                if (state is ArticleLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
-
-                // Handle backend "No articles found" as a normal response instead of an error
-                if (snapshot.hasError) {
-                  final errorMessage = snapshot.error.toString();
-                  if (errorMessage
-                      .contains("No articles found for this specialist")) {
-                    return const Center(
-                      child: Text(
-                        "No articles found.",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  }
-                  return const Center(child: Text('Error loading articles.'));
+                if (state is ArticleError) {
+                  return Center(child: Text('Error: ${state.message}'));
                 }
+                if (state is ArticleLoaded) {
+                  final filteredArticles = state.articles.where((article) {
+                    return article.title.toLowerCase().contains(searchQuery);
+                  }).toList();
 
-                // If no data or empty list, show "No articles found."
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "No articles found.",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                  if (filteredArticles.isEmpty) {
+                    return const Center(child: Text("No matching articles found."));
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: filteredArticles.length,
+                    itemBuilder: (context, index) {
+                      final article = filteredArticles[index];
+                      return SpecialistArticleCard(
+                        articleId: article.id,
+                        imageUrl: article.heroImage,
+                        title: article.title,
+                      );
+                    },
                   );
                 }
-
-                final articles = snapshot.data!;
-                final filteredArticles = articles.where((article) {
-                  return article.title
-                      .toLowerCase()
-                      .contains(searchQuery.toLowerCase());
-                }).toList();
-
-                if (filteredArticles.isEmpty) {
-                  return const Center(
-                      child: Text("No matching articles found."));
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: filteredArticles.length,
-                  itemBuilder: (context, index) {
-                    final article = filteredArticles[index];
-                    return SpecialistArticleCard(
-                      articleId: article.id,
-                      imageUrl: article.heroImage,
-                      title: article.title,
-                    );
-                  },
-                );
+                return const Center(child: Text("No articles found."));
               },
             ),
           ),
@@ -116,10 +89,7 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
             MaterialPageRoute(builder: (context) => AddArticleScreen()),
           );
         },
-        child: const Icon(
-          Icons.add,
-          size: 35,
-        ),
+        child: const Icon(Icons.add, size: 35),
       ),
     );
   }

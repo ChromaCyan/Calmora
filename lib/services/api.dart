@@ -11,6 +11,7 @@ import 'package:armstrong/models/user/user.dart';
 import 'package:armstrong/models/survey/survey_result.dart';
 import 'package:armstrong/models/survey/survey.dart';
 import 'package:armstrong/models/mood/mood.dart';
+import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
   final String baseUrl =
@@ -214,32 +215,35 @@ class ApiRepository {
   }
 
   // Get Specialist by ID
-  Future<Map<String, dynamic>> getSpecialistById(String specialistId) async {
+  Future<Specialist> fetchSpecialistById(String specialistId) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/auth/specialists/$specialistId');
+
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body)['data'];
+      return Specialist.fromJson(json.decode(response.body)['data']);
     } else {
       throw Exception('Failed to fetch specialist details: ${response.body}');
     }
   }
 
   // Get Specialist List
-  Future<List<dynamic>> getSpecialistList() async {
+  Future<List<Specialist>> fetchSpecialists() async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/auth/specialists');
+
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body)['data'];
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((json) => Specialist.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch specialists: ${response.body}');
     }

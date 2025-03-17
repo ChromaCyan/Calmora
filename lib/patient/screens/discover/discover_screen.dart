@@ -1,20 +1,14 @@
-import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/models/banner_model.dart';
-import 'package:armstrong/patient/blocs/profile/profile_state.dart';
+import 'package:armstrong/patient/blocs/specialist_list/specialist_bloc.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
-import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:armstrong/widgets/cards/article_card2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:armstrong/widgets/cards/specialist_card.dart';
 import 'package:armstrong/widgets/navigation/category.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/widgets/cards/daily_advice_card.dart';
-import 'package:armstrong/patient/blocs/profile/profile_bloc.dart';
-import 'package:armstrong/patient/blocs/profile/profile_event.dart';
 import 'package:armstrong/patient/screens/discover/specialist_detail_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:armstrong/services/api.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -42,8 +36,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   void _fetchSpecialists() {
-    final profileBloc = BlocProvider.of<ProfileBloc>(context);
-    profileBloc.add(FetchSpecialistsEvent());
+    final specialistBloc = BlocProvider.of<SpecialistBloc>(context);
+    specialistBloc.add(FetchSpecialists());
   }
 
   @override
@@ -169,7 +163,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         'coping strategies',
                         'self-care'
                       ].map<DropdownMenuItem<String>>((String value) {
-                        // Capitalize each word in the category
                         String capitalizedValue = value
                             .split(' ')
                             .map((word) =>
@@ -177,7 +170,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             .join(' ');
 
                         return DropdownMenuItem<String>(
-                          value: value, // Keep value unchanged for filtering
+                          value: value, 
                           child: Text(capitalizedValue,
                               style: TextStyle(fontSize: 16)),
                         );
@@ -192,17 +185,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark
                         ? theme.cardColor
-                            .withOpacity(0.65) // Make it slightly lighter
+                            .withOpacity(0.65) 
                         : theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white12 // Softer shadow in dark mode
+                            ? Colors.white12 
                             : Colors.black12,
                         blurRadius:
-                            10, // Slightly increased blur for a softer glow
-                        spreadRadius: 3, // More spread for visibility
+                            10, 
+                        spreadRadius: 3,
                       ),
                     ],
                   ),
@@ -223,74 +216,63 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   Widget _buildSpecialistList(
       String searchQuery, String selectedSpecialistType) {
-    return FutureBuilder<List<dynamic>>(
-      future: ApiRepository().getSpecialistList(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return BlocBuilder<SpecialistBloc, SpecialistState>(
+      builder: (context, state) {
+        if (state is SpecialistLoading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No specialists found.'));
-        }
+        } else if (state is SpecialistError) {
+          return Center(child: Text('Error: ${state.message}'));
+        } else if (state is SpecialistLoaded) {
+          final specialists = state.specialists;
 
-        final specialists = snapshot.data!;
-        final filteredSpecialists = specialists.where((specialist) {
-          final name = '${specialist['firstName']} ${specialist['lastName']}';
-          bool matchesSearchQuery =
-              name.toLowerCase().contains(searchQuery.toLowerCase());
-          bool matchesSpecialistType = selectedSpecialistType.isEmpty ||
-              specialist['specialization'] == selectedSpecialistType;
+          final filteredSpecialists = specialists.where((specialist) {
+            final name = '${specialist.firstName} ${specialist.lastName}';
+            bool matchesSearchQuery =
+                name.toLowerCase().contains(searchQuery.toLowerCase());
+            bool matchesSpecialistType = selectedSpecialistType.isEmpty ||
+                specialist.specialization == selectedSpecialistType;
 
-          return matchesSearchQuery && matchesSpecialistType;
-        }).toList();
+            return matchesSearchQuery && matchesSpecialistType;
+          }).toList();
 
-        if (filteredSpecialists.isEmpty) {
-          return const Center(child: Text('No matching specialists found.'));
-        }
+          if (filteredSpecialists.isEmpty) {
+            return const Center(child: Text('No matching specialists found.'));
+          }
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 0.65,
-          ),
-          itemCount: filteredSpecialists.length,
-          itemBuilder: (context, index) {
-            final specialist = filteredSpecialists[index];
-            final name = '${specialist['firstName']} ${specialist['lastName']}';
-            final location = specialist['location'] ?? 'Unknown';
-            final specialization = specialist['specialization'] ?? 'Unknown';
-            final image = specialist['profileImage']?.isEmpty ?? true
-                ? 'images/splash/doc1.jpg'
-                : specialist['profileImage'];
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.65,
+            ),
+            itemCount: filteredSpecialists.length,
+            itemBuilder: (context, index) {
+              final specialist = filteredSpecialists[index];
 
-            return SpecialistCard(
-              specialist: Specialist(
-                name: name,
-                location: location,
-                specialization: specialization,
-                imageUrl: image,
-              ),
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SpecialistDetailScreen(
-                      specialistId: specialist['_id'],
+              return SpecialistCard(
+                specialist: specialist,
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SpecialistDetailScreen(
+                        specialistId: specialist.id,
+                      ),
                     ),
-                  ),
-                );
-                if (result != null && result == 'refresh') {
-                  setState(() {});
-                }
-              },
-            );
-          },
-        );
+                  );
+                  if (result != null && result == 'refresh') {
+                    _fetchSpecialists(); 
+                  }
+                },
+              );
+            },
+          );
+        }
+
+        return const Center(child: Text('No specialists found.'));
       },
     );
   }

@@ -3,7 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/services/api.dart';
 
-// Events
+// EVENT BLOC LINE HERE
+//=================================================================================================
 abstract class ArticleEvent extends Equatable {
   @override
   List<Object> get props => [];
@@ -40,8 +41,8 @@ class DeleteArticle extends ArticleEvent {
   final String articleId;
   DeleteArticle(this.articleId);
 }
-
-// States
+//=================================================================================================
+// STATE BLOC LINE HERE
 abstract class ArticleState extends Equatable {
   @override
   List<Object> get props => [];
@@ -65,8 +66,8 @@ class ArticleError extends ArticleState {
   final String message;
   ArticleError(this.message);
 }
-
-// BLoC
+//=================================================================================================
+// BLOC LINE HERE
 class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   final ApiRepository _apiRepository;
   
