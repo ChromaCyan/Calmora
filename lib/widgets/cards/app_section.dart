@@ -22,8 +22,8 @@ class AppSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: Image.asset(
               imageUrl,
-              height: 75, // Reduced height
-              width: 75,  // Made square for an icon-like look
+              height: 75, 
+              width: 75,  
               fit: BoxFit.cover,
             ),
           ),

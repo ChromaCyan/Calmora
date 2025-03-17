@@ -1,7 +1,9 @@
 import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/models/banner_model.dart';
 import 'package:armstrong/patient/blocs/profile/profile_state.dart';
+import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
+import 'package:armstrong/widgets/cards/article_card2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -35,12 +37,19 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   void initState() {
     super.initState();
     _fetchSpecialists();
+    _fetchArticles();
   }
 
   @override
   void _fetchSpecialists() {
     final profileBloc = BlocProvider.of<ProfileBloc>(context);
     profileBloc.add(FetchSpecialistsEvent());
+  }
+
+  @override
+  void _fetchArticles() {
+    final articleBloc = BlocProvider.of<ArticleBloc>(context);
+    articleBloc.add(FetchAllArticles());
   }
 
   @override
@@ -287,44 +296,43 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildArticleList(String searchQuery, String selectedCategory) {
-    return FutureBuilder<List<Article>>(
-      future: ApiRepository().getAllArticles(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return BlocBuilder<ArticleBloc, ArticleState>(
+      builder: (context, state) {
+        if (state is ArticleLoading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        } else if (state is ArticleError) {
+          return Center(child: Text('Error: ${state.message}'));
+        } else if (state is ArticleLoaded) {
+          final articles = state.articles;
+          final filteredArticles = articles.where((article) {
+            bool matchesCategory = selectedCategory.isEmpty ||
+                article.categories.contains(selectedCategory);
+            bool matchesSearchQuery =
+                article.title.toLowerCase().contains(searchQuery.toLowerCase());
+            return matchesCategory && matchesSearchQuery;
+          }).toList();
+
+          if (filteredArticles.isEmpty) {
+            return const Center(child: Text('No matching articles found.'));
+          }
+
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: filteredArticles.length,
+            itemBuilder: (context, index) {
+              final article = filteredArticles[index];
+              return ArticleCard2(
+                articleId: article.id,
+                imageUrl: article.heroImage,
+                title: article.title,
+                publisher: 'By ${article.specialistName}',
+              );
+            },
+          );
+        } else {
           return const Center(child: Text('No articles found.'));
         }
-
-        final articles = snapshot.data!;
-        final filteredArticles = articles.where((article) {
-          bool matchesCategory = selectedCategory.isEmpty ||
-              article.categories.contains(selectedCategory);
-          bool matchesSearchQuery =
-              article.title.toLowerCase().contains(searchQuery.toLowerCase());
-          return matchesCategory && matchesSearchQuery;
-        }).toList();
-
-        if (filteredArticles.isEmpty) {
-          return const Center(child: Text('No matching articles found.'));
-        }
-
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: filteredArticles.length,
-          itemBuilder: (context, index) {
-            final article = filteredArticles[index];
-            return ArticleCard(
-              articleId: article.id,
-              imageUrl: article.heroImage,
-              title: article.title,
-              publisher: 'By ${article.specialistName}',
-            );
-          },
-        );
       },
     );
   }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
-import 'package:armstrong/services/api.dart';
+import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/models/article/article.dart';
 
 class ArticleList extends StatefulWidget {
@@ -22,57 +23,62 @@ class _ArticleListState extends State<ArticleList> {
     _loadUserId();
   }
 
-  // Fetch patientId from secure storage
   Future<void> _loadUserId() async {
-    final FlutterSecureStorage storage = FlutterSecureStorage();
+    final storage = FlutterSecureStorage();
     final userId = await storage.read(key: 'userId');
-    setState(() {
-      _patientId = userId;
-    });
+    print("🔵 User ID Loaded: $userId"); // Debugging output
+
+    if (userId != null) {
+      setState(() {
+        _patientId = userId;
+      });
+
+      print("🟡 Dispatching FetchRecommendedArticles event...");
+      context.read<ArticleBloc>().add(FetchRecommendedArticles(userId));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // If patientId is not loaded yet, show a loading indicator
     if (_patientId == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
     return SizedBox(
       height: 230,
-      child: FutureBuilder<List<Article>>(
-        future: ApiRepository().getRecommendedArticles(_patientId!), 
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      child: BlocBuilder<ArticleBloc, ArticleState>(
+        builder: (context, state) {
+          if (state is ArticleLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          } else if (state is ArticleError) {
+            return Center(child: Text('Error: ${state.message}'));
+          } else if (state is ArticleLoaded) {
+            final filteredArticles = state.articles.where((article) {
+              return article.title
+                  .toLowerCase()
+                  .contains(widget.searchQuery.toLowerCase());
+            }).toList();
+
+            if (filteredArticles.isEmpty) {
+              return const Center(child: Text('No matching articles found.'));
+            }
+
+            return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: filteredArticles.length,
+              itemBuilder: (context, index) {
+                final article = filteredArticles[index];
+                return ArticleCard(
+                  articleId: article.id,
+                  imageUrl: article.heroImage,
+                  title: article.title,
+                  publisher: 'By ${article.specialistName}',
+                );
+              },
+            );
+          } else {
             return const Center(child: Text('No articles found.'));
           }
-
-          final articles = snapshot.data!;
-          final filteredArticles = articles.where((article) {
-            return article.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
-          }).toList();
-
-          if (filteredArticles.isEmpty) {
-            return const Center(child: Text('No matching articles found.'));
-          }
-
-          return ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: filteredArticles.length,
-            itemBuilder: (context, index) {
-              final article = filteredArticles[index];
-              return ArticleCard(
-                articleId: article.id,
-                imageUrl: article.heroImage,
-                title: article.title,
-                publisher: 'By ${article.specialistName}',
-              );
-            },
-          );
         },
       ),
     );

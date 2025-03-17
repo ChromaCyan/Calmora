@@ -6,10 +6,10 @@ import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class ArticleDetailPage extends StatelessWidget {
+class ArticleDetailPage2 extends StatelessWidget {
   final String articleId;
 
-  const ArticleDetailPage({Key? key, required this.articleId})
+  const ArticleDetailPage2({Key? key, required this.articleId})
       : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class ArticleDetailPage extends StatelessWidget {
         final storage = FlutterSecureStorage();
         final userId = await storage.read(key: 'userId');
         if (userId != null) {
-          context.read<ArticleBloc>().add(FetchRecommendedArticles(userId));
+          context.read<ArticleBloc>().add(FetchAllArticles());
         }
         return true;
       },
