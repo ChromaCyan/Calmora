@@ -21,11 +21,10 @@ class ArticleCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsive card width
-    double cardWidth = screenWidth * 0.5; // Default: 50% of screen width
-    if (screenWidth > 600) cardWidth = screenWidth * 0.35; // Tablet size
-    if (screenWidth > 900) cardWidth = screenWidth * 0.25; // Larger screens
-    cardWidth = cardWidth.clamp(220, 400); // Min 220, Max 400
+    double cardWidth = screenWidth * 0.5; 
+    if (screenWidth > 600) cardWidth = screenWidth * 0.35;
+    if (screenWidth > 900) cardWidth = screenWidth * 0.25;
+    cardWidth = cardWidth.clamp(220, 400); 
 
     return GestureDetector(
       onTap: () {

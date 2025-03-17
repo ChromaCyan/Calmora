@@ -1,10 +1,10 @@
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/config/colors.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'dart:convert';
 import 'package:armstrong/widgets/buttons/mood_select.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class JournalPage extends StatefulWidget {
   const JournalPage({Key? key}) : super(key: key);
@@ -67,7 +67,8 @@ class _JournalPageState extends State<JournalPage> {
 
   Future<void> _saveMoodEntry() async {
     if (_selectedMood == null || _daySummaryController.text.isEmpty) {
-      _showError('Please select a mood and enter a summary');
+      _showError('Incomplete Fields!',
+          'Please select a mood and enter a summary', ContentType.warning);
       return;
     }
 
@@ -82,6 +83,7 @@ class _JournalPageState extends State<JournalPage> {
         'moodDescription': _daySummaryController.text,
         'createdAt': DateTime.now().toIso8601String(),
       };
+
       final FlutterSecureStorage storage = FlutterSecureStorage();
       await storage.write(key: 'savedMood', value: jsonEncode(moodData));
       await _saveLastMoodDate();
@@ -89,9 +91,19 @@ class _JournalPageState extends State<JournalPage> {
       setState(() {
         _moods = [moodData];
       });
-      _showSuccess(result['message']);
+
+      _showSuccess('Mood Logged!',
+          'Your mood entry has been saved successfully.', ContentType.success);
+
+      // Delay before navigating back so the user sees the success message
+      Future.delayed(const Duration(seconds: 2), () {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      });
     } catch (e) {
-      _showError('Failed to save mood entry: $e');
+      _showError('Mood failed to save..', 'Failed to save mood entry: $e',
+          ContentType.failure);
     }
   }
 
@@ -104,35 +116,65 @@ class _JournalPageState extends State<JournalPage> {
     });
   }
 
-  void _showSuccess(String message) {
+  void _showSuccess(String title, String message, ContentType type) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: title,
+          message: message,
+          contentType: type,
+        ),
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 
-  void _showError(String message) {
+  void _showError(String title, String message, ContentType type) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: title,
+          message: message,
+          contentType: type,
+        ),
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 
-  Widget _journalTextField(BuildContext context, {required TextEditingController controller}) {
+  Widget _journalTextField(BuildContext context,
+      {required TextEditingController controller}) {
     final theme = Theme.of(context);
     bool isDarkMode = theme.brightness == Brightness.dark;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        double fontSize = (constraints.maxWidth * 0.04).clamp(12.0, 18.0); // Min 12px, Max 18px
+        double fontSize = (constraints.maxWidth * 0.04)
+            .clamp(12.0, 18.0); // Min 12px, Max 18px
 
         return TextFormField(
           controller: controller,
-          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: fontSize),
+          style:
+              TextStyle(color: theme.colorScheme.onSurface, fontSize: fontSize),
           decoration: InputDecoration(
-            labelText: 'Day Summary',
-            labelStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: fontSize * 0.9),
+            labelText:
+                'Reflect on Your day! \n \nUnpack your thoughts for today.. ',
+            labelStyle: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: fontSize * 0.9),
             hintText: 'Write about your day...',
-            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: fontSize * 0.9),
-            prefixIcon: Icon(Icons.book, color: theme.colorScheme.onSurfaceVariant, size: fontSize * 1.2),
+            hintStyle: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: fontSize * 0.9),
+            prefixIcon: Icon(Icons.book,
+                color: theme.colorScheme.onSurfaceVariant,
+                size: fontSize * 1.2),
             filled: true,
             fillColor: isDarkMode ? Colors.grey[900] : Colors.grey[100],
             border: OutlineInputBorder(
@@ -153,7 +195,8 @@ class _JournalPageState extends State<JournalPage> {
                 width: 1,
               ),
             ),
-            contentPadding: EdgeInsets.symmetric(vertical: fontSize * 2, horizontal: fontSize),
+            contentPadding: EdgeInsets.symmetric(
+                vertical: fontSize * 2, horizontal: fontSize),
           ),
           minLines: 5,
           maxLines: 7,
@@ -161,7 +204,6 @@ class _JournalPageState extends State<JournalPage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -172,58 +214,84 @@ class _JournalPageState extends State<JournalPage> {
 
     return Scaffold(
       appBar: UniversalAppBar(
-        title: "Journal Screen",
+        title: "Mood Screen",
         onBackPressed: () {
           Navigator.pop(context);
         },
-        actions: [],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Log Your Mood',
-              style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                'How are you holding up? 💪',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-            const SizedBox(height: 20),
-            MoodSelect(
-              selectedMood: _selectedMood,
-              onMoodSelected: (int mood) {
-                setState(() {
-                  _selectedMood = mood;
-                });
-              },
+            const SizedBox(height: 10),
+
+            // Mood selection with stylish design
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: MoodSelect(
+                  selectedMood: _selectedMood,
+                  onMoodSelected: (int mood) {
+                    setState(() {
+                      _selectedMood = mood;
+                    });
+                  },
+                ),
+              ),
             ),
+
             const SizedBox(height: 20),
+
+            // Journal Entry Field
             _journalTextField(context, controller: _daySummaryController),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 24),
+
+            // Save Button with Gradient Styling
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _saveMoodEntry,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8)),
+                    ).copyWith(
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => states.contains(MaterialState.pressed)
+                            ? Colors.green.shade700
+                            : Colors.green.shade500,
                       ),
-                      padding: EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: FittedBox(
-                      child: Text(
-                        'Save Entry',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        maxLines: 1, // Ensures text stays in one line
-                        overflow: TextOverflow.ellipsis, // Prevents overflow issues
-                      ),
+                    child: Text(
+                      'Save your mood for today!',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

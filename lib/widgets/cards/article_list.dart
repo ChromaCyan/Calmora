@@ -26,7 +26,7 @@ class _ArticleListState extends State<ArticleList> {
   Future<void> _loadUserId() async {
     final storage = FlutterSecureStorage();
     final userId = await storage.read(key: 'userId');
-    print("🔵 User ID Loaded: $userId"); // Debugging output
+    print("🔵 User ID Loaded: $userId");
 
     if (userId != null) {
       setState(() {
