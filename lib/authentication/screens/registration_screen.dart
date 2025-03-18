@@ -139,6 +139,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     if (pickedDate != null) {
       String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       _dateOfBirthController.text = formattedDate;
+      _checkFields(); 
     }
   }
 
