@@ -24,13 +24,9 @@ class CombinedForm extends StatelessWidget {
   final TextEditingController availabilityController;
   final TextEditingController locationController;
   final TextEditingController clinicController;
-  final TextEditingController workingHoursStartController;
-  final TextEditingController workingHoursEndController;
 
   final bool isEditing;
   final VoidCallback onPickDateOfBirth;
-  final VoidCallback onPickStartTime;
-  final VoidCallback onPickEndTime;
   final String userType;
 
   const CombinedForm({
@@ -53,10 +49,6 @@ class CombinedForm extends StatelessWidget {
     required this.availabilityController,
     required this.locationController,
     required this.clinicController,
-    required this.workingHoursStartController,
-    required this.workingHoursEndController,
-    required this.onPickStartTime,
-    required this.onPickEndTime,
     required this.isEditing,
     required this.onPickDateOfBirth,
     required this.userType,
@@ -294,26 +286,6 @@ class CombinedForm extends StatelessWidget {
                       );
                     }).toList(),
                     onChanged: isEditing ? (newValue) => availabilityController.text = newValue! : null,
-                  ),
-                  GestureDetector(
-                    onTap: isEditing ? onPickStartTime : null,
-                    child: AbsorbPointer(
-                      child: TextField(
-                        controller: workingHoursStartController,
-                        readOnly: true,
-                        decoration: customInputDecoration("Working Hours Start", context, readOnly: true),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: isEditing ? onPickEndTime : null,
-                    child: AbsorbPointer(
-                      child: TextField(
-                        controller: workingHoursEndController,
-                        readOnly: true,
-                        decoration: customInputDecoration("Working Hours End", context, readOnly: true),
-                      ),
-                    ),
                   ),
                 ],
               ],

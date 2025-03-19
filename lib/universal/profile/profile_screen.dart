@@ -50,10 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController clinicController = TextEditingController();
   final TextEditingController workingHoursStartController =
       TextEditingController();
-  final TextEditingController workingHoursEndController =
-      TextEditingController();
-  TimeOfDay? _selectedStartTime;
-  TimeOfDay? _selectedEndTime;
 
   // Patient Fields
   final TextEditingController addressController = TextEditingController();
@@ -111,24 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           clinicController.text = user.clinic ?? "";
           availabilityController.text = user.availability ?? "";
 
-          // Formatting Time for working hours
-          String formatTime(String time) {
-            if (time.isEmpty) return "";
-            final parts = time.split(":");
-            int hour = int.parse(parts[0]);
-            int minute = int.parse(parts[1]);
-            String period = hour >= 12 ? "PM" : "AM";
-            hour = hour % 12 == 0 ? 12 : hour % 12;
-
-            return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period";
-          }
-
-          workingHoursStartController.text =
-              formatTime(user.workingHoursStart ?? "");
-          workingHoursEndController.text =
-              formatTime(user.workingHoursEnd ?? "");
-        }
-
         // Patient Fields
         if (_userType == "Patient") {
           addressController.text = user.address ?? "";
@@ -141,6 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           emergencyContactRelationController.text =
               emergencyContact?.relation ?? "";
         }
+        }
       });
     } catch (e) {
       setState(() {
@@ -150,26 +129,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _pickTime(bool isStartTime) async {
-    TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: isStartTime
-          ? (_selectedStartTime ?? TimeOfDay.now())
-          : (_selectedEndTime ?? TimeOfDay.now()),
-    );
-
-    if (pickedTime != null) {
-      setState(() {
-        if (isStartTime) {
-          _selectedStartTime = pickedTime;
-          workingHoursStartController.text = pickedTime.format(context);
-        } else {
-          _selectedEndTime = pickedTime;
-          workingHoursEndController.text = pickedTime.format(context);
-        }
-      });
-    }
-  }
 
   Future<void> _pickDateOfBirth() async {
     DateTime? pickedDate = await showDatePicker(
@@ -247,10 +206,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         "availability": availabilityController.text,
         "clinic": clinicController.text,
         "location": locationController.text,
-        "workingHours": {
-          "start": workingHoursStartController.text,
-          "end": workingHoursEndController.text,
-        },
       });
     } else if (_userType == "Patient") {
       updatedData.addAll({
@@ -401,11 +356,7 @@ Widget build(BuildContext context) {
                               availabilityController: availabilityController,
                               locationController: locationController,
                               clinicController: clinicController,
-                              workingHoursStartController: workingHoursStartController,
-                              workingHoursEndController: workingHoursEndController,
                               isEditing: isEditing,
-                              onPickStartTime: () => _pickTime(true),
-                              onPickEndTime: () => _pickTime(false),
                               onPickDateOfBirth: _pickDateOfBirth,
                               userType: _userType!,
                             ),
