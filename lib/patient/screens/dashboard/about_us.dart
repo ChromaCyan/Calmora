@@ -132,7 +132,7 @@ class AboutUsPage extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 30,
+                          radius: 50,
                           backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
@@ -178,7 +178,7 @@ class AboutUsPage extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 30,
+                          radius: 50,
                           backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
@@ -224,7 +224,7 @@ class AboutUsPage extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 30,
+                          radius: 50,
                           backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
@@ -270,7 +270,7 @@ class AboutUsPage extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 30,
+                          radius: 50,
                           backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
@@ -316,7 +316,7 @@ class AboutUsPage extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 30,
+                          radius: 50,
                           backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
@@ -392,12 +392,12 @@ class AboutUsPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'A Memorable Event',
+                                'Last sem exhibit?',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'This was one of our most successful events where we showcased our latest innovations.',
+                                'What to put here?',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(fontSize: 16),
                               ),
@@ -421,12 +421,12 @@ class AboutUsPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Our Team at Work',
+                                'Behind the scene?',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'A behind-the-scenes look at our team collaborating to create amazing experiences.',
+                                'What to put here',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(fontSize: 16),
                               ),
@@ -481,13 +481,13 @@ class AboutUsPage extends StatelessWidget {
 
                         // Description Text Below
                         Text(
-                          'A Special Moment in Our Journey',
+                          'Workshop Pic?',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center, // Center align text
                         ),
                         SizedBox(height: 5),
                         Text(
-                          'These pictures capture an unforgettable event where our team worked together to create something amazing.',
+                          'What to put here?',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 16),
                         ),
