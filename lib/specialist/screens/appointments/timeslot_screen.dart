@@ -60,7 +60,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
     print("Navigating to edit slot with ID: ${slot.id}");
 
     if (result == true) {
-      _fetchTimeSlots(); // ✅ Refresh slot list after editing
+      _fetchTimeSlots();
     }
   }
 
@@ -80,46 +80,76 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
               );
             }
 
+            // Grouping slots by dayOfWeek
+            Map<String, List<TimeSlotModel>> groupedSlots = {};
+            for (var slot in slots) {
+              if (!groupedSlots.containsKey(slot.dayOfWeek)) {
+                groupedSlots[slot.dayOfWeek] = [];
+              }
+              groupedSlots[slot.dayOfWeek]!.add(slot);
+            }
+
+            // Sorting days in the week
+            final daysOfWeek = [
+              "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+            ];
+
             return ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: slots.length,
+              itemCount: daysOfWeek.length,
               itemBuilder: (context, index) {
-                final slot = slots[index];
-                String formatTime(String time) {
-                  final parsedTime = DateFormat("HH:mm").parse(time);
-                  return DateFormat("h:mm a").format(parsedTime);
+                String day = daysOfWeek[index];
+                List<TimeSlotModel>? daySlots = groupedSlots[day];
+
+                if (daySlots == null || daySlots.isEmpty) {
+                  return Container(); // If no slots for this day, don't show anything
                 }
 
-                final formattedTime =
-                    "${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}";
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      "${slot.dayOfWeek}, $formattedTime",
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      day,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
                       ),
                     ),
-                    subtitle: Text(
-                      slot.isBooked ? "Booked" : "Available",
-                      style: TextStyle(
-                        color: slot.isBooked ? Colors.red : Colors.green,
-                      ),
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () {
-                        _navigateToEditSlot(slot);
-                      },
-                    ),
-                  ),
+                    const SizedBox(height: 8),
+                    ...daySlots.map((slot) {
+                      String formatTime(String time) {
+                        final parsedTime = DateFormat("HH:mm").parse(time);
+                        return DateFormat("h:mm a").format(parsedTime);
+                      }
+
+                      final formattedTime =
+                          "${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}";
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            formattedTime,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () {
+                              _navigateToEditSlot(slot);
+                            },
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    const SizedBox(height: 16),
+                  ],
                 );
               },
             );
