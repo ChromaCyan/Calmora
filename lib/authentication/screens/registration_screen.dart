@@ -37,6 +37,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _locationController = TextEditingController();
   final _clinicController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  final FocusNode _firstNameFocus = FocusNode();
+  final FocusNode _lastNameFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _phoneFocus = FocusNode();
 
   //Password Fields part
   String _passwordStrength = "";
@@ -139,7 +143,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     if (pickedDate != null) {
       String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       _dateOfBirthController.text = formattedDate;
-      _checkFields(); 
+      _checkFields();
     }
   }
 
@@ -408,24 +412,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               CustomTextField(
                                 label: "First Name",
                                 controller: _firstNameController,
+                                focusNode: _firstNameFocus,
                                 onChanged: (_) => _checkFields(),
                               ),
                               const SizedBox(height: 20),
                               CustomTextField(
                                 label: "Last Name",
                                 controller: _lastNameController,
+                                focusNode: _lastNameFocus,
                                 onChanged: (_) => _checkFields(),
                               ),
                               const SizedBox(height: 20),
                               CustomTextField(
                                 label: "Email",
                                 controller: _emailController,
+                                focusNode: _emailFocus,
                                 onChanged: (_) => _checkFields(),
                               ),
                               const SizedBox(height: 20),
                               CustomTextField(
                                 label: "Phone Number",
                                 controller: _phoneNumberController,
+                                focusNode: _phoneFocus,
                                 onChanged: (_) => _checkFields(),
                               ),
                               const SizedBox(height: 20),
@@ -453,9 +461,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 label: "Confirm Password",
                                 controller: _confirmPasswordController,
                                 obscureText: true,
-                                onChanged: (_) { 
+                                onChanged: (_) {
                                   _checkFields();
-                                  _checkPasswordMatch();} ,
+                                  _checkPasswordMatch();
+                                },
                               ),
                               Text(
                                 _passwordMatchMessage,
