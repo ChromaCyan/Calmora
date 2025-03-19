@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:armstrong/models/timeslot/timeslot.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
@@ -973,7 +974,7 @@ class ApiRepository {
   }
 
   // Get available time slots for a specialist
-  Future<List<DateTime>> getAvailableTimeSlots(
+  Future<List<TimeSlotModel>> getAvailableTimeSlots(
     String specialistId,
     DateTime date,
   ) async {
@@ -996,26 +997,7 @@ class ApiRepository {
 
       if (data["slots"] is List) {
         return (data["slots"] as List).map((slot) {
-          if (slot["startTime"] is String) {
-            final timeParts = slot["startTime"]
-                .split(":")
-                .map((s) => int.tryParse(s) ?? 0)
-                .toList();
-
-            if (timeParts.length == 2) {
-              return DateTime(
-                date.year,
-                date.month,
-                date.day,
-                timeParts[0],
-                timeParts[1],
-              );
-            } else {
-              throw Exception("Invalid time format in startTime.");
-            }
-          } else {
-            throw Exception("startTime is not a valid string.");
-          }
+          return TimeSlotModel.fromJson(slot);
         }).toList();
       } else {
         throw Exception("Invalid data format: Expected list of slots.");
@@ -1057,15 +1039,19 @@ class ApiRepository {
     String patientId,
     String slotId,
     String message,
+    DateTime appointmentDate, 
   ) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/timeslot/book');
 
-    // Print the request body for debugging
+    String formattedDate =
+        "${appointmentDate.year}-${appointmentDate.month.toString().padLeft(2, '0')}-${appointmentDate.day.toString().padLeft(2, '0')}";
+
     print("Booking appointment with the following details:");
     print("Patient ID: $patientId");
     print("Slot ID: $slotId");
     print("Message: $message");
+    print("Appointment Date: $formattedDate");
 
     final response = await http.post(
       url,
@@ -1077,6 +1063,7 @@ class ApiRepository {
         'patientId': patientId,
         'slotId': slotId,
         'message': message,
+        'appointmentDate': formattedDate, 
       }),
     );
 

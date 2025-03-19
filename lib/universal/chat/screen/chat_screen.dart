@@ -1,3 +1,4 @@
+import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/services/api.dart';
@@ -141,16 +142,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _bookAppointment(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return BlocProvider.value(
-          value: BlocProvider.of<AppointmentBloc>(context),
-          child: AppointmentBookingForm(specialistId: widget.recipientId),
-        );
-      },
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (context) {
+      return BlocProvider.value(
+        value: BlocProvider.of<TimeSlotBloc>(context), 
+        child: AppointmentBookingForm(specialistId: widget.recipientId),
+      );
+    },
+  );
+}
 
   String _formatTimestamp(String timestamp) {
     final dateTime = DateTime.parse(timestamp);

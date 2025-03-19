@@ -60,10 +60,18 @@ class _CompletedAppointmentsScreenState
     }
   }
 
-  String _formatDateTime(String? dateTimeString) {
-    if (dateTimeString == null) return "N/A";
-    final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat("MMM dd, yyyy - hh:mm a").format(dateTime);
+  String _formatAppointmentTime(dynamic appointment) {
+    if (appointment["appointmentDate"] == null || appointment["timeSlot"] == null) {
+      return "N/A";
+    }
+
+    final appointmentDate = DateTime.parse(appointment["appointmentDate"]);
+    final startTime = appointment["timeSlot"]["startTime"];
+    final endTime = appointment["timeSlot"]["endTime"];
+    
+    // Format the date and time range
+    final formattedDate = DateFormat("MMM dd, yyyy").format(appointmentDate);
+    return "$formattedDate - $startTime to $endTime";
   }
 
   void _showAppointmentDetails(BuildContext context, dynamic appointment) {
@@ -105,7 +113,7 @@ class _CompletedAppointmentsScreenState
                         children: [
                           const Icon(Icons.access_time, size: 18),
                           const SizedBox(width: 6),
-                          Text(_formatDateTime(appointment["startTime"]))
+                          Text(_formatAppointmentTime(appointment))
                         ],
                       ),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 18),

@@ -10,6 +10,7 @@ import 'package:armstrong/widgets/cards/meditation_card.dart';
 import 'package:armstrong/widgets/cards/app_section.dart';
 import 'package:armstrong/patient/screens/dashboard/meditation_details.dart';
 import 'package:armstrong/patient/screens/dashboard/breathing_details.dart';
+import 'package:armstrong/patient/screens/dashboard/about_us.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -99,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => BreathingGuideScreen()),
+                              builder: (context) => AboutUsPage()),
                         );
                       },
                     ),

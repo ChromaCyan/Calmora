@@ -6,10 +6,18 @@ class AppointmentDetailsDialog extends StatelessWidget {
 
   const AppointmentDetailsDialog({super.key, required this.appointment});
 
-  String _formatDateTime(String? dateTimeString) {
-    if (dateTimeString == null) return "N/A";
-    final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat("MMM dd, yyyy - hh:mm a").format(dateTime);
+  String _formatAppointmentTime(dynamic appointment) {
+    if (appointment["appointmentDate"] == null || appointment["timeSlot"] == null) {
+      return "N/A";
+    }
+
+    final appointmentDate = DateTime.parse(appointment["appointmentDate"]);
+    final startTime = appointment["timeSlot"]["startTime"];
+    final endTime = appointment["timeSlot"]["endTime"];
+    
+    // Format the date and time range
+    final formattedDate = DateFormat("MMM dd, yyyy").format(appointmentDate);
+    return "$formattedDate - $startTime to $endTime";
   }
 
   @override
@@ -40,7 +48,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                   children: [
                     const Icon(Icons.calendar_today, size: 18),
                     const SizedBox(width: 6),
-                    Text(_formatDateTime(appointment["startTime"])),
+                    Text(_formatAppointmentTime(appointment)),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -48,7 +56,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                   "Status: Completed",
                   style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
                 ),
-                if (appointment["feedback"] != null) ...[
+                if (appointment["feedback"] != null) ...[ 
                   const SizedBox(height: 8),
                   const Text("Feedback:", style: TextStyle(fontWeight: FontWeight.bold)),
                   Text(appointment["feedback"]),
