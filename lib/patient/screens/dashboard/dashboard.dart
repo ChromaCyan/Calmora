@@ -1,3 +1,4 @@
+import 'package:armstrong/patient/screens/dashboard/men_health.dart';
 import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:armstrong/widgets/charts/survey_result.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MeditationGuideScreen()),
+                              builder: (context) => BreathingGuideScreen()),
                         );
                       },
                     ),
@@ -128,7 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MeditationGuideScreen()),
+                              builder: (context) => MindfulMeditation()),
                         );
                       },
                     ),
@@ -142,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => BreathingGuideScreen()),
+                              builder: (context) => MindfulMeditation()),
                         );
                       },
                     ),
