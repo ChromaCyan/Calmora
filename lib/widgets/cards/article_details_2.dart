@@ -5,6 +5,7 @@ import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class ArticleDetailPage2 extends StatelessWidget {
   final String articleId;
@@ -28,7 +29,7 @@ class ArticleDetailPage2 extends StatelessWidget {
       },
 
       child: Scaffold(
-        appBar: AppBar(title: const Text('Article Details')),
+        appBar: UniversalAppBar(title: ""),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {

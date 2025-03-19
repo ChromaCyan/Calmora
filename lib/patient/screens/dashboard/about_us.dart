@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -6,7 +7,7 @@ class AboutUsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("About Us")),
+      appBar: UniversalAppBar(title: "About us"),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -18,7 +19,7 @@ class AboutUsPage extends StatelessWidget {
                 children: [
                   // About Our App
                   Text(
-                    "About Our App",
+                    "What is Armstrong?",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
@@ -392,7 +393,7 @@ class AboutUsPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Last sem exhibit?',
+                                'A Memorable Event',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 5),
@@ -509,11 +510,21 @@ class AboutUsPage extends StatelessWidget {
                 maxHeight: 70, // Maximum height (won't grow beyond this)
               ),
               padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.green),
+              decoration: BoxDecoration(
+                // color: Theme.of(context).brightness == Brightness.dark
+                //     ? Colors.grey.shade800 // Dark theme color
+                //     : Colors.grey.shade300, // Light theme color
+                color: Theme.of(context).colorScheme.primaryContainer, // Use primaryContainer color from the current theme
+              ),
               child: Center(
                 child: Text(
                   '© 2025 Armstrong, All Rights Reserved.',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 14, 
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white // Use white text for dark theme
+                        : Colors.black, // Use black text for light theme
+                  ),
                 ),
               ),
             ),

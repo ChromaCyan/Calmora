@@ -44,7 +44,19 @@ class JournalSection extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const JournalPage()),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return JournalPage();  // Destination page
+                  },
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    // Fade transition
+                    var slideAnimation = Tween<Offset>(
+                      begin: Offset(1.0, 0.0), // Slide from the right
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+                    return SlideTransition(position: slideAnimation, child: child);
+                  },
+                ),
               );
             },
             style: ElevatedButton.styleFrom(

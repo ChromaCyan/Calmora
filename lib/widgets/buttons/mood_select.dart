@@ -33,7 +33,7 @@ class MoodSelect extends StatelessWidget {
         children: [
           AnimatedContainer(
             duration: Duration(milliseconds: 300),
-            padding: EdgeInsets.all(isSelected ? 16 : 12),
+            // padding: EdgeInsets.all(isSelected ? 16 : 12),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isSelected ? activeColor.withOpacity(0.6) : Colors.transparent,
@@ -44,8 +44,8 @@ class MoodSelect extends StatelessWidget {
             ),
             child: Image.asset(
               imagePath,
-              width: isSelected ? 60 : 50,
-              height: isSelected ? 60 : 50,
+              width: isSelected ? 80 : 50,
+              height: isSelected ? 80 : 50,
             ),
           ),
           SizedBox(height: 8),

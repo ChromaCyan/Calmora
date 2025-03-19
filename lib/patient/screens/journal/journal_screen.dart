@@ -164,7 +164,7 @@ class _JournalPageState extends State<JournalPage> {
               TextStyle(color: theme.colorScheme.onSurface, fontSize: fontSize),
           decoration: InputDecoration(
             labelText:
-                'Reflect on Your day! \n \nUnpack your thoughts for today.. ',
+                'Reflect on Your day! Unpack your thoughts for today.. ',
             labelStyle: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontSize: fontSize * 0.9),

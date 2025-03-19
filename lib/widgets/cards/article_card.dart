@@ -57,10 +57,12 @@ class ArticleCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.15),
-              spreadRadius: 2,
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: theme.brightness == Brightness.dark
+            ? Colors.grey[200]!.withOpacity(0.25)  // Dark mode shadow color
+            : Colors.grey[800]!.withOpacity(0.15),  // Light mode shadow color
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 0),
             ),
           ],
         ),

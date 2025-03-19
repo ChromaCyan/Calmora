@@ -73,8 +73,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => BreathingGuideScreen()),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return BreathingGuideScreen();  // Destination page
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              // Fade transition
+                              var slideAnimation = Tween<Offset>(
+                                begin: Offset(1.0, 0.0), // Slide from the right
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+                              return SlideTransition(position: slideAnimation, child: child);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -86,8 +97,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => BreathingGuideScreen()),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return BreathingGuideScreen();  // Destination page
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              // Fade transition
+                              var slideAnimation = Tween<Offset>(
+                                begin: Offset(1.0, 0.0), // Slide from the right
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+                              return SlideTransition(position: slideAnimation, child: child);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -99,8 +121,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => AboutUsPage()),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return AboutUsPage();  // Destination page
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              // Fade transition
+                              var slideAnimation = Tween<Offset>(
+                                begin: Offset(1.0, 0.0), // Slide from the right
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+                              return SlideTransition(position: slideAnimation, child: child);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -129,8 +162,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => MindfulMeditation()),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return MindfulMeditation();  // Destination page
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              // Fade transition
+                              var slideAnimation = Tween<Offset>(
+                                begin: Offset(1.0, 0.0), // Slide from the right
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+                              return SlideTransition(position: slideAnimation, child: child);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -143,8 +187,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => BreathingGuideScreen()),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return BreathingGuideScreen();  // Destination page
+                            },
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              // Fade transition
+                              var slideAnimation = Tween<Offset>(
+                                begin: Offset(1.0, 0.0), // Slide from the right
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+                              return SlideTransition(position: slideAnimation, child: child);
+                            },
+                          ),
                         );
                       },
                     ),

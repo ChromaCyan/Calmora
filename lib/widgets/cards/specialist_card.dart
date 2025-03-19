@@ -31,7 +31,7 @@ class SpecialistCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
-              minHeight: 180,
+              minHeight: 80,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min, 
@@ -40,7 +40,7 @@ class SpecialistCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: AspectRatio(
-                    aspectRatio: 4 / 3, 
+                    aspectRatio: 5 / 5, 
                     child: Image.network(
                       specialist.profileImage ??
                           'images/armstrong_transparent.png', 
@@ -49,7 +49,7 @@ class SpecialistCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 5),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -57,20 +57,20 @@ class SpecialistCard extends StatelessWidget {
                     formatName(
                         "${specialist.firstName} ${specialist.lastName}"),
                     style: TextStyle(
-                      fontSize: nameFontSize.clamp(16, 22),
+                      fontSize: (nameFontSize * MediaQuery.of(context).size.width / 375).clamp(16, 22), // Adjust size based on screen width
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 2),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
                     specialist.specialization,
                     style: TextStyle(
-                      fontSize: specializationFontSize.clamp(14, 18),
+                      fontSize: (specializationFontSize * MediaQuery.of(context).size.width / 375).clamp(14, 18), // Adjust size based on screen width
                       color: Colors.grey[600],
                     ),
                     textAlign: TextAlign.center,
@@ -79,18 +79,22 @@ class SpecialistCard extends StatelessWidget {
                         TextOverflow.ellipsis, 
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 2),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on, color: Colors.blue, size: 18),
+                    Icon(
+                      Icons.location_on, 
+                      color: Colors.blue, 
+                      size: (18 * MediaQuery.of(context).size.width / 375).clamp(16, 24), // Make icon size responsive
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         specialist.location ?? 'Unknown Location',
                         style: TextStyle(
-                          fontSize: locationFontSize.clamp(12, 16),
+                          fontSize: (locationFontSize * MediaQuery.of(context).size.width / 375).clamp(12, 16), // Adjust size based on screen width
                           color: Colors.grey[600],
                         ),
                         textAlign: TextAlign.center,
