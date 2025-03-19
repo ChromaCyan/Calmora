@@ -27,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> isButtonEnabled = ValueNotifier(false);
+  bool _obscureText = true;
 
   @override
   void initState() {
@@ -157,7 +158,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             CustomTextField(
                               label: "Password:",
                               controller: passwordController,
-                              obscureText: true,
+                              obscureText: _obscureText,
+                              suffixIcon: IconButton(
+                                icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Align(

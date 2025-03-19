@@ -9,6 +9,7 @@ class CustomTextField extends StatefulWidget {
   final bool readOnly;
   final ValueChanged<String>? onChanged;
   final FocusNode? focusNode;
+  final Widget? suffixIcon;
 
   const CustomTextField({
     Key? key,
@@ -20,6 +21,7 @@ class CustomTextField extends StatefulWidget {
     this.readOnly = false,
     this.onChanged,
     this.focusNode,
+    this.suffixIcon,
   }) : super(key: key);
 
   @override
@@ -124,6 +126,22 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             errorText: _showError ? _errorMessage : null,
             errorStyle: TextStyle(color: Colors.red, fontSize: 14),
+
+            // Ensure suffixIcon always appears
+            suffixIcon: widget.suffixIcon != null
+                ? IconTheme(
+                    data: IconThemeData(
+                      color: _showError
+                          ? Colors.white
+                          : theme.colorScheme.onSurface,
+                    ),
+                    child: widget.suffixIcon!,
+                  )
+                : null,
+            suffixIconConstraints: BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
+            ),
           ),
         ),
       ],

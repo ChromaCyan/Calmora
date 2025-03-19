@@ -143,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MindfulMeditation()),
+                              builder: (context) => BreathingGuideScreen()),
                         );
                       },
                     ),

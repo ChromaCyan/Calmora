@@ -41,6 +41,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final FocusNode _lastNameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   //Password Fields part
   String _passwordStrength = "";
@@ -440,7 +442,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               CustomTextField(
                                 label: "Password",
                                 controller: _passwordController,
-                                obscureText: true,
+                                obscureText: _obscurePassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
                                 onChanged: (value) {
                                   _checkPasswordStrength(value);
                                   _checkPasswordMatch();
@@ -460,7 +474,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               CustomTextField(
                                 label: "Confirm Password",
                                 controller: _confirmPasswordController,
-                                obscureText: true,
+                                obscureText: _obscureConfirmPassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
+                                ),
                                 onChanged: (_) {
                                   _checkFields();
                                   _checkPasswordMatch();
