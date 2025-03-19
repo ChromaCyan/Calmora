@@ -4,17 +4,27 @@ import 'package:intl/intl.dart';
 class AppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
 
-  const AppointmentCard({Key? key, required this.appointment})
-      : super(key: key);
+  const AppointmentCard({
+    Key? key,
+    required this.appointment,
+  }) : super(key: key);
 
   String _formatDate(String dateTimeString) {
-    final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('MMM d, y').format(dateTime);
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('MMM d, y').format(dateTime);
+    } catch (e) {
+      return "Invalid Date";
+    }
   }
 
-  String _formatTime(String dateTimeString) {
-    final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('h:mm a').format(dateTime);
+  String _formatTime(String timeString) {
+    try {
+      final time = DateFormat('h:mm a').parse(timeString);
+      return DateFormat('h:mm a').format(time);
+    } catch (e) {
+      return "Invalid Time";
+    }
   }
 
   @override
@@ -25,26 +35,29 @@ class AppointmentCard extends StatelessWidget {
     final specialist = appointment['specialist'];
     final specialistName =
         '${specialist['firstName']} ${specialist['lastName']}';
-    final startTime = appointment['startTime'];
-    final endTime = appointment['endTime'];
-    final status = appointment['status'];
 
-    final formattedStartDate = _formatDate(startTime);
-    final formattedStartTime = _formatTime(startTime);
-    final formattedEndTime = _formatTime(endTime);
+    final timeSlot = appointment['timeSlot'] ?? {};
+    final status = appointment['status'] ?? 'unknown';
+
+    // Use timeSlot's start and end time
+    final formattedStartTime = _formatTime(timeSlot['startTime'] ?? '');
+    final formattedEndTime = _formatTime(timeSlot['endTime'] ?? '');
     final formattedCombinedTime = '$formattedStartTime - $formattedEndTime';
+
+    // Use appointment's appointmentDate
+    final formattedStartDate = _formatDate(appointment['appointmentDate']);
 
     return Center(
       child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.04), // Responsive padding
-        width: screenWidth * 0.9, // 90% of screen width
+        padding: EdgeInsets.all(screenWidth * 0.04),
+        width: screenWidth * 0.9,
         decoration: BoxDecoration(
           color: theme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: theme.outlineVariant),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Adapts to content size
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,7 +66,6 @@ class AppointmentCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Specialist Name (Responsive Text)
                       Text(
                         specialistName,
                         style: TextStyle(
@@ -64,10 +76,7 @@ class AppointmentCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
-
                       const SizedBox(height: 4),
-
-                      // Status with color-coded text
                       Text(
                         'Status: ${status[0].toUpperCase() + status.substring(1)}',
                         style: TextStyle(
@@ -83,24 +92,19 @@ class AppointmentCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // Profile Image (Responsive size)
                 ClipOval(
                   child: Image.network(
-                    specialist['profileImage'].isNotEmpty
+                    specialist['profileImage']?.isNotEmpty == true
                         ? specialist['profileImage']
-                        : "https://via.placeholder.com/50", // Placeholder if empty
-                    width: screenWidth * 0.14, // 14% of screen width
+                        : "https://via.placeholder.com/50",
+                    width: screenWidth * 0.14,
                     height: screenWidth * 0.14,
                     fit: BoxFit.cover,
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
-            // Date & Time Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -116,7 +120,6 @@ class AppointmentCard extends StatelessWidget {
     );
   }
 
-  // Helper widget for icon + text layout
   Widget _buildIconText(IconData icon, String text, ColorScheme theme, double screenWidth) {
     return Row(
       children: [

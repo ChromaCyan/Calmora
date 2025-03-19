@@ -19,15 +19,15 @@ class AppProviders {
       BlocProvider<SpecialistBloc>(
         create: (context) => SpecialistBloc(apiRepository: apiRepository),
       ),
-      // Appointment
-      // BlocProvider<AppointmentBloc>(
-      //   create: (context) => AppointmentBloc(apiRepository: apiRepository),
-      // ),
+      //Appointment
+      BlocProvider<AppointmentBloc>(
+        create: (context) => AppointmentBloc(apiRepository: apiRepository),
+      ),
       // Articles
       BlocProvider<ArticleBloc>(
         create: (context) => ArticleBloc(apiRepository: apiRepository),
       ),
-      // Appointment
+      // Time Slot
       BlocProvider<TimeSlotBloc>(
         create: (context) => TimeSlotBloc(apiRepository: apiRepository),
       ),

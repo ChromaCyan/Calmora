@@ -1,4 +1,5 @@
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
@@ -42,7 +43,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
       context: context,
       builder: (context) {
         return BlocProvider.value(
-          value: BlocProvider.of<AppointmentBloc>(context),
+          value: BlocProvider.of<TimeSlotBloc>(context),
           child: AppointmentBookingForm(specialistId: specialistId),
         );
       },

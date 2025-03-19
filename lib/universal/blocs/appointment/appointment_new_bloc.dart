@@ -66,11 +66,13 @@ class BookAppointmentEvent extends TimeSlotEvent {
   final String patientId;
   final String slotId;
   final String message;
+  final DateTime appointmentDate;
 
   BookAppointmentEvent({
     required this.patientId,
     required this.slotId,
     required this.message,
+    required this.appointmentDate,
   });
 
   @override
@@ -220,20 +222,24 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
   }
 
   // Book Appointment
-  Future<void> _onBookAppointment(
-      BookAppointmentEvent event, Emitter<TimeSlotState> emit) async {
-    emit(TimeSlotLoading());
-    try {
-      final result = await _apiRepository.bookAppointment(
-        event.patientId,
-        event.slotId,
-        event.message,
-      );
-      emit(TimeSlotSuccess(data: result));
-    } catch (error) {
-      emit(TimeSlotFailure(error: error.toString()));
-    }
+  // ✅ Updated _onBookAppointment to Include Date
+Future<void> _onBookAppointment(
+    BookAppointmentEvent event, Emitter<TimeSlotState> emit) async {
+  emit(TimeSlotLoading());
+  try {
+    // ✅ Include event.appointmentDate here
+    final result = await _apiRepository.bookAppointment(
+      event.patientId,
+      event.slotId,
+      event.message,
+      event.appointmentDate, // 👈 Pass appointmentDate
+    );
+    emit(TimeSlotSuccess(data: result));
+  } catch (error) {
+    emit(TimeSlotFailure(error: error.toString()));
   }
+}
+
 
   Future<void> _onResetTimeSlot(
       ResetTimeSlotEvent event, Emitter<TimeSlotState> emit) async {

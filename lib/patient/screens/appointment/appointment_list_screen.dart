@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
-import 'package:armstrong/widgets/cards/appointment_card.dart'; 
+import 'package:armstrong/widgets/cards/appointment_card.dart';
 
 class AppointmentListScreen extends StatefulWidget {
   final String patientId;
@@ -16,7 +16,7 @@ class AppointmentListScreen extends StatefulWidget {
 }
 
 class _AppointmentListScreenState extends State<AppointmentListScreen> {
-  String selectedCategory = 'pending'; 
+  String selectedCategory = 'pending';
 
   @override
   void initState() {
@@ -46,15 +46,20 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
 
             // Sort by nearest appointment
             allAppointments.sort((a, b) {
-              final aTime = DateTime.parse(a['startTime']);
-              final bTime = DateTime.parse(b['startTime']);
+              final aTime = DateTime.parse(a['appointmentDate']);
+              final bTime = DateTime.parse(b['appointmentDate']);
               return aTime.compareTo(bTime);
             });
 
             // Filter categories
-            final upcomingAppointments = allAppointments.where((a) => a['status'] == 'upcoming').toList();
-            final pendingAppointments = allAppointments.where((a) => a['status'] == 'pending').toList();
-            final acceptedAppointments = allAppointments.where((a) => a['status'] == 'accepted').toList();
+            final upcomingAppointments = allAppointments
+                .where((a) => a['status'] == 'upcoming')
+                .toList();
+            final pendingAppointments =
+                allAppointments.where((a) => a['status'] == 'pending').toList();
+            final acceptedAppointments = allAppointments
+                .where((a) => a['status'] == 'accepted')
+                .toList();
 
             // Select correct list based on category
             List filteredAppointments;
@@ -76,9 +81,23 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                           itemCount: filteredAppointments.length,
                           itemBuilder: (context, index) {
                             final appointment = filteredAppointments[index];
+                            final timeSlot = appointment['timeSlot'] ?? {};
+
+                            // Ensure startTime and endTime are parsed correctly as strings
+                            final startTime =
+                                timeSlot['startTime']?.toString() ?? 'N/A';
+                            final endTime =
+                                timeSlot['endTime']?.toString() ?? 'N/A';
+                            final dayOfWeek =
+                                timeSlot['dayOfWeek'] ?? 'Unknown';
+
+                            // Pass the necessary fields to AppointmentCard
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: AppointmentCard(appointment: appointment),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: AppointmentCard(
+                                appointment: appointment,
+                              ),
                             );
                           },
                         ),
@@ -90,7 +109,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         },
       ),
     );
-
   }
 
   /// Full-width category selector
@@ -116,13 +134,17 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           alignment: Alignment.center,
-          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceVariant,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surfaceVariant,
           child: Text(
             label,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),

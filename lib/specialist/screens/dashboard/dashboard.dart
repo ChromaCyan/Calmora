@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:armstrong/widgets/cards/specialist_appointment_card.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:intl/intl.dart';
 
 class SpecialistDashboardScreen extends StatefulWidget {
   final String specialistId;
@@ -32,25 +33,41 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
           await _apiRepository.getSpecialistAppointments(widget.specialistId);
       var now = DateTime.now();
 
+      // Filter and map the appointments based on status and time
       var closestAccepted = fetchedAppointments
           .where((appointment) => appointment['status'] == 'accepted')
           .map((appointment) {
-        var appointmentTime = DateTime.parse(appointment['startTime']);
-        var difference = appointmentTime.isBefore(now)
+        var appointmentDate = DateTime.parse(appointment['appointmentDate']);
+        var startTime =
+            DateFormat('hh:mm a').parse(appointment['timeSlot']['startTime']);
+
+        // Combine the date and time into a full DateTime
+        var fullAppointmentTime = DateTime(
+          appointmentDate.year,
+          appointmentDate.month,
+          appointmentDate.day,
+          startTime.hour,
+          startTime.minute,
+        );
+
+        // Calculate the difference from now to the appointment time
+        var difference = fullAppointmentTime.isBefore(now)
             ? Duration.zero
-            : appointmentTime.difference(now);
+            : fullAppointmentTime.difference(now);
         return {
           'appointment': appointment,
+          'fullAppointmentTime': fullAppointmentTime,
           'difference': difference,
         };
       }).toList();
 
+      // Sort by the closest appointment (time difference)
       closestAccepted
           .sort((a, b) => a['difference'].compareTo(b['difference']));
 
       setState(() {
         upcomingAppointments =
-            closestAccepted.map((e) => e['appointment']).take(3).toList();
+            closestAccepted.map((e) => e['appointment']).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -68,8 +85,7 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.center, 
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Align(
                 alignment: Alignment.center,
@@ -109,8 +125,11 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
       return const Center(child: Text('No upcoming appointments.'));
     }
 
-    return Column(
-      children: upcomingAppointments.map((appointment) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: upcomingAppointments.length,
+      itemBuilder: (context, index) {
+        final appointment = upcomingAppointments[index];
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: SpecialistAppointmentCard(
@@ -118,7 +137,7 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
             onStatusChanged: _fetchAppointments,
           ),
         );
-      }).toList(),
+      },
     );
   }
 
@@ -128,8 +147,8 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[900]
-          : Colors.white,
+            ? Colors.grey[900]
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(

@@ -1,9 +1,9 @@
+import 'package:armstrong/models/timeslot/timeslot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
-import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
-import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
+import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:intl/intl.dart';
 
 class AppointmentBookingForm extends StatefulWidget {
@@ -21,7 +21,7 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
   final _formKey = GlobalKey<FormState>();
   final _messageController = TextEditingController();
   DateTime? _selectedDate;
-  DateTime? _selectedTimeSlot;
+  TimeSlotModel? _selectedTimeSlot;
 
   void _submitForm(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
@@ -36,28 +36,49 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
       final patientId = await _storage.read(key: 'userId');
 
       if (token != null && patientId != null) {
+        final DateTime slotTime =
+            DateFormat('h:mm a').parse(_selectedTimeSlot!.startTime);
+
         final DateTime utcStartTime = DateTime.utc(
           _selectedDate!.year,
           _selectedDate!.month,
           _selectedDate!.day,
-          _selectedTimeSlot!.hour,
-          _selectedTimeSlot!.minute,
+          slotTime.hour,
+          slotTime.minute,
         );
 
-        String formattedStartTime = utcStartTime.toIso8601String();
-
-        context.read<AppointmentBloc>().add(
+        context.read<TimeSlotBloc>().add(
               BookAppointmentEvent(
                 patientId: patientId,
-                specialistId: widget.specialistId,
-                startTime: utcStartTime,
+                slotId: _selectedTimeSlot!.id,
                 message: _messageController.text,
+                appointmentDate: _selectedDate!,
               ),
             );
-
-        Navigator.pop(context);
+      } else {
+        _showSnackBar(
+          "Error",
+          "User not authenticated.",
+          ContentType.failure,
+        );
       }
     }
+  }
+
+  void _showSnackBar(String title, String message, ContentType type) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: title,
+          message: message,
+          contentType: type,
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
@@ -65,42 +86,81 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return AlertDialog(
-      backgroundColor: colorScheme.surface,
-      title: Text(
-        'Book Appointment',
-        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-      ),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildDatePicker(),
-            _buildTimeSlotDropdown(),
-          ],
+    return BlocListener<TimeSlotBloc, TimeSlotState>(
+      listener: (context, state) {
+        if (state is TimeSlotSuccess) {
+          if (state.data is Map<String, dynamic>) {
+            // ✅ Booking success
+            _showSnackBar(
+              "Success",
+              "Appointment successfully booked!",
+              ContentType.success,
+            );
+          } else {
+            // ✅ Available slots fetched
+            _showSnackBar(
+              "Slots Loaded",
+              "Available slots have been loaded.",
+              ContentType.help,
+            );
+          }
+        } else if (state is TimeSlotFailure) {
+          // ❌ Booking or slot loading failed
+          _showSnackBar(
+            "Error",
+            state.error,
+            ContentType.failure,
+          );
+        } else if (state is TimeSlotLoading) {
+          // ⏳ Fetching slots or booking
+          _showSnackBar(
+            "Loading",
+            "Please wait while we process your request.",
+            ContentType.warning,
+          );
+        }
+      },
+      child: AlertDialog(
+        backgroundColor: colorScheme.surface,
+        title: Text(
+          'Book Appointment',
+          style:
+              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel', style: TextStyle(color: colorScheme.error)),
-        ),
-        ElevatedButton(
-          onPressed: () => _submitForm(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDatePicker(),
+              _buildTimeSlotDropdown(),
+            ],
           ),
-          child: Text('Confirm', style: TextStyle(color: colorScheme.onPrimary)),
         ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(color: colorScheme.error)),
+          ),
+          ElevatedButton(
+            onPressed: () => _submitForm(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child:
+                Text('Confirm', style: TextStyle(color: colorScheme.onPrimary)),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildDatePicker() {
     return ListTile(
-      leading: Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.primary),
+      leading: Icon(Icons.calendar_today,
+          color: Theme.of(context).colorScheme.primary),
       title: Text(
         _selectedDate == null
             ? 'Select Date'
@@ -117,10 +177,10 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
         if (pickedDate != null) {
           setState(() {
             _selectedDate = pickedDate;
-            _selectedTimeSlot = null; 
+            _selectedTimeSlot = null;
           });
-          context.read<AppointmentBloc>().add(
-                FetchAvailableTimeSlotsEvent(
+          context.read<TimeSlotBloc>().add(
+                GetAvailableSlotsEvent(
                   specialistId: widget.specialistId,
                   date: _selectedDate!,
                 ),
@@ -131,15 +191,29 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
   }
 
   Widget _buildTimeSlotDropdown() {
-    return BlocBuilder<AppointmentBloc, AppointmentState>(
+    if (_selectedDate == null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Text(
+          "Please select a date first.",
+          style: TextStyle(
+            color: Colors.grey,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+
+    return BlocBuilder<TimeSlotBloc, TimeSlotState>(
       builder: (context, state) {
-        if (state is AppointmentLoading) {
+        if (state is TimeSlotLoading) {
           return Center(child: CircularProgressIndicator());
-        } else if (state is AvailableTimeSlotsLoaded) {
-          final List<DateTime> availableSlots = state.availableSlots;
+        } else if (state is TimeSlotSuccess &&
+            state.data is List<TimeSlotModel>) {
+          final List<TimeSlotModel> availableSlots = state.data;
 
           if (availableSlots.isEmpty) {
-            _selectedTimeSlot = null; 
+            _selectedTimeSlot = null;
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Text(
@@ -152,19 +226,20 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
             );
           }
 
-          return DropdownButtonFormField<DateTime>(
+          return DropdownButtonFormField<TimeSlotModel>(
             value: _selectedTimeSlot,
-            items: availableSlots.map((DateTime slot) {
-              String formattedTime = DateFormat('hh:mm a').format(slot); 
-
-              return DropdownMenuItem<DateTime>(
+            items: availableSlots.map((TimeSlotModel slot) {
+              String formattedTime = DateFormat('hh:mm a').format(
+                DateFormat('h:mm a').parse(slot.startTime),
+              );
+              return DropdownMenuItem<TimeSlotModel>(
                 value: slot,
                 child: Text(formattedTime),
               );
             }).toList(),
-            onChanged: (DateTime? value) {
+            onChanged: (TimeSlotModel? value) {
               setState(() {
-                _selectedTimeSlot = value; 
+                _selectedTimeSlot = value;
               });
             },
             decoration: InputDecoration(
@@ -173,12 +248,14 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
                 Icons.access_time,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             validator: (value) =>
                 value == null ? 'Please select a time slot' : null,
           );
-        } else if (state is AppointmentError) {
+        } else if (state is TimeSlotFailure) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
@@ -187,7 +264,7 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
             ),
           );
         }
-        return Container(); 
+        return Container();
       },
     );
   }

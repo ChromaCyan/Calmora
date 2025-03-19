@@ -1,10 +1,7 @@
-import 'package:armstrong/specialist/screens/appointments/appointment_complete.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
-import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
-import 'package:armstrong/services/api.dart'; 
+import 'package:armstrong/services/api.dart';
+import 'package:armstrong/specialist/screens/appointments/appointment_complete.dart';
 
 class SpecialistAppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
@@ -17,25 +14,34 @@ class SpecialistAppointmentCard extends StatelessWidget {
   });
 
   String _formatDate(String dateTimeString) {
-    final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('MMM d, y').format(dateTime);
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('MMM d, y').format(dateTime);
+    } catch (e) {
+      return "Invalid Date";
+    }
   }
 
-  String _formatTime(String dateTimeString) {
-    final dateTime = DateTime.parse(dateTimeString);
-    return DateFormat('h:mm a').format(dateTime);
+  String _formatTime(String timeString) {
+    try {
+      final time = DateFormat('h:mm a').parse(timeString);
+      return DateFormat('h:mm a').format(time);
+    } catch (e) {
+      return "Invalid Time";
+    }
   }
 
-  String _combineDateTimes(String startDateTimeString, String endDateTimeString) {
-    final startFormatted = _formatTime(startDateTimeString);
-    final endFormatted = _formatTime(endDateTimeString);
-    return '$startFormatted - $endFormatted';
+  String _combineDateTimes(String startTimeString, String endTimeString) {
+    final formattedStartTime = _formatTime(startTimeString);
+    final formattedEndTime = _formatTime(endTimeString);
+    return '$formattedStartTime - $formattedEndTime';
   }
 
-  Future<void> _acceptAppointment(BuildContext context, String appointmentId) async {
+  Future<void> _acceptAppointment(
+      BuildContext context, String appointmentId) async {
     try {
       await _apiRepository.acceptAppointment(appointmentId);
-      onStatusChanged(); 
+      onStatusChanged();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error accepting appointment')),
@@ -43,10 +49,11 @@ class SpecialistAppointmentCard extends StatelessWidget {
     }
   }
 
-  Future<void> _declineAppointment(BuildContext context, String appointmentId) async {
+  Future<void> _declineAppointment(
+      BuildContext context, String appointmentId) async {
     try {
       await _apiRepository.declineAppointment(appointmentId);
-      onStatusChanged(); 
+      onStatusChanged();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error declining appointment')),
@@ -60,23 +67,29 @@ class SpecialistAppointmentCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    final specialistId =
+        appointment['specialist']; // This is the ID, not the object
+    final specialistName = specialistId != null
+        ? 'Loading Specialist...' // You should show a loading indicator or fetch specialist details from an API
+        : 'Specialist';
     final patient = appointment['patient'];
     final patientName = '${patient['firstName']} ${patient['lastName']}';
-    final startTime = appointment['startTime'];
-    final endTime = appointment['endTime'];
-    final status = appointment['status'];
+
+    final timeSlot = appointment['timeSlot'] ?? {};
+    final status = appointment['status'] ?? 'pending';
     final appointmentId = appointment['_id'];
 
-    final timeRange = _combineDateTimes(startTime, endTime);
-    final formattedStartDate = _formatDate(startTime);
+    final formattedStartDate = _formatDate(appointment['appointmentDate']);
+    final timeRange = _combineDateTimes(
+        timeSlot['startTime'] ?? '', timeSlot['endTime'] ?? '');
 
     return Center(
       child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.04), 
-        width: screenWidth * 0.9, 
+        padding: EdgeInsets.all(screenWidth * 0.04),
+        width: screenWidth * 0.9,
         decoration: BoxDecoration(
           color: theme.surface,
-          borderRadius: BorderRadius.circular(screenWidth * 0.04), 
+          borderRadius: BorderRadius.circular(screenWidth * 0.04),
           border: Border.all(color: theme.outlineVariant),
         ),
         child: Column(
@@ -93,7 +106,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                         Text(
                           patientName,
                           style: TextStyle(
-                            fontSize: screenWidth * 0.045, 
+                            fontSize: screenWidth * 0.045,
                             fontWeight: FontWeight.bold,
                             color: theme.onSurface,
                           ),
@@ -101,7 +114,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                         Text(
                           'Status: ${status[0].toUpperCase() + status.substring(1)}',
                           style: TextStyle(
-                            fontSize: screenWidth * 0.04, 
+                            fontSize: screenWidth * 0.04,
                             fontWeight: FontWeight.w500,
                             color: status == 'pending'
                                 ? theme.tertiary
@@ -117,7 +130,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.all(screenWidth * 0.02),
                   child: Container(
-                    height: screenWidth * 0.15, 
+                    height: screenWidth * 0.15,
                     width: screenWidth * 0.15,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -125,7 +138,8 @@ class SpecialistAppointmentCard extends StatelessWidget {
                         image: patient['profileImage'] != null &&
                                 patient['profileImage'].isNotEmpty
                             ? NetworkImage(patient['profileImage'])
-                            : const AssetImage("lib/icons/profile_placeholder.png")
+                            : const AssetImage(
+                                    "lib/icons/profile_placeholder.png")
                                 as ImageProvider,
                         fit: BoxFit.cover,
                       ),
@@ -137,18 +151,24 @@ class SpecialistAppointmentCard extends StatelessWidget {
             SizedBox(height: screenHeight * 0.01),
             Row(
               children: [
-                Icon(Icons.calendar_today, color: theme.primary, size: screenWidth * 0.04),
+                Icon(Icons.calendar_today,
+                    color: theme.primary, size: screenWidth * 0.04),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
                   formattedStartDate,
-                  style: TextStyle(fontSize: screenWidth * 0.04, color: theme.onSurfaceVariant),
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.04,
+                      color: theme.onSurfaceVariant),
                 ),
                 SizedBox(width: screenWidth * 0.05),
-                Icon(Icons.access_time, color: theme.secondary, size: screenWidth * 0.04),
+                Icon(Icons.access_time,
+                    color: theme.secondary, size: screenWidth * 0.04),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
                   timeRange,
-                  style: TextStyle(fontSize: screenWidth * 0.04, color: theme.onSurfaceVariant),
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.04,
+                      color: theme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -159,32 +179,38 @@ class SpecialistAppointmentCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => _acceptAppointment(context, appointmentId),
+                      onPressed: () =>
+                          _acceptAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
                         ),
                       ),
                       child: Text(
                         'Accept',
-                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: screenWidth * 0.04),
                       ),
                     ),
                   ),
                   SizedBox(width: screenWidth * 0.03),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => _declineAppointment(context, appointmentId),
+                      onPressed: () =>
+                          _declineAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.error,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
                         ),
                       ),
                       child: Text(
                         'Decline',
-                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: screenWidth * 0.04),
                       ),
                     ),
                   ),
@@ -198,7 +224,8 @@ class SpecialistAppointmentCard extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AppointmentCompleteScreen(appointmentId: appointmentId),
+                      builder: (context) => AppointmentCompleteScreen(
+                          appointmentId: appointmentId),
                     ),
                   );
                 },
@@ -210,7 +237,8 @@ class SpecialistAppointmentCard extends StatelessWidget {
                 ),
                 child: Text(
                   'Proceed to Complete',
-                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                  style: TextStyle(
+                      color: Colors.white, fontSize: screenWidth * 0.04),
                 ),
               ),
             ],
@@ -220,4 +248,3 @@ class SpecialistAppointmentCard extends StatelessWidget {
     );
   }
 }
-

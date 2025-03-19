@@ -2,7 +2,6 @@ import 'package:armstrong/models/timeslot/timeslot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
-import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/widgets/forms/timeslot_form.dart';
 import 'package:intl/intl.dart';
 
@@ -42,11 +41,6 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
     if (result == true) {
       _fetchTimeSlots();
     }
-  }
-
-  Future<void> _navigateBack(BuildContext context) async {
-    Navigator.pop(context, true);
-    context.read<TimeSlotBloc>().add(ResetTimeSlotEvent());
   }
 
   void _navigateToEditSlot(TimeSlotModel slot) async {
