@@ -68,7 +68,8 @@ class SpecialistBottomNavBar extends StatelessWidget {
           _buildNavItem(context, Icons.home_filled, "Home", 0),
           _buildNavItem(context, Icons.newspaper, "Articles", 1),
           _buildNavItemWithBadge(context, Icons.message_outlined, "Messages", 2, chatNotificationCount),
-          _buildNavItemWithBadge(context, Icons.checklist, "Appointments", 3, notificationCount),
+          _buildNavItem(context, Icons.date_range, "Timeslot", 3),
+          _buildNavItemWithBadge(context, Icons.checklist, "Appointments", 4, notificationCount),
         ],
       ),
     );

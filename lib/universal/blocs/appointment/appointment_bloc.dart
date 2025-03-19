@@ -70,7 +70,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     try {
       // Fetch updated available slots
       final List<DateTime> availableSlots = await _apiRepository
-          .getAvailableTimeSlots(event.specialistId, event.startTime);
+          .fetchAvailableTimeSlots(event.specialistId, event.startTime);
 
       // Check if the selected time is available
       bool isSlotAvailable = availableSlots.any(
@@ -83,7 +83,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       }
 
       // Create the appointment
-      final appointment = await _apiRepository.createAppointment(
+      final appointment = await _apiRepository.addAppointment(
         event.patientId,
         event.specialistId,
         event.startTime,
@@ -92,7 +92,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
 
       // After booking, refresh available time slots
       final List<DateTime> updatedSlots = await _apiRepository
-          .getAvailableTimeSlots(event.specialistId, event.startTime);
+          .fetchAvailableTimeSlots(event.specialistId, event.startTime);
 
       emit(AvailableTimeSlotsLoaded(availableSlots: updatedSlots));
       emit(AppointmentBooked(appointment: appointment));
@@ -115,7 +115,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     try {
       // Fetch available slots as a simple List<DateTime>
       final List<DateTime> availableSlots = await _apiRepository
-          .getAvailableTimeSlots(event.specialistId, event.date);
+          .fetchAvailableTimeSlots(event.specialistId, event.date);
 
       emit(AvailableTimeSlotsLoaded(availableSlots: availableSlots));
     } catch (e) {

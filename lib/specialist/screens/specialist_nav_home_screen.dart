@@ -1,8 +1,8 @@
 import 'package:armstrong/specialist/screens/appointments/appointment_screen.dart';
+import 'package:armstrong/specialist/screens/appointments/timeslot_screen.dart';
 import 'package:armstrong/universal/chat/screen/chat_list_screen.dart';
 import 'package:armstrong/universal/notification/notification_screen.dart';
 import 'package:armstrong/universal/profile/profile_screen.dart';
-import 'package:armstrong/widgets/navigation/specialist_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/nav_cubit.dart';
@@ -197,6 +197,9 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                   : const Center(child: CircularProgressIndicator()),
               ChatListScreen(),
               _userId != null
+                  ? TimeSlotListScreen(specialistId: _userId!)
+                  : const Center(child: CircularProgressIndicator()),
+              _userId != null
                   ? SpecialistAppointmentListScreen(specialistId: _userId!)
                   : const Center(child: CircularProgressIndicator()),
             ],
@@ -219,7 +222,9 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       case 2:
         return 'Chat';
       case 3:
-        return 'Appointment';
+        return 'Time Slot';
+      case 4:
+        return 'Appointments';
       default:
         return 'Home';
     }
