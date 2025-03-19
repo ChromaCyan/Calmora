@@ -14,8 +14,7 @@ import 'package:armstrong/models/mood/mood.dart';
 import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
-  final String baseUrl =
-      'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
+  final String baseUrl ='https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
   //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
@@ -364,7 +363,7 @@ class ApiRepository {
   // Appointments (API)
 
   // Get available time slots from specialist
-  Future<List<DateTime>> getAvailableTimeSlots(
+  Future<List<DateTime>> fetchAvailableTimeSlots(
       String specialistId, DateTime date) async {
     final token = await _storage.read(key: 'token');
     String formattedDate =
@@ -397,7 +396,7 @@ class ApiRepository {
   }
 
 // Create a new appointment
-  Future<Map<String, dynamic>> createAppointment(
+  Future<Map<String, dynamic>> addAppointment(
     String patientId,
     String specialistId,
     DateTime startTime,
@@ -907,6 +906,184 @@ class ApiRepository {
     if (response.statusCode != 200) {
       throw Exception(
           'Failed to mark all notifications as read: ${response.body}');
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Time Slot with Booking Recreation (The last keep failing)
+
+  // Add a new time slot for the specialist
+  Future<Map<String, dynamic>> addTimeSlot({
+    required String specialistId,
+    required String dayOfWeek,
+    required String startTime,
+    required String endTime,
+  }) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/timeslot/');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'specialistId': specialistId,
+        'dayOfWeek': dayOfWeek,
+        'startTime': startTime,
+        'endTime': endTime,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to add time slot: ${response.body}');
+    }
+  }
+
+// Update an existing time slot
+  Future<Map<String, dynamic>> updateTimeSlot({
+    required String slotId,
+    String? dayOfWeek,
+    String? startTime,
+    String? endTime,
+  }) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/timeslot/$slotId');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        if (dayOfWeek != null) 'dayOfWeek': dayOfWeek,
+        if (startTime != null) 'startTime': startTime,
+        if (endTime != null) 'endTime': endTime,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to update time slot: ${response.body}');
+    }
+  }
+
+  // Get available time slots for a specialist
+  Future<List<DateTime>> getAvailableTimeSlots(
+    String specialistId,
+    DateTime date,
+  ) async {
+    final token = await _storage.read(key: 'token');
+    String formattedDate =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+    final url = Uri.parse('$baseUrl/timeslot/$specialistId/$formattedDate');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print("API Response: ${response.body}");
+      final data = json.decode(response.body);
+
+      if (data["slots"] is List) {
+        return (data["slots"] as List).map((slot) {
+          if (slot["startTime"] is String) {
+            final timeParts = slot["startTime"]
+                .split(":")
+                .map((s) => int.tryParse(s) ?? 0)
+                .toList();
+
+            if (timeParts.length == 2) {
+              return DateTime(
+                date.year,
+                date.month,
+                date.day,
+                timeParts[0],
+                timeParts[1],
+              );
+            } else {
+              throw Exception("Invalid time format in startTime.");
+            }
+          } else {
+            throw Exception("startTime is not a valid string.");
+          }
+        }).toList();
+      } else {
+        throw Exception("Invalid data format: Expected list of slots.");
+      }
+    } else {
+      throw Exception('Failed to fetch available slots: ${response.body}');
+    }
+  }
+
+  // Get all slots for a specialist (no date filter)
+  Future<List<dynamic>> getAllTimeSlots(String specialistId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/timeslot/$specialistId/all');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print("API Response: ${response.body}");
+      final data = json.decode(response.body);
+
+      // ✅ Fix: Return only the 'slots' list
+      if (data["slots"] is List) {
+        return data["slots"] as List<dynamic>;
+      } else {
+        throw Exception("Invalid data format: Expected list of slots.");
+      }
+    } else {
+      throw Exception('Failed to fetch all time slots: ${response.body}');
+    }
+  }
+
+  // Book an appointment using timeSlot
+  Future<Map<String, dynamic>> bookAppointment(
+    String patientId,
+    String slotId,
+    String message,
+  ) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/timeslot/book');
+
+    // Print the request body for debugging
+    print("Booking appointment with the following details:");
+    print("Patient ID: $patientId");
+    print("Slot ID: $slotId");
+    print("Message: $message");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'patientId': patientId,
+        'slotId': slotId,
+        'message': message,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to book appointment: ${response.body}');
     }
   }
 }

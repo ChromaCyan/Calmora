@@ -92,19 +92,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Expanded(
                     child: AppSection(
-                      title: "Give your feedback",
-                      imageUrl: "images/splash/image1.png",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BreathingGuideScreen()),
-                        );
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: AppSection(
                       title: "What is Armstrong?",
                       imageUrl: "images/armstrong_white.png",
                       onTap: () {

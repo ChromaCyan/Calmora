@@ -26,7 +26,7 @@ List<OnBoards> onBoardData = [
     image: "images/splash/image2.png",
   ),
   OnBoards(
-    text: "Join the Conversation Chat with peers and share experiences in a safe, supportive community.",
+    text: "Find the right help! Chat with specialist and share experiences in a safe space for men.",
     image: "images/splash/image3.png",
   ),
 ];

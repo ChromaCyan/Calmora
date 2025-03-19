@@ -1,3 +1,4 @@
+import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:armstrong/patient/blocs/specialist_list/specialist_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
@@ -19,12 +20,16 @@ class AppProviders {
         create: (context) => SpecialistBloc(apiRepository: apiRepository),
       ),
       // Appointment
-      BlocProvider<AppointmentBloc>(
-        create: (context) => AppointmentBloc(apiRepository: apiRepository),
-      ),
+      // BlocProvider<AppointmentBloc>(
+      //   create: (context) => AppointmentBloc(apiRepository: apiRepository),
+      // ),
       // Articles
       BlocProvider<ArticleBloc>(
         create: (context) => ArticleBloc(apiRepository: apiRepository),
+      ),
+      // Appointment
+      BlocProvider<TimeSlotBloc>(
+        create: (context) => TimeSlotBloc(apiRepository: apiRepository),
       ),
     ];
   }
