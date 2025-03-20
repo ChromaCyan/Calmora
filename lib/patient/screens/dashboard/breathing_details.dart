@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class BreathingGuideScreen extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class _BreathingGuideScreenState extends State<BreathingGuideScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Breathing Exercise Guide")),
+      appBar: UniversalAppBar(title: "Breathing Exercise Guide"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class EditArticleForm extends StatefulWidget {
   final Article article;
@@ -138,9 +139,7 @@ class _EditArticleFormState extends State<EditArticleForm> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Article'),
-      ),
+      appBar: UniversalAppBar(title: ""),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Card(

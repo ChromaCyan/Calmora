@@ -12,6 +12,8 @@ import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:armstrong/widgets/forms/profile_picture.dart';
 import 'package:armstrong/widgets/forms/common_fields.dart';
 import 'package:armstrong/models/user/user.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -248,7 +250,23 @@ Widget build(BuildContext context) {
   double buttonFontSize = screenWidth * 0.045; // 4.5% of screen width
 
   return Scaffold(
-    appBar: AppBar(title: Text("Profile", style: TextStyle(fontSize: titleFontSize))),
+    appBar: AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onPrimaryContainer),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Text(
+        "You",
+        style: GoogleFonts.poppins(
+          color: Theme.of(context).colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+        ),
+      ),
+      centerTitle: true,
+      elevation: 2,
+
+    ),
     body: isLoading
         ? const Center(child: CircularProgressIndicator())
         : hasError

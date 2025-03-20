@@ -1,6 +1,5 @@
 import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +10,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:armstrong/universal/chat/screen/text_n_send.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -171,37 +171,37 @@ class _ChatScreenState extends State<ChatScreen> {
     final theme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Chat with ${widget.recipientName}")),
-      body: Column(
-        children: <Widget>[
-          // Create Appointment Button
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onPrimaryContainer),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "Chat with ${widget.recipientName}",
+          style: GoogleFonts.poppins(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 2,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => _bookAppointment(context),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-                backgroundColor: theme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                shadowColor: Colors.black.withOpacity(0.2),
-                elevation: 5,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.calendar_today, color: Colors.white, size: 22),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "Create Appointment Now",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ],
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Tooltip(
+              message: 'Create Appointment', // Tooltip message
+              child: IconButton(
+                icon: const Icon(Icons.calendar_today, color: Colors.white),
+                onPressed: () => _bookAppointment(context),
               ),
             ),
           ),
-
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
           // Chat Messages
           Expanded(
             child: _isLoading

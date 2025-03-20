@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class SpecialistArticleDetailPage extends StatefulWidget {
   final String articleId;
@@ -43,9 +44,7 @@ class _SpecialistArticleDetailPageState
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Article Details'),
-        ),
+        appBar: UniversalAppBar(title: "Article Details"),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {
@@ -141,17 +140,23 @@ class _SpecialistArticleDetailPageState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        ElevatedButton.icon(
-          icon: const Icon(Icons.edit),
-          label: const Text('Edit'),
-          onPressed: () => _navigateToEditForm(context, article),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+        Column(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () => _navigateToEditForm(context, article),
+            ),
+            const Text('Edit', style: TextStyle(color: Colors.blue)),
+          ],
         ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.delete),
-          label: const Text('Delete'),
-          onPressed: () => _confirmDelete(context, article.id),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+        Column(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _confirmDelete(context, article.id),
+            ),
+            const Text('Delete', style: TextStyle(color: Colors.red)),
+          ],
         ),
       ],
     );
@@ -160,8 +165,23 @@ class _SpecialistArticleDetailPageState
   void _navigateToEditForm(BuildContext context, Article article) async {
     bool? result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditArticleForm(article: article),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => EditArticleForm(article: article),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0); // Start from the right
+          const end = Offset.zero; // End at the center
+          const curve = Curves.easeInOut; // Animation curve
+
+          // Create a tween animation
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          // Slide the child in from the right
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
       ),
     );
 
@@ -174,20 +194,37 @@ class _SpecialistArticleDetailPageState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Article?'),
-        content: const Text('Are you sure you want to delete this article?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15), // Rounded corners
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.warning, color: Colors.red, size: 24), // Warning icon
+            const SizedBox(width: 8),
+            const Text('Delete Article?', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to delete this article? This action cannot be undone.',
+          style: TextStyle(fontSize: 16),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: Colors.blue)),
           ),
           ElevatedButton(
             onPressed: () {
               _deleteArticle(context, articleId);
               Navigator.pop(context, true);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Rounded button
+              ),
+            ),
+            child: const Text('Yes, Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
