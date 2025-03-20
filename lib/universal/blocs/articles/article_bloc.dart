@@ -176,7 +176,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         additionalImages: event.additionalImages,
         categories: event.categories,
       );
-      add(FetchAllArticles()); 
+      add(FetchArticleById(event.articleId));
     } catch (e) {
       emit(ArticleError(e.toString()));
     }

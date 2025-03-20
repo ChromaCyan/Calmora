@@ -87,19 +87,18 @@ class _EditArticleFormState extends State<EditArticleForm> {
       }
     }
 
-    // ✅ Dispatch UpdateArticle event with modified data
     context.read<ArticleBloc>().add(
           UpdateArticle(
             articleId: widget.article.id,
             title: _titleController.text,
             content: _contentController.text,
             heroImage: heroImageUrl ?? widget.article.heroImage,
-            categories: _selectedCategories.map((c) => c.toLowerCase()).toList(),
+            categories:
+                _selectedCategories.map((c) => c.toLowerCase()).toList(),
           ),
         );
-
     _showSnackbar('Article updated successfully!');
-    Navigator.pop(context); 
+    Navigator.pop(context, true);
   }
 
   // ✅ Show success or error snackbar
@@ -226,14 +225,22 @@ class _EditArticleFormState extends State<EditArticleForm> {
                 ..._categories.map((category) {
                   return CheckboxListTile(
                     title: Text(category),
-                    value: _selectedCategories.contains(category),
+                    value: _selectedCategories
+                        .map((c) => c.toLowerCase())
+                        .contains(
+                            category.toLowerCase()),
                     onChanged: (bool? selected) {
                       setState(() {
                         if (selected == true &&
                             _selectedCategories.length < 2) {
-                          _selectedCategories.add(category);
+                          if (!_selectedCategories
+                              .map((c) => c.toLowerCase())
+                              .contains(category.toLowerCase())) {
+                            _selectedCategories.add(category);
+                          }
                         } else {
-                          _selectedCategories.remove(category);
+                          _selectedCategories.removeWhere(
+                              (c) => c.toLowerCase() == category.toLowerCase());
                         }
                       });
                     },
