@@ -71,6 +71,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,10 +90,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
             labelText: widget.label,
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             labelStyle: TextStyle(
-              color: _showError ? Colors.white : theme.colorScheme.onSurface,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
             floatingLabelStyle: TextStyle(
-              color: _showError ? Colors.white : theme.colorScheme.primary,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
             ),
             filled: true,
             fillColor: theme.colorScheme.background,
@@ -112,33 +113,22 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color: Colors.red,
                 width: 2,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color: Colors.red,
                 width: 2,
               ),
             ),
             errorText: _showError ? _errorMessage : null,
-            errorStyle: TextStyle(color: Colors.red, fontSize: 14),
-
-            // Ensure suffixIcon always appears
-            suffixIcon: widget.suffixIcon != null
-                ? IconTheme(
-                    data: IconThemeData(
-                      color: _showError
-                          ? Colors.white
-                          : theme.colorScheme.onSurface,
-                    ),
-                    child: widget.suffixIcon!,
-                  )
-                : null,
-            suffixIconConstraints: BoxConstraints(
+            errorStyle: const TextStyle(color: Colors.red, fontSize: 14),
+            suffixIcon: widget.suffixIcon,
+            suffixIconConstraints: const BoxConstraints(
               minWidth: 40,
               minHeight: 40,
             ),
