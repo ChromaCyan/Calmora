@@ -11,6 +11,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:armstrong/universal/chat/screen/text_n_send.dart';
+import 'package:armstrong/helpers/storage_helpers.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -38,6 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _userId;
   bool _isScrolledUp = false;
   bool _isLoading = true;
+  bool _isSpecialist = false;
 
   @override
   void initState() {
@@ -54,12 +56,15 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _initializeUserIdAndLoadData() async {
-    _userId = await _storage.read(key: 'userId');
-    if (_userId != null) {
-      setState(() {});
+    _userId = await StorageHelper.getUserId();
+    String? userType = await StorageHelper.getUserType();
+
+    if (_userId != null && userType != null) {
+      setState(() {
+        _isSpecialist = userType.toLowerCase() == 'specialist';
+      });
     }
 
-    //_initializeSocket();
     _loadMessages();
   }
 
@@ -142,16 +147,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _bookAppointment(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return BlocProvider.value(
-        value: BlocProvider.of<TimeSlotBloc>(context), 
-        child: AppointmentBookingForm(specialistId: widget.recipientId),
-      );
-    },
-  );
-}
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocProvider.value(
+          value: BlocProvider.of<TimeSlotBloc>(context),
+          child: AppointmentBookingForm(specialistId: widget.recipientId),
+        );
+      },
+    );
+  }
 
   String _formatTimestamp(String timestamp) {
     final dateTime = DateTime.parse(timestamp);
@@ -175,32 +180,38 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           // Create Appointment Button
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => _bookAppointment(context),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-                backgroundColor: theme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                shadowColor: Colors.black.withOpacity(0.2),
-                elevation: 5,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.calendar_today, color: Colors.white, size: 22),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "Create Appointment Now",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          if (!_isSpecialist)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () => _bookAppointment(context),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
+                  backgroundColor: theme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ],
+                  shadowColor: Colors.black.withOpacity(0.2),
+                  elevation: 5,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.calendar_today,
+                        color: Colors.white, size: 22),
+                    const SizedBox(width: 10),
+                    const Text(
+                      "Create Appointment Now",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
           // Chat Messages
           Expanded(
@@ -211,11 +222,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.chat_bubble_outline, size: 50, color: Colors.grey),
+                            Icon(Icons.chat_bubble_outline,
+                                size: 50, color: Colors.grey),
                             SizedBox(height: 10),
                             Text(
                               "No messages yet",
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
                             ),
                           ],
                         ),
@@ -244,4 +257,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-

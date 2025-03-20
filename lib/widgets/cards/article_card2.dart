@@ -21,12 +21,10 @@ class ArticleCard2 extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsive card width
-    double cardWidth = screenWidth * 0.5; // Default: 50% of screen width
-    if (screenWidth > 600) cardWidth = screenWidth * 0.35; // Tablet size
-    if (screenWidth > 900) cardWidth = screenWidth * 0.25; // Larger screens
-    cardWidth = cardWidth.clamp(220, 400); // Min 220, Max 400
-
+    double cardWidth = screenWidth * 0.5; 
+    if (screenWidth > 600) cardWidth = screenWidth * 0.35; 
+    if (screenWidth > 900) cardWidth = screenWidth * 0.25; 
+    cardWidth = cardWidth.clamp(220, 400); 
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -59,8 +57,8 @@ class ArticleCard2 extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: theme.brightness == Brightness.dark
-                ? Colors.grey[300]!.withOpacity(0.15)  // Dark mode shadow color
-                : Colors.grey[800]!.withOpacity(0.15),  // Light mode shadow color
+                ? Colors.grey[300]!.withOpacity(0.15)  
+                : Colors.grey[800]!.withOpacity(0.15),  
               spreadRadius: 2,
               blurRadius: 8,
               offset: const Offset(0, 4),
@@ -73,11 +71,11 @@ class ArticleCard2 extends StatelessWidget {
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
               child: AspectRatio(
-                aspectRatio: 16 / 9, // Ensures image scales properly
+                aspectRatio: 16 / 9, 
                 child: Image.network(
                   imageUrl,
                   width: double.infinity,
-                  fit: BoxFit.cover, // Prevents zoom-in/zoom-out issues
+                  fit: BoxFit.cover, 
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: Colors.grey[300],
                     child: const Center(
@@ -99,7 +97,7 @@ class ArticleCard2 extends StatelessWidget {
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    softWrap: true, // Ensures long words break properly
+                    softWrap: true, 
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -107,8 +105,8 @@ class ArticleCard2 extends StatelessWidget {
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
-                    maxLines: 1, // Prevents overflow
-                    overflow: TextOverflow.ellipsis, // Ensures truncation
+                    maxLines: 1, 
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

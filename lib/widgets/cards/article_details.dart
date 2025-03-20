@@ -25,11 +25,14 @@ class ArticleDetailPage extends StatelessWidget {
         if (userId != null) {
           context.read<ArticleBloc>().add(FetchRecommendedArticles(userId));
         }
+        Navigator.pop(context);
         return true;
       },
 
       child: Scaffold(
-        appBar: UniversalAppBar(title: ""),
+        appBar: AppBar(
+          title: const Text('Article Details'),
+        ),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {
@@ -113,6 +116,7 @@ class ArticleDetailPage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Wrap(
                   spacing: screenWidth > 600 ? 12.0 : 8.0,
+                  
                   runSpacing: screenWidth > 600 ? 6.0 : 4.0,
                   children: article.categories.map((category) {
                     String capitalizedCategory = category

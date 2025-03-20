@@ -64,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     await StorageHelper.saveUserId(userId);
                     await StorageHelper.saveToken(token);
+                    await StorageHelper.saveUserType(userType);
 
                     if (userType == 'Patient') {
                       final FlutterSecureStorage storage =
