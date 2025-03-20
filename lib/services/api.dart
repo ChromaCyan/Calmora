@@ -15,7 +15,8 @@ import 'package:armstrong/models/mood/mood.dart';
 import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
-  final String baseUrl ='https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
+  final String baseUrl =
+      'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
   //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
@@ -973,6 +974,26 @@ class ApiRepository {
     }
   }
 
+  // Delete existing timeslot
+  Future<Map<String, dynamic>> deleteTimeSlot(String slotId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/timeslot/$slotId');
+
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to delete time slot: ${response.body}');
+    }
+  }
+
   // Get available time slots for a specialist
   Future<List<TimeSlotModel>> getAvailableTimeSlots(
     String specialistId,
@@ -1039,7 +1060,7 @@ class ApiRepository {
     String patientId,
     String slotId,
     String message,
-    DateTime appointmentDate, 
+    DateTime appointmentDate,
   ) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/timeslot/book');
@@ -1063,7 +1084,7 @@ class ApiRepository {
         'patientId': patientId,
         'slotId': slotId,
         'message': message,
-        'appointmentDate': formattedDate, 
+        'appointmentDate': formattedDate,
       }),
     );
 

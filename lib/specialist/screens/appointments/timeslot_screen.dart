@@ -57,11 +57,46 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
       ),
     );
 
-    print("Navigating to edit slot with ID: ${slot.id}");
-
     if (result == true) {
       _fetchTimeSlots();
     }
+  }
+
+  // ✅ Confirm and delete slot
+  void _confirmDeleteSlot(String slotId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Time Slot"),
+        content: const Text("Are you sure you want to delete this time slot?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteSlot(slotId);
+            },
+            child: const Text(
+              "Delete",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ Delete slot using Bloc
+  void _deleteSlot(String slotId) {
+    context.read<TimeSlotBloc>().add(
+          DeleteTimeSlotEvent(
+            slotId: slotId,
+            specialistId: widget.specialistId,
+          ),
+        );
   }
 
   @override
@@ -91,7 +126,13 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
 
             // Sorting days in the week
             final daysOfWeek = [
-              "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
             ];
 
             return ListView.builder(
@@ -139,11 +180,24 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                               fontSize: 16,
                             ),
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            onPressed: () {
-                              _navigateToEditSlot(slot);
-                            },
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ✏️ Edit Slot Icon
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  _navigateToEditSlot(slot);
+                                },
+                              ),
+                              // ❌ Delete Slot Icon
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  _confirmDeleteSlot(slot.id);
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       );

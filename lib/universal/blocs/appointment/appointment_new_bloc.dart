@@ -88,6 +88,20 @@ class GetAllSlotsEvent extends TimeSlotEvent {
   List<Object?> get props => [specialistId];
 }
 
+// Delete Time Slot
+class DeleteTimeSlotEvent extends TimeSlotEvent {
+  final String slotId;
+  final String specialistId;
+
+  DeleteTimeSlotEvent({
+    required this.slotId,
+    required this.specialistId,
+  });
+
+  @override
+  List<Object?> get props => [slotId, specialistId];
+}
+
 // ------- STATES -------
 abstract class TimeSlotState extends Equatable {
   @override
@@ -129,6 +143,7 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
     on<BookAppointmentEvent>(_onBookAppointment);
     on<GetAllSlotsEvent>(_onGetAllSlots);
     on<ResetTimeSlotEvent>(_onResetTimeSlot);
+    on<DeleteTimeSlotEvent>(_onDeleteTimeSlot);
   }
 
   // Get All Slots
@@ -223,26 +238,48 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
 
   // Book Appointment
   // ✅ Updated _onBookAppointment to Include Date
-Future<void> _onBookAppointment(
-    BookAppointmentEvent event, Emitter<TimeSlotState> emit) async {
-  emit(TimeSlotLoading());
-  try {
-    // ✅ Include event.appointmentDate here
-    final result = await _apiRepository.bookAppointment(
-      event.patientId,
-      event.slotId,
-      event.message,
-      event.appointmentDate, // 👈 Pass appointmentDate
-    );
-    emit(TimeSlotSuccess(data: result));
-  } catch (error) {
-    emit(TimeSlotFailure(error: error.toString()));
+  Future<void> _onBookAppointment(
+      BookAppointmentEvent event, Emitter<TimeSlotState> emit) async {
+    emit(TimeSlotLoading());
+    try {
+      // ✅ Include event.appointmentDate here
+      final result = await _apiRepository.bookAppointment(
+        event.patientId,
+        event.slotId,
+        event.message,
+        event.appointmentDate, // 👈 Pass appointmentDate
+      );
+      emit(TimeSlotSuccess(data: result));
+    } catch (error) {
+      emit(TimeSlotFailure(error: error.toString()));
+    }
   }
-}
-
 
   Future<void> _onResetTimeSlot(
       ResetTimeSlotEvent event, Emitter<TimeSlotState> emit) async {
     emit(TimeSlotInitial());
+  }
+
+  // Delete Time Slot
+  Future<void> _onDeleteTimeSlot(
+      DeleteTimeSlotEvent event, Emitter<TimeSlotState> emit) async {
+    emit(TimeSlotLoading());
+    try {
+      final result = await _apiRepository.deleteTimeSlot(event.slotId);
+
+      if (result['success']) {
+        final updatedSlots =
+            await _apiRepository.getAllTimeSlots(event.specialistId);
+        final slots = updatedSlots
+            .map<TimeSlotModel>((slot) => TimeSlotModel.fromJson(slot))
+            .toList();
+
+        emit(TimeSlotSuccess(data: slots));
+      } else {
+        throw Exception(result['message']);
+      }
+    } catch (error) {
+      emit(TimeSlotFailure(error: error.toString()));
+    }
   }
 }
