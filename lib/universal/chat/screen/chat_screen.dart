@@ -1,6 +1,5 @@
 import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

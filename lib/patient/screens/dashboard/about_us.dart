@@ -134,7 +134,7 @@ class AboutUsPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
+                          backgroundImage: AssetImage('images/members_pfp/oliver.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -180,7 +180,7 @@ class AboutUsPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
+                          backgroundImage: AssetImage('images/members_pfp/genghis.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -226,7 +226,7 @@ class AboutUsPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
+                          backgroundImage: AssetImage('images/members_pfp/josh.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -318,7 +318,7 @@ class AboutUsPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage('assets/john_doe.jpg'), // Replace with actual image
+                          backgroundImage: AssetImage('images/members_pfp/marion.jpg'), // Replace with actual image
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -357,146 +357,146 @@ class AboutUsPage extends StatelessWidget {
                   SizedBox(height: 20),
 
                                     // Divider to separate sections
-                  Divider(
-                    thickness: 2, // Adjust thickness as needed
-                    color: Colors.grey, // Adjust color as needed
-                  ),
+                  // Divider(
+                  //   thickness: 2, // Adjust thickness as needed
+                  //   color: Colors.grey, // Adjust color as needed
+                  // ),
 
                   SizedBox(height: 20),
 
                   // Gallery Section
-                  Text(
-                    'Gallery',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
+                  // Text(
+                  //   'Gallery',
+                  //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  // ),
+                  // SizedBox(height: 10),
 
                   // Container for the Gallery
                   // First Gallery Item
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
-                    decoration: boxDecoration(),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                            height: 100,
-                            width: 130,
-                          child: Image.asset(
-                            'assets/gallery1.jpg', // Replace with actual image
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'A Memorable Event',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                'What to put here?',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
+                  // Container(
+                  //   width: double.infinity,
+                  //   padding: EdgeInsets.all(16),
+                  //   decoration: boxDecoration(),
+                  //   child: Row(
+                  //     children: [
+                  //       SizedBox(
+                  //           height: 100,
+                  //           width: 130,
+                  //         child: Image.asset(
+                  //           'assets/gallery1.jpg', // Replace with actual image
+                  //           fit: BoxFit.cover,
+                  //         ),
+                  //       ),
+                  //       SizedBox(width: 10),
+                  //       Expanded(
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             Text(
+                  //               'A Memorable Event',
+                  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  //             ),
+                  //             SizedBox(height: 5),
+                  //             Text(
+                  //               'What to put here?',
+                  //               textAlign: TextAlign.left,
+                  //               style: TextStyle(fontSize: 16),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // SizedBox(height: 10),
 
                   // Second Gallery Item
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
-                    decoration: boxDecoration(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Behind the scene?',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                'What to put here',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        SizedBox(
-                            height: 100,
-                            width: 130,
-                          child: Image.asset(
-                            'assets/gallery2.jpg', // Replace with actual image
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
+                  // Container(
+                  //   width: double.infinity,
+                  //   padding: EdgeInsets.all(16),
+                  //   decoration: boxDecoration(),
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             Text(
+                  //               'Behind the scene?',
+                  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  //             ),
+                  //             SizedBox(height: 5),
+                  //             Text(
+                  //               'What to put here',
+                  //               textAlign: TextAlign.left,
+                  //               style: TextStyle(fontSize: 16),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //       SizedBox(width: 10),
+                  //       SizedBox(
+                  //           height: 100,
+                  //           width: 130,
+                  //         child: Image.asset(
+                  //           'assets/gallery2.jpg', // Replace with actual image
+                  //           fit: BoxFit.cover,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // SizedBox(height: 10),
 
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
-                    decoration: boxDecoration(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center, // Center everything
-                      children: [
-                        // Row with Two Images
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 140, // Adjust as needed
-                              height: 100,
-                              child: Image.asset(
-                                'assets/gallery3_1.jpg', // Replace with actual image
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            SizedBox(width: 10), // Spacing between images
-                            SizedBox(
-                              width: 140,
-                              height: 100,
-                              child: Image.asset(
-                                'assets/gallery3_2.jpg', // Replace with actual image
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10), // Space between images and text
+                  // Container(
+                  //   width: double.infinity,
+                  //   padding: EdgeInsets.all(16),
+                  //   decoration: boxDecoration(),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.center, // Center everything
+                  //     children: [
+                  //       // Row with Two Images
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           SizedBox(
+                  //             width: 140, // Adjust as needed
+                  //             height: 100,
+                  //             child: Image.asset(
+                  //               'assets/gallery3_1.jpg', // Replace with actual image
+                  //               fit: BoxFit.cover,
+                  //             ),
+                  //           ),
+                  //           SizedBox(width: 10), // Spacing between images
+                  //           SizedBox(
+                  //             width: 140,
+                  //             height: 100,
+                  //             child: Image.asset(
+                  //               'assets/gallery3_2.jpg', // Replace with actual image
+                  //               fit: BoxFit.cover,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       SizedBox(height: 10), // Space between images and text
 
-                        // Description Text Below
-                        Text(
-                          'Workshop Pic?',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center, // Center align text
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          'What to put here?',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
+                  //       // Description Text Below
+                  //       Text(
+                  //         'Workshop Pic?',
+                  //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  //         textAlign: TextAlign.center, // Center align text
+                  //       ),
+                  //       SizedBox(height: 5),
+                  //       Text(
+                  //         'What to put here?',
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(fontSize: 16),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
 
-                  SizedBox(height: 50),
+                  // SizedBox(height: 50),
                 ],
               ),
             ),

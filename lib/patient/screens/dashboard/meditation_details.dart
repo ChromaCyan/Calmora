@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class MindfulMeditation extends StatelessWidget {
   const MindfulMeditation({Key? key}) : super(key: key);
@@ -6,10 +7,7 @@ class MindfulMeditation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Mindful Meditation"),
-        centerTitle: true,
-      ),
+      appBar: UniversalAppBar(title: "Mindful Meditation"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -80,7 +78,7 @@ class MindfulMeditation extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'images/meditation2.jpeg',
+                'images/meditation3.jpg',
                 fit: BoxFit.cover,
               ),
             ),

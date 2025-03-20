@@ -62,7 +62,7 @@ class SpecialistArticleCard extends StatelessWidget {
                 : Colors.grey[800]!.withOpacity(0.15),  // Light mode shadow color
               spreadRadius: 2,
               blurRadius: 8,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 0),
             ),
           ],
         ),
