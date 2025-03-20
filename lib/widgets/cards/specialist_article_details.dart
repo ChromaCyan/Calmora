@@ -1,9 +1,8 @@
+import 'package:armstrong/widgets/forms/edit_article_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
-import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SpecialistArticleDetailPage extends StatelessWidget {
@@ -17,7 +16,6 @@ class SpecialistArticleDetailPage extends StatelessWidget {
     context.read<ArticleBloc>().add(FetchArticleById(articleId));
 
     return WillPopScope(
-      // This listens for back button presses
       onWillPop: () async {
         final storage = FlutterSecureStorage();
         final userId = await storage.read(key: 'userId');
@@ -26,9 +24,10 @@ class SpecialistArticleDetailPage extends StatelessWidget {
         }
         return true;
       },
-
       child: Scaffold(
-        appBar: AppBar(title: const Text('Article Details')),
+        appBar: AppBar(
+          title: const Text('Article Details'),
+        ),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {
@@ -50,19 +49,10 @@ class SpecialistArticleDetailPage extends StatelessWidget {
     );
   }
 
+  // ✅ Updated to include Edit/Delete Buttons
   Widget _buildArticleDetail(BuildContext context, Article article) {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-    final Map<String, Color> categoryColors = {
-      "health": Colors.green,
-      "social": Colors.blue,
-      "relationships": Colors.pink,
-      "growth": Colors.orange,
-      "coping strategies": Colors.purple,
-      "mental wellness": Colors.teal,
-      "self-care": Colors.red,
-    };
-
     double contentPadding = screenWidth > 600 ? 32.0 : 20.0;
     double titleFontSize = screenWidth > 600 ? 24.0 : 22.0;
     double bodyFontSize = screenWidth > 600 ? 20.0 : 18.0;
@@ -108,36 +98,6 @@ class SpecialistArticleDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Wrap(
-                  spacing: screenWidth > 600 ? 12.0 : 8.0,
-                  runSpacing: screenWidth > 600 ? 6.0 : 4.0,
-                  children: article.categories.map((category) {
-                    String capitalizedCategory = category
-                        .split(' ')
-                        .map(
-                            (word) => word[0].toUpperCase() + word.substring(1))
-                        .join(' ');
-
-                    return Chip(
-                      label: Text(
-                        capitalizedCategory,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white,
-                          fontSize: screenWidth > 600 ? 16.0 : 14.0,
-                        ),
-                      ),
-                      backgroundColor:
-                          categoryColors[category] ?? theme.colorScheme.primary,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth > 600 ? 16.0 : 12.0,
-                        vertical: screenWidth > 600 ? 8.0 : 6.0,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
               const Divider(thickness: 1, height: 24),
               Text(
                 article.content,
@@ -151,10 +111,89 @@ class SpecialistArticleDetailPage extends StatelessWidget {
                 overflow: TextOverflow.clip,
               ),
               const SizedBox(height: 20),
+              _buildEditDeleteButtons(
+                  context, article), // ✅ Add Edit/Delete Buttons Here
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // ✅ Add Edit and Delete Buttons
+  Widget _buildEditDeleteButtons(BuildContext context, Article article) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.edit),
+          label: const Text('Edit'),
+          onPressed: () =>
+              _navigateToEditForm(context, article), // ✅ Navigate to form
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+        ),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.delete),
+          label: const Text('Delete'),
+          onPressed: () => _confirmDelete(context, article.id),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToEditForm(BuildContext context, Article article) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            EditArticleForm(article: article), // ✅ Navigate to EditArticleForm
+      ),
+    );
+  }
+
+  // ✅ Edit Logic: Dispatch UpdateArticle
+  void _updateArticle(BuildContext context, String articleId, String title,
+      String content, String heroImage) {
+    context.read<ArticleBloc>().add(
+          UpdateArticle(
+            articleId: articleId,
+            title: title,
+            content: content,
+            heroImage: heroImage,
+          ),
+        );
+  }
+
+  // ✅ Show Confirm Delete Dialog
+  void _confirmDelete(BuildContext context, String articleId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Article?'),
+        content: const Text('Are you sure you want to delete this article?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _deleteArticle(context, articleId);
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ Delete Logic: Dispatch DeleteArticle
+  void _deleteArticle(BuildContext context, String articleId) {
+    context.read<ArticleBloc>().add(DeleteArticle(articleId));
+    Navigator.pop(context);
   }
 }

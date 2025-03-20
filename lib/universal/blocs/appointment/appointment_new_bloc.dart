@@ -130,6 +130,8 @@ class TimeSlotFailure extends TimeSlotState {
 
 class ResetTimeSlotEvent extends TimeSlotEvent {}
 
+class TimeSlotDeleted extends TimeSlotState {}
+
 // ------- BLOC -------
 class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
   final ApiRepository _apiRepository;
@@ -237,7 +239,6 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
   }
 
   // Book Appointment
-  // ✅ Updated _onBookAppointment to Include Date
   Future<void> _onBookAppointment(
       BookAppointmentEvent event, Emitter<TimeSlotState> emit) async {
     emit(TimeSlotLoading());
@@ -263,22 +264,17 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
   // Delete Time Slot
   Future<void> _onDeleteTimeSlot(
       DeleteTimeSlotEvent event, Emitter<TimeSlotState> emit) async {
-    emit(TimeSlotLoading());
     try {
       final result = await _apiRepository.deleteTimeSlot(event.slotId);
 
       if (result['success']) {
-        final updatedSlots =
-            await _apiRepository.getAllTimeSlots(event.specialistId);
-        final slots = updatedSlots
-            .map<TimeSlotModel>((slot) => TimeSlotModel.fromJson(slot))
-            .toList();
-
-        emit(TimeSlotSuccess(data: slots));
+        // ✅ Emit TimeSlotDeleted to trigger Snackbar and reload
+        emit(TimeSlotDeleted());
       } else {
         throw Exception(result['message']);
       }
     } catch (error) {
+      // ✅ Emit failure to handle error gracefully
       emit(TimeSlotFailure(error: error.toString()));
     }
   }

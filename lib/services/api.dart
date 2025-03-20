@@ -813,9 +813,19 @@ class ApiRepository {
     String? content,
     String? heroImage,
     List<String>? additionalImages,
+    List<String>? categories,
   }) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/$articleId');
+
+    final Map<String, dynamic> payload = {};
+
+    if (title != null) payload['title'] = title;
+    if (content != null) payload['content'] = content;
+    if (heroImage != null) payload['heroImage'] = heroImage;
+    if (additionalImages != null)
+      payload['additionalImages'] = additionalImages;
+    if (categories != null) payload['categories'] = categories;
 
     final response = await http.put(
       url,
@@ -823,12 +833,7 @@ class ApiRepository {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({
-        'title': title,
-        'content': content,
-        'heroImage': heroImage,
-        'additionalImages': additionalImages ?? [],
-      }),
+      body: jsonEncode(payload),
     );
 
     if (response.statusCode == 200) {
@@ -848,7 +853,7 @@ class ApiRepository {
       headers: {'Authorization': 'Bearer $token'},
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('Failed to delete article: ${response.body}');
     }
   }
