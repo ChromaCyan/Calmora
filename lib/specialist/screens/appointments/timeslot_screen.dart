@@ -17,10 +17,14 @@ class TimeSlotListScreen extends StatefulWidget {
 }
 
 class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
+  bool hasFetched = false;
   @override
   void initState() {
     super.initState();
-    _fetchTimeSlots();
+    if (!hasFetched) {
+      _fetchTimeSlots();
+      hasFetched = true;
+    }
   }
 
   void _fetchTimeSlots() {
@@ -121,7 +125,6 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
     return Scaffold(
       body: MultiBlocListener(
         listeners: [
-          // ✅ Handle delete errors gracefully
           BlocListener<TimeSlotBloc, TimeSlotState>(
             listener: (context, state) {
               if (state is TimeSlotDeleted) {
@@ -130,17 +133,18 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                   "Time slot deleted successfully.",
                   ContentType.success,
                 );
-                _fetchTimeSlots(); 
+                _fetchTimeSlots();
               } else if (state is TimeSlotFailure) {
-                _showSnackBar(
-                  "Error",
-                  state.error.contains(
-                          "Cannot delete a slot with upcoming appointments")
-                      ? "Cannot delete a slot that has upcoming appointments."
-                      : "Error: ${state.error}",
-                  ContentType.failure,
-                );
-                _fetchTimeSlots(); 
+                if (!state.error.contains("No time slots found")) {
+                  _showSnackBar(
+                    "Error",
+                    state.error.contains(
+                            "Cannot delete a slot with upcoming appointments")
+                        ? "Cannot delete a slot that has upcoming appointments."
+                        : "Error: ${state.error}",
+                    ContentType.failure,
+                  );
+                }
               }
             },
           ),
@@ -189,7 +193,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                   List<TimeSlotModel>? daySlots = groupedSlots[day];
 
                   if (daySlots == null || daySlots.isEmpty) {
-                    return Container(); // Skip days with no slots
+                    return Container();
                   }
 
                   return Column(
@@ -256,14 +260,23 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                 },
               );
             } else if (state is TimeSlotFailure) {
-              return const Center(
-                child: Text(
-                  "Error loading time slots. Please try again later.",
-                  style: TextStyle(color: Colors.red),
-                ),
-              );
+              // ✅ Check for "No time slots found" and display a friendly message
+              if (state.error.contains("No time slots found")) {
+                return const Center(
+                  child: Text(
+                    "No available time slots. Please add new slots.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text(
+                    "Error loading time slots. Please try again later.",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                );
+              }
             }
-
             return const Center(child: Text("No time slots available."));
           },
         ),

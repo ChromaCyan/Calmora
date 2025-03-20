@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class EditArticleForm extends StatefulWidget {
   final Article article;
@@ -57,6 +58,22 @@ class _EditArticleFormState extends State<EditArticleForm> {
     }
   }
 
+  void _showSnackBar(String title, String message, ContentType type) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: title,
+          message: message,
+          contentType: type,
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   // ✅ Upload new image to Supabase
   Future<String?> _uploadImageToSupabase(File image) async {
     return await SupabaseService.uploadArticleImage(image);
@@ -67,13 +84,20 @@ class _EditArticleFormState extends State<EditArticleForm> {
     if (_titleController.text.isEmpty ||
         _contentController.text.isEmpty ||
         _selectedCategories.isEmpty) {
-      _showSnackbar('Please fill all fields and choose categories',
-          isError: true);
+      _showSnackBar(
+                  "Warning",
+                  "Please fill all fields and choose 1-2 categories..",
+                  ContentType.warning,
+                );
       return;
     }
 
     if (_selectedCategories.length > 2) {
-      _showSnackbar('You can only select up to 2 categories', isError: true);
+      _showSnackBar(
+                  "Categories select error!",
+                  'You can only select up to 2 categories',
+                  ContentType.warning,
+                );
       return;
     }
 
@@ -82,7 +106,11 @@ class _EditArticleFormState extends State<EditArticleForm> {
     if (_image != null) {
       heroImageUrl = await _uploadImageToSupabase(_image!);
       if (heroImageUrl == null) {
-        _showSnackbar('Failed to upload image', isError: true);
+        _showSnackBar(
+                  "Failed to upload image",
+                  "Failed to upload image, please check your internet connection and try again..",
+                  ContentType.failure,
+                );
         return;
       }
     }
@@ -97,18 +125,12 @@ class _EditArticleFormState extends State<EditArticleForm> {
                 _selectedCategories.map((c) => c.toLowerCase()).toList(),
           ),
         );
-    _showSnackbar('Article updated successfully!');
+    _showSnackBar(
+                  "Success",
+                  "Article updated successfully!",
+                  ContentType.success,
+                );
     Navigator.pop(context, true);
-  }
-
-  // ✅ Show success or error snackbar
-  void _showSnackbar(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.white)),
-        backgroundColor: isError ? Colors.redAccent : Colors.green,
-      ),
-    );
   }
 
   @override
