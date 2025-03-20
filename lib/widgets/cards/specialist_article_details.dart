@@ -44,7 +44,9 @@ class _SpecialistArticleDetailPageState
         return true;
       },
       child: Scaffold(
-        appBar: UniversalAppBar(title: "Article Details"),
+        appBar: AppBar(
+          title: const Text('Article Details'),
+        ),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {

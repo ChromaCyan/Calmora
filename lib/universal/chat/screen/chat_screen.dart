@@ -249,7 +249,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
           ),
 
-          // Text Field and Send Button
           TextNSend(controller: _controller, onSend: _sendMessage),
         ],
       ),
