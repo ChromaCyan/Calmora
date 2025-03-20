@@ -10,6 +10,8 @@ import 'package:armstrong/widgets/cards/meditation_card.dart';
 import 'package:armstrong/widgets/cards/app_section.dart';
 import 'package:armstrong/patient/screens/dashboard/meditation_details.dart';
 import 'package:armstrong/patient/screens/dashboard/breathing_details.dart';
+import 'package:armstrong/patient/screens/dashboard/men_health.dart';
+import 'package:armstrong/patient/screens/dashboard/emergency_services.dart';
 import 'package:armstrong/patient/screens/dashboard/about_us.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -75,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) {
-                              return BreathingGuideScreen();  // Destination page
+                              return MentalHealthAwarenessPage();  // Destination page
                             },
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                               // Fade transition
@@ -99,7 +101,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) {
-                              return BreathingGuideScreen();  // Destination page
+                              return EmergencyServicePage();  // Destination page
                             },
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                               // Fade transition

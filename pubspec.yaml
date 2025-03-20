@@ -161,6 +161,10 @@ flutter:
     - images/icons/psychosis.png
     - images/icons/relax.png
     - images/icons/very-happy.png
+    - images/members_pfp/josh.jpg
+    - images/members_pfp/genghis.jpg
+    - images/members_pfp/marion.jpg
+    - images/members_pfp/oliver.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
