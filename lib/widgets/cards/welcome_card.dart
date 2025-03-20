@@ -15,9 +15,9 @@ class WelcomeSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome Back',
+                '"Remember, strength is not just physical, \n mental resilience is power."',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -33,7 +33,7 @@ class WelcomeSection extends StatelessWidget {
           ),
           CircleAvatar(
             radius: 30,
-            backgroundImage: AssetImage('images/splash/logo_placeholder.png'),
+            backgroundImage: AssetImage('images/icons/relax.png'),
           ),
         ],
       ),

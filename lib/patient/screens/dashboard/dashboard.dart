@@ -147,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               Center(
                 child: Text(
-                  'Exercises you can do!',
+                  'Mind & Body Wellness',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
@@ -222,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               Center(
                 child: Text(
-                  'Write about your day!',
+                  'What is on your mind?',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
