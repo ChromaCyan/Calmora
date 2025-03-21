@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class EditArticleForm extends StatefulWidget {
   final Article article;
@@ -38,7 +39,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
     _initializeFormData();
   }
 
-  // ✅ Load existing data into form
   void _initializeFormData() {
     _titleController.text = widget.article.title;
     _contentController.text = widget.article.content;
@@ -48,7 +48,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
         .toList();
   }
 
-  // ✅ Pick a new image or retain the old one
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -74,12 +73,10 @@ class _EditArticleFormState extends State<EditArticleForm> {
     );
   }
 
-  // ✅ Upload new image to Supabase
   Future<String?> _uploadImageToSupabase(File image) async {
     return await SupabaseService.uploadArticleImage(image);
   }
 
-  // ✅ Handle Edit Submission
   Future<void> _submitEditedArticle() async {
     if (_titleController.text.isEmpty ||
         _contentController.text.isEmpty ||
@@ -101,7 +98,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
       return;
     }
 
-    // ✅ Upload image if changed, otherwise use the existing one
     String? heroImageUrl = widget.article.heroImage;
     if (_image != null) {
       heroImageUrl = await _uploadImageToSupabase(_image!);
@@ -138,9 +134,7 @@ class _EditArticleFormState extends State<EditArticleForm> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Article'),
-      ),
+      appBar: UniversalAppBar(title: ""),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Card(
@@ -158,7 +152,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                 ),
                 const SizedBox(height: 16),
 
-                // ✅ Image Picker with Existing Image
                 GestureDetector(
                   onTap: _pickImage,
                   child: Stack(
@@ -208,7 +201,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                 ),
                 const SizedBox(height: 16),
 
-                // ✅ Title TextField
                 TextFormField(
                   controller: _titleController,
                   decoration: InputDecoration(
@@ -223,7 +215,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                 ),
                 const SizedBox(height: 12),
 
-                // ✅ Content TextField
                 TextFormField(
                   controller: _contentController,
                   maxLines: 5,
@@ -239,7 +230,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                 ),
                 const SizedBox(height: 16),
 
-                // ✅ Category Selector
                 const Text(
                   'Categories',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -271,7 +261,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
 
                 const SizedBox(height: 16),
 
-                // ✅ Submit Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(

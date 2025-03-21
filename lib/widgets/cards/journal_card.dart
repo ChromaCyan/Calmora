@@ -31,7 +31,7 @@ class JournalSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Daily Journal',
+            'Thoughts & Reflections',
             style: theme.textTheme.titleMedium?.copyWith(
               color: Colors.white, // Always light-colored
               fontSize: screenWidth * 0.05, // Adaptive font size based on screen width

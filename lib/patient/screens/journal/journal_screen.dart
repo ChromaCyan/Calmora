@@ -227,7 +227,7 @@ class _JournalPageState extends State<JournalPage> {
             const SizedBox(height: 10),
             Center(
               child: Text(
-                'How are you holding up? 💪',
+                'Log your mood for today..',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColor,

@@ -59,7 +59,7 @@ class CustomBottomNavBar extends StatelessWidget {
               context,
               "Dashboard with personalized recommended articles, add your mood, and view your upcoming appointments"),
           _buildNavItem(
-              Icons.search,
+              Icons.handshake_outlined,
               "Discover",
               1,
               colorScheme.primary,
@@ -104,10 +104,8 @@ class CustomBottomNavBar extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onItemTapped(index);
-        // Mark showcase as completed when the user interacts with the item
         if (!showcaseCompleted) {
-          // <-- Use the passed showcaseCompleted variable
-          completeShowcase(); // <-- Call the passed completeShowcase function
+          completeShowcase(); 
         }
       },
       child: Showcase(
