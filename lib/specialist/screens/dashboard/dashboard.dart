@@ -1,3 +1,4 @@
+import 'package:armstrong/specialist/screens/dashboard/chart/WeeklyAppointment.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:armstrong/widgets/cards/specialist_appointment_card.dart';
@@ -107,7 +108,7 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              _buildAppointmentChart(),
+              WeeklyAppointmentChart(specialistId: widget.specialistId),
               const SizedBox(height: 20),
             ],
           ),
@@ -139,85 +140,5 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
         );
       },
     );
-  }
-
-  Widget _buildAppointmentChart() {
-    return Container(
-      height: 250,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[900]
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: BarChart(
-        BarChartData(
-          barGroups: _getBarChartData(),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 40,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: const TextStyle(fontSize: 12),
-                  );
-                },
-              ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  const days = [
-                    'Mon',
-                    'Tue',
-                    'Wed',
-                    'Thu',
-                    'Fri',
-                    'Sat',
-                    'Sun'
-                  ];
-                  return Text(
-                    days[value.toInt()],
-                    style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.bold),
-                  );
-                },
-              ),
-            ),
-          ),
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-        ),
-      ),
-    );
-  }
-
-  List<BarChartGroupData> _getBarChartData() {
-    final appointmentsPerDay = [3, 5, 2, 4, 6, 1, 3]; // Sample appointment data
-
-    return List.generate(7, (index) {
-      return BarChartGroupData(
-        x: index,
-        barRods: [
-          BarChartRodData(
-            toY: appointmentsPerDay[index].toDouble(),
-            color: Colors.blue,
-            width: 16,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-      );
-    });
   }
 }

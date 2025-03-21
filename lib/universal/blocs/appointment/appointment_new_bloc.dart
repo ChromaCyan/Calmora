@@ -243,12 +243,11 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
       BookAppointmentEvent event, Emitter<TimeSlotState> emit) async {
     emit(TimeSlotLoading());
     try {
-      // ✅ Include event.appointmentDate here
       final result = await _apiRepository.bookAppointment(
         event.patientId,
         event.slotId,
         event.message,
-        event.appointmentDate, // 👈 Pass appointmentDate
+        event.appointmentDate, 
       );
       emit(TimeSlotSuccess(data: result));
     } catch (error) {
@@ -268,13 +267,11 @@ class TimeSlotBloc extends Bloc<TimeSlotEvent, TimeSlotState> {
       final result = await _apiRepository.deleteTimeSlot(event.slotId);
 
       if (result['success']) {
-        // ✅ Emit TimeSlotDeleted to trigger Snackbar and reload
         emit(TimeSlotDeleted());
       } else {
         throw Exception(result['message']);
       }
     } catch (error) {
-      // ✅ Emit failure to handle error gracefully
       emit(TimeSlotFailure(error: error.toString()));
     }
   }

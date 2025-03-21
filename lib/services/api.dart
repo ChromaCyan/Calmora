@@ -554,6 +554,35 @@ class ApiRepository {
     }
   }
 
+  // Fetch specialist's weekly completed appointments
+  Future<List<dynamic>> getSpecialistWeeklyCompletedAppointments(
+    String specialistId, {
+    String? startDate,
+    String? endDate,
+  }) async {
+    final token = await _storage.read(key: 'token');
+
+    String url =
+        '$baseUrl/appointment/completed/weekly/$specialistId';
+
+    if (startDate != null && endDate != null) {
+      url += '?startDate=$startDate&endDate=$endDate';
+    }
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+        'Failed to fetch weekly completed appointments: ${response.body}',
+      );
+    }
+  }
+
   /////////////////////////////////////////////////////////////////////////////////
   // Mood (API)
   // Create Mood Entry
