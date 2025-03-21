@@ -80,7 +80,7 @@ class MindfulMeditation extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'images/meditation2.jpeg',
+                'images/meditation3.jpg',
                 fit: BoxFit.cover,
               ),
             ),
