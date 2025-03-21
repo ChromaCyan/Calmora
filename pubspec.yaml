@@ -166,6 +166,7 @@ flutter:
     - images/members_pfp/genghis.jpg
     - images/members_pfp/marion.jpg
     - images/members_pfp/oliver.jpg
+    - images/members_pfp/raven.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
