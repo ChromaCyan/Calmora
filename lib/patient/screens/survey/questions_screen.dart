@@ -380,25 +380,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PatientHomeScreen()),
-                        );
-                      },
-                      child: Text(
-                        "Skip for Testing purposes",
-                        style: TextStyle(fontSize: 16, color: Colors.blue),
-                      ),
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
