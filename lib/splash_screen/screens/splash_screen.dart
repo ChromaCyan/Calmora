@@ -171,7 +171,7 @@ class _OnboardingItem extends StatelessWidget {
   String _getTitle(int index) {
     const titles = [
       "Armstrong",
-      "It's Okay\nto\nNot be Okay",
+      "It's Okay\nto Not be Okay",
       "Sorting through\nthe Noise",
       "Browse Resources!",
       "Find a Specialist",
