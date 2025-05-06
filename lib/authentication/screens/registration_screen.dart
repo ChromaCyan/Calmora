@@ -271,6 +271,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     BlocProvider.of<AuthBloc>(context).add(event);
   }
 
+// <---Frontend part--->
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -68,11 +68,17 @@ class _ArticleListState extends State<ArticleList> {
               itemCount: filteredArticles.length,
               itemBuilder: (context, index) {
                 final article = filteredArticles[index];
-                return ArticleCard(
-                  articleId: article.id,
-                  imageUrl: article.heroImage,
-                  title: article.title,
-                  publisher: 'By ${article.specialistName}',
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: SizedBox(
+                    width: 245,
+                    child: ArticleCard(
+                      articleId: article.id,
+                      imageUrl: article.heroImage,
+                      title: article.title,
+                      publisher: 'By ${article.specialistName}',
+                    ),
+                  ),
                 );
               },
             );

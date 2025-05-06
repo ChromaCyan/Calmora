@@ -15,6 +15,7 @@ import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'dart:ui';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,191 +50,220 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, constraints) {
           return Stack(
             children: [
+              // Fullscreen background image
               Positioned.fill(
-                child: Container(
-                  color: Theme.of(context).colorScheme.primary,
+                child: Image.asset(
+                  'images/login_bg_image.png',
+                  fit: BoxFit.cover,
                 ),
               ),
-              BlocListener<AuthBloc, AuthState>(
-                listener: (context, state) async {
-                  if (state is AuthSuccess) {
-                    final userData = state.userData;
-                    final userType = userData['userType'];
-                    final userId = userData['userId'];
-                    final token = userData['token'];
 
-                    await StorageHelper.saveUserId(userId);
-                    await StorageHelper.saveToken(token);
-                    await StorageHelper.saveUserType(userType);
+              // Bottom overlay container with glassmorphism
+              Positioned(
+                top: MediaQuery.of(context).size.height * 0.5,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: BlocListener<AuthBloc, AuthState>(
+                  listener: (context, state) async {
+                    if (state is AuthSuccess) {
+                      final userData = state.userData;
+                      final userType = userData['userType'];
+                      final userId = userData['userId'];
+                      final token = userData['token'];
 
-                    if (userType == 'Patient') {
-                      final FlutterSecureStorage storage =
-                          FlutterSecureStorage();
-                      final hasCompletedSurvey =
-                          await storage.read(key: 'hasCompletedSurvey_$userId');
-                      final surveyOnboardingCompleted = await storage.read(
-                          key: 'survey_onboarding_completed_$userId');
+                      await StorageHelper.saveUserId(userId);
+                      await StorageHelper.saveToken(token);
+                      await StorageHelper.saveUserType(userType);
 
-                      if (hasCompletedSurvey == 'true' &&
-                          surveyOnboardingCompleted == 'true') {
+                      if (userType == 'Patient') {
+                        final FlutterSecureStorage storage = FlutterSecureStorage();
+                        final hasCompletedSurvey = await storage.read(key: 'hasCompletedSurvey_$userId');
+                        final surveyOnboardingCompleted = await storage.read(key: 'survey_onboarding_completed_$userId');
+
+                        if (hasCompletedSurvey == 'true' && surveyOnboardingCompleted == 'true') {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => PatientHomeScreen()),
+                          );
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => SurveyScreen()),
+                          );
+                        }
+                      } else if (userType == 'Specialist') {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => PatientHomeScreen()),
-                        );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SurveyScreen()),
+                          MaterialPageRoute(builder: (context) => SpecialistHomeScreen()),
                         );
                       }
-                    } else if (userType == 'Specialist') {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SpecialistHomeScreen()),
+                    } else if (state is AuthError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Try Again!',
+                            message: 'Email or password is incorrect',
+                            contentType: ContentType.failure,
+                          ),
+                          duration: const Duration(seconds: 3),
+                        ),
                       );
                     }
-                  } else if (state is AuthError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        elevation: 0,
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.transparent,
-                        content: AwesomeSnackbarContent(
-                          title: 'Try Again!',
-                          message: 'Email or password is incorrect',
-                          contentType: ContentType.failure,
-                        ),
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                },
-                child: Center(
-                  child: Container(
-                    width: constraints.maxWidth > 500
-                        ? 500
-                        : constraints.maxWidth * 0.9,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).shadowColor,
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+                  },
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(123),
+                      topRight: Radius.circular(123),
                     ),
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: 250,
-                              child: Image.asset(
-                                'images/armstrong_transparent.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                            const SizedBox(height: 30),
-                            Text(
-                              "Login",
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 20),
-                            // Email Field
-                            CustomTextField(
-                              label: "Email:",
-                              controller: emailController,
-                              obscureText: false,
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Password Field
-                            CustomTextField(
-                              label: "Password:",
-                              controller: passwordController,
-                              obscureText: _obscureText,
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureText = !_obscureText;
-                                  });
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  _showForgotPasswordDialog(context);
-                                },
-                                child: Text(
-                                  "Forgot Password?",
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "No account yet?",
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            RegistrationScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "Sign up",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            ValueListenableBuilder<bool>(
-                              valueListenable: isButtonEnabled,
-                              builder: (context, isEnabled, child) {
-                                return LoginButton(
-                                  onTap: isEnabled
-                                      ? () {
-                                          context.read<AuthBloc>().add(
-                                                LoginEvent(
-                                                  email: emailController.text,
-                                                  password:
-                                                      passwordController.text,
-                                                ),
-                                              );
-                                        }
-                                      : null,
-                                );
-                              },
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(123),
+                            topRight: Radius.circular(123),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).shadowColor.withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, -5),
                             ),
                           ],
                         ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+                        child: Center(
+                          child: Container(
+                            width: constraints.maxWidth > 500
+                                ? 500
+                                : constraints.maxWidth * 0.9,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      "Login",
+                                      style: Theme.of(context).textTheme.headlineSmall,
+                                    ),
+                                    const SizedBox(height: 20),
+
+                                    // Email Field
+                                    CustomTextField(
+                                      label: "Email:",
+                                      controller: emailController,
+                                      obscureText: false,
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    // Password Field
+                                    CustomTextField(
+                                      label: "Password:",
+                                      controller: passwordController,
+                                      obscureText: _obscureText,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(_obscureText
+                                            ? Icons.visibility
+                                            : Icons.visibility_off),
+                                        onPressed: () {
+                                          setState(() {
+                                            _obscureText = !_obscureText;
+                                          });
+                                        },
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 10),
+
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: () {
+                                          _showForgotPasswordDialog(context);
+                                        },
+                                        child: Text(
+                                          "Forgot Password?",
+                                          style: TextStyle(
+                                              color: Theme.of(context).colorScheme.primary),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 40),
+
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "No account yet?",
+                                          style: Theme.of(context).textTheme.bodyMedium,
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => RegistrationScreen(),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            "Sign up",
+                                            style: TextStyle(
+                                                color: Theme.of(context).colorScheme.primary),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    ValueListenableBuilder<bool>(
+                                      valueListenable: isButtonEnabled,
+                                      builder: (context, isEnabled, child) {
+                                        return LoginButton(
+                                          onTap: isEnabled
+                                              ? () {
+                                                  context.read<AuthBloc>().add(
+                                                        LoginEvent(
+                                                          email: emailController.text,
+                                                          password: passwordController.text,
+                                                        ),
+                                                      );
+                                                }
+                                              : null,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Overlapping logo
+              Positioned(
+                top: MediaQuery.of(context).size.height * 0.20 - 150,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    width: 300,
+                    height: 300,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('images/armstrong_transparent.png'),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
@@ -245,6 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
 
   void _showForgotPasswordDialog(BuildContext context) {
     showDialog(
