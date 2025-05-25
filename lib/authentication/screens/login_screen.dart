@@ -175,6 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: GoogleFonts.montserrat(
                                       textStyle: Theme.of(context).textTheme.headlineSmall,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 30,
                                     ),
                                   ),
                                   const SizedBox(height: 20),
@@ -232,16 +233,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                         onPressed: () {
                                           Navigator.push(
                                             context,
-                                            MaterialPageRoute(
-                                              builder: (context) => RegistrationScreen(),
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation, secondaryAnimation) => RegistrationScreen(),
+                                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                                return FadeTransition(
+                                                  opacity: animation,
+                                                  child: child,
+                                                );
+                                              },
                                             ),
                                           );
                                         },
-                                        child: Text("Sign up",
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.primary),
+                                        child: Text(
+                                          "Sign up",
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.primary,
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                   const SizedBox(height: 10),
