@@ -9,9 +9,9 @@ class SupabaseService {
     if (_isInitialized) return; 
 
     await Supabase.initialize(
-      url: 'https://nbjvaoyntnonujntcwbh.supabase.co',
+      url: 'https://xipqovlvavpygfnzjtpg.supabase.co',
       anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ianZhb3ludG5vbnVqbnRjd2JoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxODQ5NTAsImV4cCI6MjA1NDc2MDk1MH0.kJaDZSH5z2XN3717HDnZ5igx7hT5Fjf7KYArorts7eQ',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpcHFvdmx2YXZweWdmbnpqdHBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjUwMjUsImV4cCI6MjA2ODE0MTAyNX0.bkCpFtAocbVAPlLir7IOp_MwpeXWvjJc5CTMmwzgQss',
     );
 
     _client = Supabase.instance.client; 

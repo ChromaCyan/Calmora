@@ -74,17 +74,61 @@ class _ChatListScreenState extends State<ChatListScreen> {
           children: [
             /// Search Bar
             Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16), // Added vertical padding
-            child: CustomSearchBar(
-              hintText: 'Search chats...',
-              searchController: _searchController,
-              onChanged: _filterChats,
-              onClear: () {
-                _searchController.clear();
-                _filterChats('');
-              },
+              padding: const EdgeInsets.symmetric(
+                  vertical: 16), // Added vertical padding
+              child: CustomSearchBar(
+                hintText: 'Search chats...',
+                searchController: _searchController,
+                onChanged: _filterChats,
+                onClear: () {
+                  _searchController.clear();
+                  _filterChats('');
+                },
+              ),
             ),
-          ),
+
+            /// Talk to AI Therapist Button (Placeholder since i haven't implemented the feature yet)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        chatId: "ai-therapist", 
+                        recipientId: "ai-001",
+                        recipientName: "AI Therapist",
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 3,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.psychology_alt, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      'Talk to our AI Therapist',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // End of the AI Chat button (Just pushing this temporarily until i replace this with functioning chat to differentiate the users)
 
             /// Chat List with Pull-to-Refresh
             Expanded(
@@ -107,7 +151,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   child: Text(
                                     'No chats found.',
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                      color: theme.colorScheme.onBackground.withOpacity(0.6),
+                                      color: theme.colorScheme.onBackground
+                                          .withOpacity(0.6),
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -117,14 +162,21 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   itemBuilder: (context, index) {
                                     final chat = _filteredChats[index];
 
-                                    final participants = chat['participants'] ?? [];
+                                    final participants =
+                                        chat['participants'] ?? [];
                                     final chatId = chat['chatId'] ?? '';
-                                    final recipient = participants.isNotEmpty ? participants[0] : {};
+                                    final recipient = participants.isNotEmpty
+                                        ? participants[0]
+                                        : {};
                                     final recipientId = recipient['_id'] ?? '';
-                                    final recipientName = recipient['firstName'] ?? 'No Name';
-                                    final recipientImage = recipient['profileImage'] ?? '';
-                                    final lastMessage = chat['lastMessage'] ?? {};
-                                    final messageContent = lastMessage['content'] ?? 'No message';
+                                    final recipientName =
+                                        recipient['firstName'] ?? 'No Name';
+                                    final recipientImage =
+                                        recipient['profileImage'] ?? '';
+                                    final lastMessage =
+                                        chat['lastMessage'] ?? {};
+                                    final messageContent =
+                                        lastMessage['content'] ?? 'No message';
 
                                     return ChatCard(
                                       chatId: chatId,
