@@ -102,7 +102,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() => _passwordStrength = "Needs Lowercase");
     } else if (!RegExp(r'^(?=.*\d)').hasMatch(password)) {
       setState(() => _passwordStrength = "Needs a Number");
-    } else if (!RegExp(r'^(?=.*[@$!%*?&])').hasMatch(password)) {
+    } else if (!RegExp(r'[!@#$%^&*(),.?":{}|<>_\-+=\\/\[\]`~;]')
+        .hasMatch(password)) {
       setState(() => _passwordStrength = "Needs a Special Character");
     } else {
       setState(() => _passwordStrength = "Strong Password ✅");
@@ -187,7 +188,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     // Password strength checker
     final password = _passwordController.text;
     final strongPasswordRegExp = RegExp(
-      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
     );
 
     if (!strongPasswordRegExp.hasMatch(password)) {
