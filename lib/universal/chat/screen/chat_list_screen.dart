@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:armstrong/universal/chat/screen/chat_screen.dart';
+import 'package:armstrong/universal/chat/screen/ai_chat_screen.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -95,11 +96,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        chatId: "ai-therapist", 
-                        recipientId: "ai-001",
-                        recipientName: "AI Therapist",
-                      ),
+                      builder: (context) => AIChatScreen(),
                     ),
                   );
                 },
