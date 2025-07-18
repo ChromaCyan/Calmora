@@ -32,7 +32,8 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
       setState(() => _passwordStrength = "Needs Lowercase");
     } else if (!RegExp(r'^(?=.*\d)').hasMatch(password)) {
       setState(() => _passwordStrength = "Needs a Number");
-    } else if (!RegExp(r'^(?=.*[@$!%*?&])').hasMatch(password)) {
+    } else if (!RegExp(r'^(?=.*[!@#$%^&*(),.?":{}|<>_\-+=\\/\[\]`~;])')
+        .hasMatch(password)) {
       setState(() => _passwordStrength = "Needs a Special Character");
     } else {
       setState(() => _passwordStrength = "Strong Password ✅");
@@ -186,7 +187,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
     );
   }
 
-    Future<void> _handleNextStep() async {
+  Future<void> _handleNextStep() async {
     setState(() {
       isLoading = true;
       errorMessage = null;
@@ -228,7 +229,8 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
 
         // **Enforce Password Strength**
         if (_passwordStrength != "Strong Password ✅") {
-          throw Exception("Weak password! Must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.");
+          throw Exception(
+              "Weak password! Must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.");
         }
 
         final response = await _apiRepository.resetPassword(

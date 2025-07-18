@@ -102,7 +102,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() => _passwordStrength = "Needs Lowercase");
     } else if (!RegExp(r'^(?=.*\d)').hasMatch(password)) {
       setState(() => _passwordStrength = "Needs a Number");
-    } else if (!RegExp(r'[!@#$%^&*(),.?":{}|<>_\-+=\\/\[\]`~;]')
+    } else if (!RegExp(r'^(?=.*[!@#$%^&*(),.?":{}|<>_\-+=\\/\[\]`~;])')
         .hasMatch(password)) {
       setState(() => _passwordStrength = "Needs a Special Character");
     } else {

@@ -18,7 +18,7 @@ class TTSService {
     });
 
     await _flutterTts.setLanguage("en-GB");
-    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setPitch(1.1);
     await _flutterTts.setSpeechRate(1.0);
     await _flutterTts.setVolume(1.0);
   }

@@ -18,9 +18,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final List<Map<String, dynamic>> _messages = [];
 
   final List<String> _aiResponses = [
-    "Thanks for sharing that. I will help you understand your emotions, but you have to remember. I'm an a i, and i can't replace a real mental health specialist, i also can't diagnose your condition, it's still better to seek a real mental health specialist to walk you through and help you work your problems out. Now why exactly do you feel this way? I'm glad you reached out. Want to talk more about what’s been bothering you?",
+    "Thanks for sharing that. I will help you understand your emotions or listen to you about your issues and help you with what you can do, but you have to remember. I'm an a i, and i can't replace a real mental health specialist, i also can't diagnose your condition, it's still better to seek a real mental health specialist to walk you through and help you work your problems out. Now why exactly do you feel this way? I'm glad you reached out. Want to talk more about what’s been bothering you?",
     "It's okay to feel this way sometimes. Can you describe when it started?",
-    "Let’s try to unpack that feeling together.",
+    "Let’s try to unpack that feeling together. I do get where you are coming from, It's really frustrating and confusing to feel those emotions and problems.",
     "Thanks for sharing that. Take your time, I’m here for you.",
   ];
 
@@ -79,7 +79,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         _addBotMessage(_aiResponses[_responseIndex]);
         _responseIndex++;
       } else {
-        _addBotMessage("Can you tell me more?");
+        _addBotMessage("I'm here for you always remember, As a reminder to always take care of yourself, you are not alone remember that. You could find a specialist in this app to help you understand your self better! You can share your problems with me again.");
       }
     });
   }
@@ -124,7 +124,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("AI Therapist"),
+        title: const Text("Calmora (AI Chatbot)"),
         actions: [
           IconButton(
             icon: const Icon(Icons.mic),
