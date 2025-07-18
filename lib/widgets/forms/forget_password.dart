@@ -16,6 +16,8 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
       TextEditingController();
   final ApiRepository _apiRepository = ApiRepository();
   bool isLoading = false;
+  bool _isNewPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   String? errorMessage;
 
   //Password Fields part
@@ -86,6 +88,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
             ] else if (currentStep == "reset_password") ...[
               _buildHeader("Enter your new password"),
               _buildPasswordField("New password:", newPasswordController, true),
+
               Text(
                 _passwordStrength,
                 style: TextStyle(
@@ -94,8 +97,8 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
                       : Colors.red,
                 ),
               ),
-              _buildPasswordField(
-                  "Confirm new password:", confirmPasswordController, false),
+              _buildPasswordField("Confirm new password:", confirmPasswordController, true),
+
               Text(
                 _passwordMatchMessage,
                 style: TextStyle(color: _passwordMatchColor),
@@ -123,21 +126,40 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
     );
   }
 
-  Widget _buildPasswordField(
-      String label, TextEditingController controller, bool isNewPassword) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: CustomTextField(
-        label: label,
-        controller: controller,
-        obscureText: true,
-        onChanged: (value) {
-          if (isNewPassword) _checkPasswordStrength(value);
-          _checkPasswordMatch();
-        },
+Widget _buildPasswordField(
+    String label, TextEditingController controller, bool isNewPassword) {
+  bool isVisible =
+      isNewPassword ? _isNewPasswordVisible : _isConfirmPasswordVisible;
+
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: TextField(
+      controller: controller,
+      obscureText: !isVisible,
+      onChanged: (value) {
+        if (isNewPassword) _checkPasswordStrength(value);
+        _checkPasswordMatch();
+      },
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
+          onPressed: () {
+            setState(() {
+              if (isNewPassword) {
+                _isNewPasswordVisible = !_isNewPasswordVisible;
+              } else {
+                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+              }
+            });
+          },
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildHeader(String title) {
     final theme = Theme.of(context);
