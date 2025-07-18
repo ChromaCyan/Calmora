@@ -35,6 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
   DateTime? _selectedDateOfBirth;
 
@@ -87,6 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         firstNameController.text = user.firstName ?? "";
         lastNameController.text = user.lastName ?? "";
         phoneNumberController.text = user.phoneNumber ?? "";
+        genderController.text = user.gender ?? "";
         _imageUrl =
             user.profileImage?.isNotEmpty ?? false ? user.profileImage : null;
 
@@ -192,6 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       "firstName": firstNameController.text,
       "lastName": lastNameController.text,
       "phoneNumber": phoneNumberController.text,
+      "gender": genderController.text,
       "profileImage": _imageUrl ?? "",
       "dateOfBirth": _selectedDateOfBirth != null
           ? DateFormat('yyyy-MM-dd').format(_selectedDateOfBirth!)
@@ -244,10 +247,9 @@ Widget build(BuildContext context) {
   final screenWidth = screenSize.width;
   final screenHeight = screenSize.height;
 
-  // Calculate dynamic font sizes
-  double titleFontSize = screenWidth * 0.05; // 5% of screen width
-  double bodyFontSize = screenWidth * 0.04; // 4% of screen width
-  double buttonFontSize = screenWidth * 0.045; // 4.5% of screen width
+  double titleFontSize = screenWidth * 0.05; 
+  double bodyFontSize = screenWidth * 0.04; 
+  double buttonFontSize = screenWidth * 0.045; 
 
   return Scaffold(
     appBar: AppBar(
@@ -280,7 +282,7 @@ Widget build(BuildContext context) {
                       const SizedBox(height: 20),
                       // Profile Picture Container
                       Container(
-                        padding: EdgeInsets.all(screenWidth * 0.04), // responsive padding
+                        padding: EdgeInsets.all(screenWidth * 0.04), 
                         child: ProfilePictureWidget(
                           selectedImage: _selectedImage,
                           imageUrl: _imageUrl,
@@ -290,7 +292,7 @@ Widget build(BuildContext context) {
                       ),
 
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // responsive padding
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -359,6 +361,7 @@ Widget build(BuildContext context) {
                               firstNameController: firstNameController,
                               lastNameController: lastNameController,
                               phoneNumberController: phoneNumberController,
+                              genderController: genderController,
                               dateOfBirthController: dateOfBirthController,
                               addressController: addressController,
                               medicalHistoryController: medicalHistoryController,

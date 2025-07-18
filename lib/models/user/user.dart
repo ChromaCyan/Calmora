@@ -6,6 +6,7 @@ class Profile {
   final String lastName;
   final String email;
   final String phoneNumber;
+  final String gender;
   final String? profileImage;
   final String userType;
   
@@ -34,6 +35,7 @@ class Profile {
     required this.lastName,
     required this.email,
     required this.phoneNumber,
+    required this.gender,
     this.profileImage,
     required this.userType,
     this.address,
@@ -60,6 +62,7 @@ class Profile {
       lastName: json['lastName'],
       email: json['email'],
       phoneNumber: json['phoneNumber'],
+      gender: json['gender'],
       profileImage: json['profileImage'],
       userType: json['userType'],
       
@@ -91,6 +94,7 @@ class Profile {
       'lastName': lastName,
       'email': email,
       'phoneNumber': phoneNumber,
+      'gender': gender,
       'profileImage': profileImage,
       'userType': userType,
 

@@ -15,8 +15,7 @@ import 'package:armstrong/models/mood/mood.dart';
 import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
-  final String baseUrl =
-      'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
+  final String baseUrl = 'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
   //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
@@ -30,6 +29,7 @@ class ApiRepository {
     String email,
     String password,
     String phoneNumber,
+    String gender,
     String profileImage,
     Map<String, dynamic> otherDetails,
   ) async {
@@ -43,6 +43,7 @@ class ApiRepository {
         'email': email,
         'password': password,
         'phoneNumber': phoneNumber,
+        'gender': gender,
         'profileImage': profileImage,
         ...otherDetails,
       }),

@@ -5,6 +5,7 @@ class CombinedForm extends StatelessWidget {
   final TextEditingController firstNameController;
   final TextEditingController lastNameController;
   final TextEditingController phoneNumberController;
+  final TextEditingController genderController;
   final TextEditingController dateOfBirthController;
 
   // Patient-specific fields
@@ -34,6 +35,7 @@ class CombinedForm extends StatelessWidget {
     required this.firstNameController,
     required this.lastNameController,
     required this.phoneNumberController,
+    required this.genderController,
     required this.dateOfBirthController,
     required this.addressController,
     required this.medicalHistoryController,
@@ -54,7 +56,8 @@ class CombinedForm extends StatelessWidget {
     required this.userType,
   }) : super(key: key);
 
-  InputDecoration customInputDecoration(String label, BuildContext context, {bool readOnly = false}) {
+  InputDecoration customInputDecoration(String label, BuildContext context,
+      {bool readOnly = false}) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -111,7 +114,8 @@ class CombinedForm extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         controller: firstNameController,
-                        decoration: customInputDecoration("First Name", context),
+                        decoration:
+                            customInputDecoration("First Name", context),
                         enabled: isEditing,
                       ),
                     ),
@@ -130,21 +134,45 @@ class CombinedForm extends StatelessWidget {
                   decoration: customInputDecoration("Phone Number", context),
                   enabled: isEditing,
                 ),
+                DropdownButtonFormField<String>(
+                  value: genderController.text.isNotEmpty
+                      ? genderController.text
+                      : null,
+                  decoration: customInputDecoration("Gender", context),
+                  items: [
+                    {"label": "Male", "value": "male"},
+                    {"label": "Female", "value": "female"}
+                  ].map((gender) {
+                    return DropdownMenuItem<String>(
+                      value: gender["value"],
+                      child: Text(gender["label"]!),
+                    );
+                  }).toList(),
+                  onChanged: isEditing
+                      ? (newValue) {
+                          genderController.text = newValue!;
+                        }
+                      : null,
+                ),
+
                 // Only show the date picker for patients
-              if (userType.toLowerCase() == "patient") ...[
-                GestureDetector(
-                  onTap: isEditing ? onPickDateOfBirth : null,
-                  child: AbsorbPointer(
-                    child: TextField(
-                      controller: dateOfBirthController,
-                      readOnly: true,
-                      decoration: customInputDecoration("Date of Birth", context, readOnly: true).copyWith(
-                        suffixIcon: const Icon(Icons.calendar_today),
+                if (userType.toLowerCase() == "patient") ...[
+                  GestureDetector(
+                    onTap: isEditing ? onPickDateOfBirth : null,
+                    child: AbsorbPointer(
+                      child: TextField(
+                        controller: dateOfBirthController,
+                        readOnly: true,
+                        decoration: customInputDecoration(
+                                "Date of Birth", context,
+                                readOnly: true)
+                            .copyWith(
+                          suffixIcon: const Icon(Icons.calendar_today),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
                 const SizedBox(height: 20),
 
                 if (userType.toLowerCase() == "patient") ...[
@@ -160,7 +188,8 @@ class CombinedForm extends StatelessWidget {
                   ),
                   TextField(
                     controller: medicalHistoryController,
-                    decoration: customInputDecoration("Medical History", context),
+                    decoration:
+                        customInputDecoration("Medical History", context),
                     enabled: isEditing,
                   ),
                   TextField(
@@ -169,7 +198,6 @@ class CombinedForm extends StatelessWidget {
                     enabled: isEditing,
                   ),
                   const SizedBox(height: 20),
-
                   const Text(
                     "Emergency Contact Information",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -177,17 +205,20 @@ class CombinedForm extends StatelessWidget {
                   const SizedBox(height: 8),
                   TextField(
                     controller: emergencyContactNameController,
-                    decoration: customInputDecoration("Emergency Contact Name", context),
+                    decoration: customInputDecoration(
+                        "Emergency Contact Name", context),
                     enabled: isEditing,
                   ),
                   TextField(
                     controller: emergencyContactPhoneController,
-                    decoration: customInputDecoration("Emergency Contact Phone", context),
+                    decoration: customInputDecoration(
+                        "Emergency Contact Phone", context),
                     enabled: isEditing,
                   ),
                   TextField(
                     controller: emergencyContactRelationController,
-                    decoration: customInputDecoration("Emergency Contact Relation", context),
+                    decoration: customInputDecoration(
+                        "Emergency Contact Relation", context),
                     enabled: isEditing,
                   ),
                 ],
@@ -202,7 +233,8 @@ class CombinedForm extends StatelessWidget {
                     value: specializationController.text.isNotEmpty
                         ? specializationController.text
                         : null,
-                    decoration: customInputDecoration("Specialization", context),
+                    decoration:
+                        customInputDecoration("Specialization", context),
                     items: ["Psychologist", "Psychiatrist", "Counselor"]
                         .map((String value) {
                       return DropdownMenuItem<String>(
@@ -217,7 +249,8 @@ class CombinedForm extends StatelessWidget {
                         : null,
                   ),
                   Container(
-                    constraints: BoxConstraints(maxHeight: isEditing ? double.infinity : 100), // Use constraints instead of fixed height
+                    constraints: BoxConstraints(
+                        maxHeight: isEditing ? double.infinity : 100),
                     child: SingleChildScrollView(
                       child: TextField(
                         controller: bioController,
@@ -235,12 +268,14 @@ class CombinedForm extends StatelessWidget {
                   ),
                   TextField(
                     controller: yearsOfExperienceController,
-                    decoration: customInputDecoration("Years of Experience", context),
+                    decoration:
+                        customInputDecoration("Years of Experience", context),
                     enabled: isEditing,
                   ),
                   TextField(
                     controller: languagesSpokenController,
-                    decoration: customInputDecoration("Languages Spoken", context),
+                    decoration:
+                        customInputDecoration("Languages Spoken", context),
                     enabled: isEditing,
                   ),
                   // TextField(
@@ -248,23 +283,23 @@ class CombinedForm extends StatelessWidget {
                   //   decoration: customInputDecoration("Location", context),
                   //   enabled: isEditing,
                   // ),
-                                DropdownButtonFormField<String>(
-                value: locationController.text.isNotEmpty
-                    ? locationController.text
-                    : null,
-                decoration: customInputDecoration("Location", context),
-                items: ["Dagupan City", "Urdaneta City"]
-                    .map((city) => DropdownMenuItem(
-                          value: city,
-                          child: Text(city),
-                        ))
-                    .toList(),
-                onChanged: isEditing
-                    ? (value) {
-                        locationController.text = value!;
-                      }
-                    : null,
-              ),
+                  DropdownButtonFormField<String>(
+                    value: locationController.text.isNotEmpty
+                        ? locationController.text
+                        : null,
+                    decoration: customInputDecoration("Location", context),
+                    items: ["Dagupan City", "Urdaneta City"]
+                        .map((city) => DropdownMenuItem(
+                              value: city,
+                              child: Text(city),
+                            ))
+                        .toList(),
+                    onChanged: isEditing
+                        ? (value) {
+                            locationController.text = value!;
+                          }
+                        : null,
+                  ),
                   TextField(
                     controller: clinicController,
                     decoration: customInputDecoration("Clinic", context),
@@ -277,7 +312,9 @@ class CombinedForm extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   DropdownButtonFormField<String>(
-                    value: availabilityController.text.isNotEmpty ? availabilityController.text : null,
+                    value: availabilityController.text.isNotEmpty
+                        ? availabilityController.text
+                        : null,
                     decoration: customInputDecoration("Availability", context),
                     items: ["Available", "Not Available"].map((String value) {
                       return DropdownMenuItem<String>(
@@ -285,7 +322,9 @@ class CombinedForm extends StatelessWidget {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: isEditing ? (newValue) => availabilityController.text = newValue! : null,
+                    onChanged: isEditing
+                        ? (newValue) => availabilityController.text = newValue!
+                        : null,
                   ),
                 ],
               ],

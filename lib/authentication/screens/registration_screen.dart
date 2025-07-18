@@ -25,6 +25,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
+  final _genderController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _dateOfBirthController = TextEditingController();
   final _emergencyContactNameController = TextEditingController();
@@ -75,6 +76,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         _lastNameController.text.isNotEmpty &&
         _emailController.text.isNotEmpty &&
         _phoneNumberController.text.isNotEmpty &&
+        _genderController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty &&
         _confirmPasswordController.text.isNotEmpty;
 
@@ -92,6 +94,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         isPatientFieldsFilled &&
         isSpecialistFieldsFilled;
   }
+
+  final genderOptions = [
+    {"label": "Male", "value": "male"},
+    {"label": "Female", "value": "female"},
+  ];
 
   void _checkPasswordStrength(String password) {
     if (password.length < 8) {
@@ -237,6 +244,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             lastName: _lastNameController.text,
             email: _emailController.text,
             phoneNumber: _phoneNumberController.text,
+            gender: _genderController.text,
             password: password,
             otherDetails: {
               "dateOfBirth": _dateOfBirthController.text,
@@ -259,6 +267,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             lastName: _lastNameController.text,
             email: _emailController.text,
             phoneNumber: _phoneNumberController.text,
+            gender: _genderController.text,
             password: password,
             otherDetails: {
               "specialization": _specializationController.text,
@@ -439,6 +448,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 controller: _phoneNumberController,
                                 focusNode: _phoneFocus,
                                 onChanged: (_) => _checkFields(),
+                              ),
+                              const SizedBox(height: 20),
+                              DropdownButtonFormField<String>(
+                                value: _genderController.text.isNotEmpty
+                                    ? _genderController.text
+                                    : null,
+                                decoration:
+                                    customInputDecoration("Gender", context),
+                                items: genderOptions.map((option) {
+                                  return DropdownMenuItem<String>(
+                                    value: option[
+                                        "value"],
+                                    child: Text(option[
+                                        "label"]!),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _genderController.text =
+                                        value!; 
+                                  });
+                                  _checkFields();
+                                },
                               ),
                               const SizedBox(height: 20),
                               CustomTextField(

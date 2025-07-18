@@ -76,7 +76,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             /// Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(
-                  vertical: 16), // Added vertical padding
+                  vertical: 16), 
               child: CustomSearchBar(
                 hintText: 'Search chats...',
                 searchController: _searchController,
@@ -114,7 +114,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     Icon(Icons.psychology_alt, color: Colors.white),
                     SizedBox(width: 10),
                     Text(
-                      'Talk to our AI Therapist',
+                      'Talk to our AI Chatbot',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

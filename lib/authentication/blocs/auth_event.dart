@@ -11,6 +11,7 @@ class RegisterEvent extends AuthEvent {
   final String email;
   final String password;
   final String phoneNumber;
+  final String gender;
   final String? profileImage;
   final Map<String, dynamic> otherDetails;
 
@@ -20,6 +21,7 @@ class RegisterEvent extends AuthEvent {
     required this.email,
     required this.password,
     required this.phoneNumber,
+    required this.gender,
     this.profileImage,
     required this.otherDetails,
   });
@@ -31,6 +33,7 @@ class RegisterEvent extends AuthEvent {
         email,
         password,
         phoneNumber,
+        gender,
         profileImage,
         otherDetails,
       ];
