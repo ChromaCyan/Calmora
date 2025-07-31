@@ -1129,4 +1129,29 @@ class ApiRepository {
       throw Exception('Failed to book appointment: ${response.body}');
     }
   }
+
+  Future<String> askGemini(String message) async {
+  final token = await _storage.read(key: 'token');
+  final url = Uri.parse('$baseUrl/chatbot/ask-ai');
+
+  final response = await http.post(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      // Uncomment if protected:
+      // 'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'message': message,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return data['reply'];
+  } else {
+    throw Exception('Gemini error: ${response.body}');
+  }
+}
+
 }

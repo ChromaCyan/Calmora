@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:armstrong/services/tts.dart';
+import 'package:armstrong/services/api.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -14,17 +15,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final TTSService _ttsService = TTSService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
+  final ApiRepository _apiRepository = ApiRepository();
 
   final List<Map<String, dynamic>> _messages = [];
-
-  final List<String> _aiResponses = [
-    "Thanks for sharing that. I will help you understand your emotions or listen to you about your issues and help you with what you can do, but you have to remember. I'm an a i, and i can't replace a real mental health specialist, i also can't diagnose your condition, it's still better to seek a real mental health specialist to walk you through and help you work your problems out. Now why exactly do you feel this way? I'm glad you reached out. Want to talk more about what’s been bothering you?",
-    "It's okay to feel this way sometimes. Can you describe when it started?",
-    "Let’s try to unpack that feeling together. I do get where you are coming from, It's really frustrating and confusing to feel those emotions and problems.",
-    "Thanks for sharing that. Take your time, I’m here for you.",
-  ];
-
-  int _responseIndex = 0;
 
   @override
   void initState() {
@@ -68,20 +61,19 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _scrollToBottom();
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     final content = _controller.text.trim();
     if (content.isEmpty) return;
 
     _addUserMessage(content);
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (_responseIndex < _aiResponses.length) {
-        _addBotMessage(_aiResponses[_responseIndex]);
-        _responseIndex++;
-      } else {
-        _addBotMessage("I'm here for you always remember, As a reminder to always take care of yourself, you are not alone remember that. You could find a specialist in this app to help you understand your self better! You can share your problems with me again.");
-      }
-    });
+    try {
+      final aiReply = await _apiRepository.askGemini(content);
+      _addBotMessage(aiReply);
+    } catch (e) {
+      _addBotMessage("Oops! Something went wrong. Please try again later.");
+      print("Gemini error: $e");
+    }
   }
 
   void _scrollToBottom() {
@@ -154,7 +146,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
             child: Row(
               children: [
                 Expanded(
