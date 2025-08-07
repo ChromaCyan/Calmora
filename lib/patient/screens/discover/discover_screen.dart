@@ -26,6 +26,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   String selectedCategory = 'Specialist';
   String selectedArticleCategory = '';
   String selectedSpecialistType = '';
+  String selectedGender = '';
+  String selectedArticleGender = 'everyone';
 
   @override
   void initState() {
@@ -130,6 +132,40 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       }).toList(),
                     ],
                   ),
+                const SizedBox(height: 5),
+                if (selectedCategory == 'Specialist')
+                  DropdownButton<String>(
+                    value: selectedGender.isEmpty ? null : selectedGender,
+                    icon: Icon(Icons.arrow_drop_down,
+                        color: theme.colorScheme.primary),
+                    isExpanded: true,
+                    elevation: 16,
+                    hint: Text("Select Gender"),
+                    onChanged: (String? newGender) {
+                      setState(() {
+                        selectedGender =
+                            newGender == "Clear Gender" ? '' : newGender ?? '';
+                        _fetchSpecialists();
+                      });
+                    },
+                    items: [
+                      DropdownMenuItem<String>(
+                        value: "Clear Gender",
+                        child: Text("Clear Gender",
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                      ...['male', 'female']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(
+                            value[0].toUpperCase() + value.substring(1),
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
 
                 // Article Category Dropdown
                 if (selectedCategory == 'Articles')
@@ -170,31 +206,59 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             .join(' ');
 
                         return DropdownMenuItem<String>(
-                          value: value, 
+                          value: value,
                           child: Text(capitalizedValue,
                               style: TextStyle(fontSize: 16)),
                         );
                       }).toList(),
                     ],
                   ),
-
+                if (selectedCategory == 'Articles')
+                  DropdownButton<String>(
+                    value: selectedArticleGender.isEmpty
+                        ? null
+                        : selectedArticleGender,
+                    icon: Icon(Icons.arrow_drop_down,
+                        color: theme.colorScheme.primary),
+                    isExpanded: true,
+                    elevation: 16,
+                    hint: Text("Select Gender for Articles"),
+                    onChanged: (String? newGender) {
+                      setState(() {
+                        selectedArticleGender =
+                            newGender == "Clear Filter" ? '' : newGender ?? '';
+                      });
+                    },
+                    items: [
+                      DropdownMenuItem<String>(
+                        value: "Clear Filter",
+                        child: Text("Clear Filter",
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                      ...["Male", "Female", "Everyone"]
+                          .map<DropdownMenuItem<String>>((String gender) {
+                        return DropdownMenuItem<String>(
+                          value: gender.toLowerCase(),
+                          child: Text(gender),
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 const SizedBox(height: 20),
 
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? theme.cardColor
-                            .withOpacity(0.65) 
+                        ? theme.cardColor.withOpacity(0.65)
                         : theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white12 
+                            ? Colors.white12
                             : Colors.black12,
-                        blurRadius:
-                            10, 
+                        blurRadius: 10,
                         spreadRadius: 3,
                       ),
                     ],
@@ -231,8 +295,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 name.toLowerCase().contains(searchQuery.toLowerCase());
             bool matchesSpecialistType = selectedSpecialistType.isEmpty ||
                 specialist.specialization == selectedSpecialistType;
+            bool matchesGender = selectedGender.isEmpty ||
+                specialist.gender.toLowerCase() == selectedGender.toLowerCase();
 
-            return matchesSearchQuery && matchesSpecialistType;
+            return matchesSearchQuery && matchesSpecialistType && matchesGender;
           }).toList();
 
           if (filteredSpecialists.isEmpty) {
@@ -264,7 +330,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   );
                   if (result != null && result == 'refresh') {
-                    _fetchSpecialists(); 
+                    _fetchSpecialists();
                   }
                 },
               );
@@ -289,9 +355,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           final filteredArticles = articles.where((article) {
             bool matchesCategory = selectedCategory.isEmpty ||
                 article.categories.contains(selectedCategory);
+            bool matchesGender = selectedArticleGender.isEmpty ||
+                article.targetGender.toLowerCase() ==
+                    selectedArticleGender.toLowerCase();
             bool matchesSearchQuery =
                 article.title.toLowerCase().contains(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearchQuery;
+            return matchesCategory && matchesSearchQuery && matchesGender;
           }).toList();
 
           if (filteredArticles.isEmpty) {

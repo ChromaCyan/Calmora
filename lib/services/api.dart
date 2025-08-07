@@ -809,6 +809,7 @@ class ApiRepository {
     List<String>? additionalImages,
     required String specialistId,
     required List<String> categories,
+    required String targetGender,
   }) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/create-article');
@@ -826,6 +827,7 @@ class ApiRepository {
         'additionalImages': additionalImages ?? [],
         'specialistId': specialistId,
         'categories': categories,
+        'targetGender': targetGender,
       }),
     );
 
@@ -844,6 +846,7 @@ class ApiRepository {
     String? heroImage,
     List<String>? additionalImages,
     List<String>? categories,
+    String? targetGender
   }) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/$articleId');
@@ -856,6 +859,7 @@ class ApiRepository {
     if (additionalImages != null)
       payload['additionalImages'] = additionalImages;
     if (categories != null) payload['categories'] = categories;
+    if (targetGender != null) payload['targetGender'] = targetGender;
 
     final response = await http.put(
       url,
@@ -1138,7 +1142,6 @@ class ApiRepository {
     url,
     headers: {
       'Content-Type': 'application/json',
-      // Uncomment if protected:
       // 'Authorization': 'Bearer $token',
     },
     body: jsonEncode({

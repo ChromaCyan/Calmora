@@ -5,6 +5,7 @@ class Specialist {
   final String firstName;
   final String lastName;
   final String email;
+  final String gender;
   final String phoneNumber;
   final String? profileImage;
   final String specialization;
@@ -23,6 +24,7 @@ class Specialist {
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.gender,
     required this.phoneNumber,
     this.profileImage,
     required this.specialization,
@@ -43,6 +45,7 @@ class Specialist {
       firstName: json['firstName'],
       lastName: json['lastName'],
       email: json['email'],
+      gender: json['gender'] ?? 'unknown',
       phoneNumber: json['phoneNumber'],
       profileImage: json['profileImage'],
       specialization: json['specialization'] ?? 'Unknown',

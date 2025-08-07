@@ -33,6 +33,8 @@ class _EditArticleFormState extends State<EditArticleForm> {
   ];
   List<String> _selectedCategories = [];
 
+  String? _selectedGender;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,7 @@ class _EditArticleFormState extends State<EditArticleForm> {
         .map((category) =>
             category[0].toUpperCase() + category.substring(1).toLowerCase())
         .toList();
+    _selectedGender = widget.article.targetGender;
   }
 
   Future<void> _pickImage() async {
@@ -82,19 +85,19 @@ class _EditArticleFormState extends State<EditArticleForm> {
         _contentController.text.isEmpty ||
         _selectedCategories.isEmpty) {
       _showSnackBar(
-                  "Warning",
-                  "Please fill all fields and choose 1-2 categories..",
-                  ContentType.warning,
-                );
+        "Warning",
+        "Please fill all fields and choose 1-2 categories..",
+        ContentType.warning,
+      );
       return;
     }
 
     if (_selectedCategories.length > 2) {
       _showSnackBar(
-                  "Categories select error!",
-                  'You can only select up to 2 categories',
-                  ContentType.warning,
-                );
+        "Categories select error!",
+        'You can only select up to 2 categories',
+        ContentType.warning,
+      );
       return;
     }
 
@@ -103,10 +106,10 @@ class _EditArticleFormState extends State<EditArticleForm> {
       heroImageUrl = await _uploadImageToSupabase(_image!);
       if (heroImageUrl == null) {
         _showSnackBar(
-                  "Failed to upload image",
-                  "Failed to upload image, please check your internet connection and try again..",
-                  ContentType.failure,
-                );
+          "Failed to upload image",
+          "Failed to upload image, please check your internet connection and try again..",
+          ContentType.failure,
+        );
         return;
       }
     }
@@ -117,15 +120,15 @@ class _EditArticleFormState extends State<EditArticleForm> {
             title: _titleController.text,
             content: _contentController.text,
             heroImage: heroImageUrl ?? widget.article.heroImage,
-            categories:
-                _selectedCategories.map((c) => c.toLowerCase()).toList(),
+            categories:_selectedCategories.map((c) => c.toLowerCase()).toList(),
+            targetGender: (_selectedGender ?? 'everyone').toLowerCase().trim(),
           ),
         );
     _showSnackBar(
-                  "Success",
-                  "Article updated successfully!",
-                  ContentType.success,
-                );
+      "Success",
+      "Article updated successfully!",
+      ContentType.success,
+    );
     Navigator.pop(context, true);
   }
 
@@ -151,7 +154,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-
                 GestureDetector(
                   onTap: _pickImage,
                   child: Stack(
@@ -200,7 +202,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 TextFormField(
                   controller: _titleController,
                   decoration: InputDecoration(
@@ -214,7 +215,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 TextFormField(
                   controller: _contentController,
                   maxLines: 5,
@@ -229,7 +229,6 @@ class _EditArticleFormState extends State<EditArticleForm> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 const Text(
                   'Categories',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -239,8 +238,7 @@ class _EditArticleFormState extends State<EditArticleForm> {
                     title: Text(category),
                     value: _selectedCategories
                         .map((c) => c.toLowerCase())
-                        .contains(
-                            category.toLowerCase()),
+                        .contains(category.toLowerCase()),
                     onChanged: (bool? selected) {
                       setState(() {
                         if (selected == true &&
@@ -258,9 +256,33 @@ class _EditArticleFormState extends State<EditArticleForm> {
                     },
                   );
                 }).toList(),
-
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    'Target Gender',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onBackground,
+                    ),
+                  ),
+                ),
+                Column(
+                  children: ['everyone', 'male', 'female'].map((gender) {
+                    return RadioListTile<String>(
+                      title: Text(
+                        gender[0].toUpperCase() + gender.substring(1),
+                      ),
+                      value: gender,
+                      groupValue: _selectedGender,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedGender = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
                 const SizedBox(height: 16),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(

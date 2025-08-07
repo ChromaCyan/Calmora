@@ -39,6 +39,7 @@ class UpdateArticle extends ArticleEvent {
   final String? heroImage;
   final List<String>? additionalImages;
   final List<String>? categories;
+  final String? targetGender;
   UpdateArticle({
     required this.articleId,
     this.title,
@@ -46,6 +47,7 @@ class UpdateArticle extends ArticleEvent {
     this.heroImage,
     this.additionalImages,
     this.categories,
+    this.targetGender,
   });
 }
 
@@ -157,6 +159,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         heroImage: event.article.heroImage,
         specialistId: event.article.specialistId,
         categories: event.article.categories,
+        targetGender: event.article.targetGender,
       );
       add(FetchAllArticles());
     } catch (e) {
@@ -175,6 +178,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         heroImage: event.heroImage,
         additionalImages: event.additionalImages,
         categories: event.categories,
+        targetGender: event.targetGender,
       );
       add(FetchArticleById(event.articleId));
     } catch (e) {

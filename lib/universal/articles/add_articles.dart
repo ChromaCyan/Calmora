@@ -32,6 +32,8 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
   ];
   List<String> _selectedCategories = [];
 
+  String? _selectedGender = 'everyone';
+
   @override
   void initState() {
     super.initState();
@@ -64,7 +66,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
         _image == null ||
         _selectedCategories.isEmpty) {
       _showSnackbar(
-          'Please fill all fields, select an image, and choose categories',
+          'Please fill all fields, select an image, choose categories, and select target demographic',
           isError: true);
       return;
     }
@@ -74,7 +76,8 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
       return;
     }
 
-     final normalizedCategories = _selectedCategories.map((category) => category.toLowerCase()).toList();
+    final normalizedCategories =
+        _selectedCategories.map((category) => category.toLowerCase()).toList();
 
     final heroImageUrl = await _uploadImageToSupabase(_image!);
     if (heroImageUrl == null) {
@@ -93,7 +96,9 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
         heroImage: heroImageUrl,
         specialistId: _userId ?? '',
         categories: normalizedCategories,
+        targetGender: (_selectedGender ?? 'everyone').toLowerCase().trim(),
       );
+
 
       if (response.isNotEmpty) {
         _showSnackbar('Article added successfully!');
@@ -290,14 +295,14 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                 SizedBox(height: 20),
 
                 Center(
-                child: Text(
-                  'Categories',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
+                  child: Text(
+                    'Categories',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onBackground,
+                    ),
                   ),
                 ),
-              ),
 
                 // Category Dropdown
                 Column(
@@ -309,17 +314,44 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                         setState(() {
                           if (selected == true &&
                               _selectedCategories.length < 2) {
-                            _selectedCategories.add(
-                                category); 
+                            _selectedCategories.add(category);
                           } else {
-                            _selectedCategories.remove(
-                                category); 
+                            _selectedCategories.remove(category);
                           }
                         });
                       },
                     );
                   }).toList(),
                 ),
+
+                SizedBox(height: 20),
+
+                Center(
+                  child: Text(
+                    'Target Gender',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onBackground,
+                    ),
+                  ),
+                ),
+                Column(
+                  children: ['everyone', 'male', 'female'].map((gender) {
+                    return RadioListTile<String>(
+                      title: Text(
+                        gender[0].toUpperCase() + gender.substring(1),
+                      ),
+                      value: gender,
+                      groupValue: _selectedGender,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedGender = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+
                 SizedBox(height: 12),
 
                 //Submit Button

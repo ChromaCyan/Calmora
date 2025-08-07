@@ -7,6 +7,7 @@ class Article {
   final String specialistId; 
   final List<String> categories;
   final String specialistName;
+  final String targetGender;
 
   Article({
     required this.id,
@@ -17,6 +18,7 @@ class Article {
     required this.specialistId,
     required this.categories,
     required this.specialistName,
+    required this.targetGender,
   });
 
   // Factory constructor to create an Article from a Map (API response)
@@ -32,6 +34,7 @@ class Article {
       specialistName: map['specialistId'] != null
           ? '${map['specialistId']['firstName'] ?? ''} ${map['specialistId']['lastName'] ?? ''}'.trim()
           : '',
+      targetGender: map['targetGender'] ?? 'everyone',
     );
   }
 
@@ -46,6 +49,7 @@ class Article {
       'specialistId': specialistId,
       'categories': categories,
       'specialistName': specialistName,
+      'targetGender': targetGender,
     };
   }
 }
