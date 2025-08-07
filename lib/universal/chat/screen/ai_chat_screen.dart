@@ -3,6 +3,7 @@ import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:armstrong/services/tts.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -16,6 +17,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
   final ApiRepository _apiRepository = ApiRepository();
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _lastWords = '';
 
   final List<Map<String, dynamic>> _messages = [];
 
@@ -24,6 +28,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     super.initState();
     _initTTSVoice();
     _sendInitialMessage();
+    _speech = stt.SpeechToText();
   }
 
   void _initTTSVoice() async {
@@ -86,6 +91,35 @@ class _AIChatScreenState extends State<AIChatScreen> {
     });
   }
 
+  void _startListening() async {
+    bool available = await _speech.initialize(
+      onStatus: (val) => print('Speech status: $val'),
+      onError: (val) => print('Speech error: $val'),
+    );
+
+    if (available) {
+      setState(() => _isListening = true);
+      _speech.listen(
+        onResult: (val) {
+          setState(() {
+            _lastWords = val.recognizedWords;
+            _controller.text = _lastWords;
+          });
+        },
+      );
+    }
+  }
+
+  void _stopListeningAndSend() async {
+    await _speech.stop();
+    setState(() => _isListening = false);
+
+    if (_lastWords.trim().isNotEmpty) {
+      _sendMessage();
+      _lastWords = '';
+    }
+  }
+
   String _formatTimestamp(String timestamp) {
     final dateTime = DateTime.parse(timestamp);
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
@@ -96,33 +130,12 @@ class _AIChatScreenState extends State<AIChatScreen> {
     await _ttsService.speak(text);
   }
 
-  void _readLatestBotMessage() {
-    final latestBotMessage = _messages.lastWhere(
-      (msg) => msg['isSender'] == false,
-      orElse: () => {},
-    );
-
-    if (latestBotMessage.isNotEmpty) {
-      final content = latestBotMessage['content'] as String;
-      _speak(content);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No message from Calmora yet.")),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text("Calmora (AI Chatbot)"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mic),
-            onPressed: _readLatestBotMessage,
-          ),
-        ],
+        title: const Text("Calmora AI Chatbot"),
       ),
       body: Column(
         children: [
@@ -148,22 +161,40 @@ class _AIChatScreenState extends State<AIChatScreen> {
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: "Type a message...",
-                      border: OutlineInputBorder(),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: "Type a message or use mic...",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendMessage,
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onLongPressStart: (_) => _startListening(),
+                    onLongPressEnd: (_) => _stopListeningAndSend(),
+                    child: Icon(
+                      _isListening ? Icons.mic : Icons.mic_none,
+                      size: 28,
+                      color: _isListening ? Colors.red : Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: _sendMessage,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
