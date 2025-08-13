@@ -29,6 +29,23 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   String selectedGender = '';
   String selectedArticleGender = 'everyone';
 
+  // Specialist Type
+  final List<String> specialistTypes = [
+    'Psychologist',
+    'Psychiatrist',
+    'Counselor',
+  ];
+
+  // Article Categories
+  final List<String> articleCategories = [
+    'Health',
+    'Social',
+    'Growth',
+    'Relationships',
+    'Coping Strategies',
+    'Self-Care',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -99,151 +116,108 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
                 const SizedBox(height: 20),
 
-                // Specialist Type Dropdown
-                if (selectedCategory == 'Specialist')
-                  DropdownButton<String>(
-                    value: selectedSpecialistType.isEmpty
-                        ? null
-                        : selectedSpecialistType,
-                    icon: Icon(Icons.arrow_drop_down,
-                        color: theme.colorScheme.primary),
-                    isExpanded: true,
-                    elevation: 16,
-                    hint: Text("Select Specialist Type"),
-                    onChanged: (String? newType) {
-                      setState(() {
-                        selectedSpecialistType =
-                            newType == "Clear Filter" ? '' : newType ?? '';
-                        _fetchSpecialists();
-                      });
-                    },
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: "Clear Filter",
-                        child: Text("Clear Filter",
-                            style: TextStyle(color: Colors.red)),
-                      ),
-                      ...['Psychologist', 'Psychiatrist', 'Counselor']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value, style: TextStyle(fontSize: 16)),
-                        );
-                      }).toList(),
-                    ],
+                // Specialist Type Category
+                if (selectedCategory == 'Specialist') ...[
+                  _buildFilterCard(
+                    'Specialist Type',
+                    buildCategorySelector(
+                      selectedValue: selectedSpecialistType,
+                      categories: specialistTypes,
+                      icons: {
+                        'Psychologist': Icons.psychology,
+                        'Psychiatrist': Icons.medical_information,
+                        'Counselor': Icons.support_agent,
+                      },
+                      colors: [
+                        Colors.deepPurple,
+                        Colors.redAccent,
+                        Colors.teal
+                      ],
+                      onSelect: (value) {
+                        setState(() {
+                          selectedSpecialistType = value;
+                          _fetchSpecialists();
+                        });
+                      },
+                    ),
                   ),
-                const SizedBox(height: 5),
-                if (selectedCategory == 'Specialist')
-                  DropdownButton<String>(
-                    value: selectedGender.isEmpty ? null : selectedGender,
-                    icon: Icon(Icons.arrow_drop_down,
-                        color: theme.colorScheme.primary),
-                    isExpanded: true,
-                    elevation: 16,
-                    hint: Text("Select Gender"),
-                    onChanged: (String? newGender) {
-                      setState(() {
-                        selectedGender =
-                            newGender == "Clear Gender" ? '' : newGender ?? '';
-                        _fetchSpecialists();
-                      });
-                    },
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: "Clear Gender",
-                        child: Text("Clear Gender",
-                            style: TextStyle(color: Colors.red)),
-                      ),
-                      ...['male', 'female']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value[0].toUpperCase() + value.substring(1),
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        );
-                      }).toList(),
-                    ],
+                  _buildFilterCard(
+                    'Specialist Gender',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _genderOption("Female", Icons.female, "female"),
+                        _genderOption("Male", Icons.male, "male"),
+                        _genderOption(
+                            "Everyone", Icons.transgender, "everyone"),
+                      ],
+                    ),
                   ),
+                ],
 
-                // Article Category Dropdown
-                if (selectedCategory == 'Articles')
-                  DropdownButton<String>(
-                    value: selectedArticleCategory.isEmpty
-                        ? null
-                        : selectedArticleCategory,
-                    icon: Icon(Icons.arrow_drop_down,
-                        color: theme.colorScheme.primary),
-                    isExpanded: true,
-                    elevation: 16,
-                    hint: Text("Select Article Category"),
-                    onChanged: (String? newCategory) {
-                      setState(() {
-                        selectedArticleCategory = newCategory == "Clear Filter"
-                            ? ''
-                            : newCategory ?? '';
-                      });
-                    },
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: "Clear Filter",
-                        child: Text("Clear Filter",
-                            style: TextStyle(color: Colors.red)),
-                      ),
-                      ...[
-                        'health',
-                        'social',
-                        'growth',
-                        'relationships',
-                        'coping strategies',
-                        'self-care'
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        String capitalizedValue = value
-                            .split(' ')
-                            .map((word) =>
-                                word[0].toUpperCase() + word.substring(1))
-                            .join(' ');
+                // Article Category
+                if (selectedCategory == 'Articles') ...[
+                  _buildFilterCard(
+                    'Article Category',
+                    DropdownButton<String>(
+                      value: selectedArticleCategory.isEmpty
+                          ? null
+                          : selectedArticleCategory,
+                      icon: Icon(Icons.arrow_drop_down,
+                          color: theme.colorScheme.primary),
+                      isExpanded: true,
+                      elevation: 16,
+                      hint: Text("Select Article Category"),
+                      onChanged: (String? newCategory) {
+                        setState(() {
+                          selectedArticleCategory =
+                              newCategory == "Clear Filter"
+                                  ? ''
+                                  : newCategory ?? '';
+                        });
+                      },
+                      items: [
+                        DropdownMenuItem<String>(
+                          value: "Clear Filter",
+                          child: Text("Clear Filter",
+                              style: TextStyle(color: Colors.red)),
+                        ),
+                        ...[
+                          'health',
+                          'social',
+                          'growth',
+                          'relationships',
+                          'coping strategies',
+                          'self-care'
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          String capitalizedValue = value
+                              .split(' ')
+                              .map((word) =>
+                                  word[0].toUpperCase() + word.substring(1))
+                              .join(' ');
 
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(capitalizedValue,
-                              style: TextStyle(fontSize: 16)),
-                        );
-                      }).toList(),
-                    ],
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(capitalizedValue,
+                                style: TextStyle(fontSize: 16)),
+                          );
+                        }).toList(),
+                      ],
+                    ),
                   ),
-                if (selectedCategory == 'Articles')
-                  DropdownButton<String>(
-                    value: selectedArticleGender.isEmpty
-                        ? null
-                        : selectedArticleGender,
-                    icon: Icon(Icons.arrow_drop_down,
-                        color: theme.colorScheme.primary),
-                    isExpanded: true,
-                    elevation: 16,
-                    hint: Text("Select Gender for Articles"),
-                    onChanged: (String? newGender) {
-                      setState(() {
-                        selectedArticleGender =
-                            newGender == "Clear Filter" ? '' : newGender ?? '';
-                      });
-                    },
-                    items: [
-                      DropdownMenuItem<String>(
-                        value: "Clear Filter",
-                        child: Text("Clear Filter",
-                            style: TextStyle(color: Colors.red)),
-                      ),
-                      ...["Male", "Female", "Everyone"]
-                          .map<DropdownMenuItem<String>>((String gender) {
-                        return DropdownMenuItem<String>(
-                          value: gender.toLowerCase(),
-                          child: Text(gender),
-                        );
-                      }).toList(),
-                    ],
+                  _buildFilterCard(
+                    'Article Audience',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _articleGenderOption("Female", Icons.female, "female"),
+                        _articleGenderOption("Male", Icons.male, "male"),
+                        _articleGenderOption(
+                            "Everyone", Icons.transgender, "everyone"),
+                      ],
+                    ),
                   ),
+                ],
                 const SizedBox(height: 20),
 
                 Container(
@@ -273,6 +247,252 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  // All Widget Design here....
+
+  Widget _buildFilterCard(String title, Widget child) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          child,
+        ],
+      ),
+    );
+  }
+
+  // Category Selector (Specialist Type / Article Category)
+  Widget buildCategorySelector({
+    required String? selectedValue,
+    required List<String> categories,
+    required ValueChanged<String> onSelect,
+    Map<String, IconData>? icons,
+    List<Color>? colors,
+  }) {
+    return SizedBox(
+      height: 50,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final isSelected = selectedValue == category;
+
+          final baseColor = colors != null && index < colors.length
+              ? colors[index]
+              : Theme.of(context).colorScheme.primary;
+
+          final icon = icons != null && icons.containsKey(category)
+              ? icons[category]
+              : Icons.category;
+
+          return GestureDetector(
+            onTap: () => onSelect(isSelected ? '' : category),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? baseColor : Colors.grey.shade600,
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(icon,
+                      size: 18,
+                      color: isSelected ? baseColor : Colors.grey.shade400),
+                  const SizedBox(width: 6),
+                  Text(
+                    category,
+                    style: TextStyle(
+                      color: isSelected ? baseColor : Colors.grey.shade400,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Specialist (Gender Card Widget)
+  Widget _genderOption(String label, IconData icon, String value) {
+    final bool isSelected = selectedGender == value;
+
+    Color baseColor;
+    if (value == "female") {
+      baseColor = Colors.pinkAccent;
+    } else if (value == "male") {
+      baseColor = Colors.blueAccent;
+    } else {
+      baseColor = Colors.purpleAccent;
+    }
+
+    BoxDecoration boxDecoration;
+    if (value == "everyone") {
+      boxDecoration = BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.pinkAccent, Colors.blueAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? Colors.white : Colors.grey.shade600,
+          width: 1.5,
+        ),
+      );
+    } else {
+      boxDecoration = BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? baseColor : Colors.grey.shade600,
+          width: 1.5,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (selectedGender == value) {
+            selectedGender = "";
+          } else {
+            selectedGender = value;
+          }
+          _fetchSpecialists();
+        });
+      },
+      child: Container(
+        width: 80,
+        height: 80,
+        padding: EdgeInsets.all(8),
+        decoration: boxDecoration,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: value == "everyone"
+                  ? Colors.white
+                  : (isSelected ? baseColor : Colors.grey.shade400),
+            ),
+            SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: value == "everyone"
+                    ? Colors.white
+                    : (isSelected ? baseColor : Colors.grey.shade400),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Article (Gender Card Widget)
+  Widget _articleGenderOption(String label, IconData icon, String value) {
+    final bool isSelected = selectedArticleGender == value;
+
+    Color baseColor;
+    if (value == "female") {
+      baseColor = Colors.pinkAccent;
+    } else if (value == "male") {
+      baseColor = Colors.blueAccent;
+    } else {
+      baseColor = Colors.purpleAccent;
+    }
+
+    BoxDecoration boxDecoration;
+    if (value == "everyone") {
+      boxDecoration = BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.pinkAccent, Colors.blueAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? Colors.white : Colors.grey.shade600,
+          width: 1.5,
+        ),
+      );
+    } else {
+      boxDecoration = BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? baseColor : Colors.grey.shade600,
+          width: 1.5,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (selectedArticleGender == value) {
+            selectedArticleGender = "";
+          } else {
+            selectedArticleGender = value;
+          }
+          _fetchArticles();
+        });
+      },
+      child: Container(
+        width: 80,
+        height: 80,
+        padding: EdgeInsets.all(8),
+        decoration: boxDecoration,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: value == "everyone"
+                  ? Colors.white
+                  : (isSelected ? baseColor : Colors.grey.shade400),
+            ),
+            SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: value == "everyone"
+                    ? Colors.white
+                    : (isSelected ? baseColor : Colors.grey.shade400),
+              ),
+            ),
+          ],
         ),
       ),
     );
