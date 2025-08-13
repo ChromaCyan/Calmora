@@ -1,79 +1,142 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 /// The [AppTheme] defines light and dark themes for the app.
-///
-/// Theme setup for FlexColorScheme package v8.
-/// Use same major flex_color_scheme package version. If you use a
-/// lower minor version, some properties may not be supported.
-/// In that case, remove them after copying this theme to your
-/// app or upgrade package to version 8.1.0.
-///
-/// Use in [MaterialApp] like this:
-///
-/// MaterialApp(
-///   theme: AppTheme.light,
-///   darkTheme: AppTheme.dark,
-///     :
-/// );
 abstract final class AppTheme {
-  // The defined light theme.
+  // Light theme using your new ColorScheme
   static ThemeData light = FlexThemeData.light(
-  colors: const FlexSchemeColor(
-    primary: Color(0xFF00296B),
-    primaryContainer: Color(0xFFA0C2ED),
-    primaryLightRef: Color(0xFF00296B),
-    secondary: Color(0xFFD26900),
-    secondaryContainer: Color(0xFFFFD270),
-    secondaryLightRef: Color(0xFFD26900),
-    tertiary: Color(0xFF5C5C95),
-    tertiaryContainer: Color(0xFFC8DBF8),
-    tertiaryLightRef: Color(0xFF5C5C95),
-    appBarColor: Color(0xFFC8DCF8),
-    error: Color(0x00000000),
-    errorContainer: Color(0x00000000),
-  ),
-  subThemesData: const FlexSubThemesData(
-    interactionEffects: true,
-    tintedDisabledControls: true,
-    useM2StyleDividerInM3: true,
-    inputDecoratorIsFilled: true,
-    inputDecoratorBorderType: FlexInputBorderType.outline,
-    alignedDropdown: true,
-    navigationRailUseIndicator: true,
-    navigationRailLabelType: NavigationRailLabelType.all,
-  ),
-  visualDensity: FlexColorScheme.comfortablePlatformDensity,
-  cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+    colorScheme: lightColorScheme,
+    subThemesData: const FlexSubThemesData(
+      interactionEffects: true,
+      tintedDisabledControls: true,
+      useM2StyleDividerInM3: true,
+      inputDecoratorIsFilled: true,
+      inputDecoratorBorderType: FlexInputBorderType.outline,
+      alignedDropdown: true,
+      navigationRailUseIndicator: true,
+      navigationRailLabelType: NavigationRailLabelType.all,
+    ),
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
   );
-  // The defined dark theme.
+
+  // Dark theme using your new ColorScheme
   static ThemeData dark = FlexThemeData.dark(
-  colors: const FlexSchemeColor(
-    primary: Color(0xFFB1CFF5),
-    primaryContainer: Color(0xFF00296B),
-    primaryLightRef: Color(0xFF3873BA),
-    secondary: Color(0xFFFFD270),
-    secondaryContainer: Color(0xFFD26900),
-    secondaryLightRef: Color(0xFFD26900),
-    tertiary: Color(0xFFC9CBFC),
-    tertiaryContainer: Color(0xFF535393),
-    tertiaryLightRef: Color(0xFF5C5C95),
-    appBarColor: Color(0xFF00102B),
-    error: Color(0x00000000),
-    errorContainer: Color(0x00000000),
-  ),
-  subThemesData: const FlexSubThemesData(
-    interactionEffects: true,
-    tintedDisabledControls: true,
-    blendOnColors: true,
-    useM2StyleDividerInM3: true,
-    inputDecoratorIsFilled: true,
-    inputDecoratorBorderType: FlexInputBorderType.outline,
-    alignedDropdown: true,
-    navigationRailUseIndicator: true,
-    navigationRailLabelType: NavigationRailLabelType.all,
-  ),
-  visualDensity: FlexColorScheme.comfortablePlatformDensity,
-  cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+    colorScheme: darkColorScheme,
+    subThemesData: const FlexSubThemesData(
+      interactionEffects: true,
+      tintedDisabledControls: true,
+      blendOnColors: true,
+      useM2StyleDividerInM3: true,
+      inputDecoratorIsFilled: true,
+      inputDecoratorBorderType: FlexInputBorderType.outline,
+      alignedDropdown: true,
+      navigationRailUseIndicator: true,
+      navigationRailLabelType: NavigationRailLabelType.all,
+    ),
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
   );
 }
+
+// Your ColorSchemes 
+const ColorScheme lightColorScheme = ColorScheme(
+  brightness: Brightness.light,
+  primary: Color(0xFF465D91),
+  onPrimary: Color(0xFFFFFFFF),
+  primaryContainer: Color(0xFFD9E2FF),
+  onPrimaryContainer: Color(0xFF001944),
+  primaryFixed: Color(0xFFD9E2FF),
+  primaryFixedDim: Color(0xFFAFC6FF),
+  onPrimaryFixed: Color(0xFF001944),
+  onPrimaryFixedVariant: Color(0xFF2D4578),
+  secondary: Color(0xFF51606F),
+  onSecondary: Color(0xFFFFFFFF),
+  secondaryContainer: Color(0xFFD4E4F6),
+  onSecondaryContainer: Color(0xFF0D1D2A),
+  secondaryFixed: Color(0xFFD4E4F6),
+  secondaryFixedDim: Color(0xFFB8C8DA),
+  onSecondaryFixed: Color(0xFF0D1D2A),
+  onSecondaryFixedVariant: Color(0xFF394857),
+  tertiary: Color(0xFF505E7D),
+  onTertiary: Color(0xFFFFFFFF),
+  tertiaryContainer: Color(0xFFD8E2FF),
+  onTertiaryContainer: Color(0xFF0B1B36),
+  tertiaryFixed: Color(0xFFD8E2FF),
+  tertiaryFixedDim: Color(0xFFB8C6EA),
+  onTertiaryFixed: Color(0xFF0B1B36),
+  onTertiaryFixedVariant: Color(0xFF394764),
+  error: Color(0xFFBC1127),
+  onError: Color(0xFFFFFFFF),
+  errorContainer: Color(0xFFFFDAD8),
+  onErrorContainer: Color(0xFF410006),
+  surface: Color(0xFFFAF8FF),
+  onSurface: Color(0xFF1A1B20),
+  surfaceDim: Color(0xFFDAD9E0),
+  surfaceBright: Color(0xFFFAF8FF),
+  surfaceContainerLowest: Color(0xFFFFFFFF),
+  surfaceContainerLow: Color(0xFFF4F3FA),
+  surfaceContainer: Color(0xFFEEEDF4),
+  surfaceContainerHigh: Color(0xFFE8E7EF),
+  surfaceContainerHighest: Color(0xFFE2E2E9),
+  onSurfaceVariant: Color(0xFF44464F),
+  outline: Color(0xFF757780),
+  outlineVariant: Color(0xFFC5C6D0),
+  shadow: Color(0xFF000000),
+  scrim: Color(0xFF000000),
+  inverseSurface: Color(0xFF2F3036),
+  onInverseSurface: Color(0xFFF1F0F7),
+  inversePrimary: Color(0xFFAFC6FF),
+  surfaceTint: Color(0xFF465D91),
+);
+
+const ColorScheme darkColorScheme = ColorScheme(
+  brightness: Brightness.dark,
+  primary: Color(0xFFAFC6FF),
+  onPrimary: Color(0xFF142F60),
+  primaryContainer: Color(0xFF2D4578),
+  onPrimaryContainer: Color(0xFFD9E2FF),
+  primaryFixed: Color(0xFFD9E2FF),
+  primaryFixedDim: Color(0xFFAFC6FF),
+  onPrimaryFixed: Color(0xFF001944),
+  onPrimaryFixedVariant: Color(0xFF2D4578),
+  secondary: Color(0xFFB8C8DA),
+  onSecondary: Color(0xFF23323F),
+  secondaryContainer: Color(0xFF394857),
+  onSecondaryContainer: Color(0xFFD4E4F6),
+  secondaryFixed: Color(0xFFD4E4F6),
+  secondaryFixedDim: Color(0xFFB8C8DA),
+  onSecondaryFixed: Color(0xFF0D1D2A),
+  onSecondaryFixedVariant: Color(0xFF394857),
+  tertiary: Color(0xFFB8C6EA),
+  onTertiary: Color(0xFF22304C),
+  tertiaryContainer: Color(0xFF394764),
+  onTertiaryContainer: Color(0xFFD8E2FF),
+  tertiaryFixed: Color(0xFFD8E2FF),
+  tertiaryFixedDim: Color(0xFFB8C6EA),
+  onTertiaryFixed: Color(0xFF0B1B36),
+  onTertiaryFixedVariant: Color(0xFF394764),
+  error: Color(0xFFFFB2BC),
+  onError: Color(0xFF600F26),
+  errorContainer: Color(0xFF7E273B),
+  onErrorContainer: Color(0xFFFFD9DD),
+  surface: Color(0xFF121318),
+  onSurface: Color(0xFFE2E2E9),
+  surfaceDim: Color(0xFF121318),
+  surfaceBright: Color(0xFF38393E),
+  surfaceContainerLowest: Color(0xFF0C0E13),
+  surfaceContainerLow: Color(0xFF1A1B20),
+  surfaceContainer: Color(0xFF1E1F25),
+  surfaceContainerHigh: Color(0xFF282A2F),
+  surfaceContainerHighest: Color(0xFF33353A),
+  onSurfaceVariant: Color(0xFFC5C6D0),
+  outline: Color(0xFF8F9099),
+  outlineVariant: Color(0xFF44464F),
+  shadow: Color(0xFF000000),
+  scrim: Color(0xFF000000),
+  inverseSurface: Color(0xFFE2E2E9),
+  onInverseSurface: Color(0xFF2F3036),
+  inversePrimary: Color(0xFF465D91),
+  surfaceTint: Color(0xFFAFC6FF),
+);
