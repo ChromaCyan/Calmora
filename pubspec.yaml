@@ -173,6 +173,56 @@ flutter:
     - images/members_pfp/raven.jpg
     - images/login_bg_image.png
 
+    # Fonts Assets
+  fonts:
+    # Soft Fonts
+    - family: Nunito
+      fonts:
+        - asset: fonts/Nunito.ttf
+    - family: Quicksand
+      fonts:
+        - asset: fonts/Quicksand.ttf
+    - family: Mulish
+      fonts:
+        - asset: fonts/Mulish.ttf
+
+    # Minimal Fonts
+    - family: Merriweather
+      fonts:
+        - asset: fonts/Merriweather.ttf
+    - family: Bitter
+      fonts:
+        - asset: fonts/Bitter.ttf
+    - family: Lora
+      fonts:
+        - asset: fonts/Lora.ttf
+
+    # Humanist Fonts
+    - family: OpenSans
+      fonts:
+        - asset: fonts/OpenSans.ttf
+    - family: SourceSans3
+      fonts:
+        - asset: fonts/SourceSans3.ttf
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto.ttf
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway.ttf
+
+    # Specialty Fonts
+    - family: Cabin
+      fonts:
+        - asset: fonts/Cabin.ttf
+    - family: Comfortaa
+      fonts:
+        - asset: fonts/Comfortaa.ttf
+    - family: Asap
+      fonts:
+        - asset: fonts/Asap.ttf
+
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

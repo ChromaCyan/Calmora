@@ -1,4 +1,6 @@
 import 'package:armstrong/config/app_theme.dart';
+import 'package:armstrong/providers/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:armstrong/splash_screen/screens/survey_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,7 +8,8 @@ import 'splash_screen/screens/splash_screen.dart';
 import 'authentication/screens/login_screen.dart';
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
-import 'package:armstrong/providers/provider.dart';
+import 'package:armstrong/providers/font_provider.dart';
+import 'package:armstrong/providers/theme_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -25,8 +28,8 @@ void main() async {
   await NotificationService.initNotifications();
 
   Future.delayed(Duration(seconds: 3), () {
-    // socketService.showNotification(  
-    //     "Welcome to Armstrong", "Men's Mental Health App!"); 
+    // socketService.showNotification(
+    //     "Welcome to Armstrong", "Men's Mental Health App!");
   });
 
   String? token = await storage.read(key: 'jwt');
@@ -47,9 +50,9 @@ void main() async {
         hasCompletedSurvey =
             await storage.read(key: 'hasCompletedSurvey_$userId') == 'true';
         surveyOnboardingCompleted =
-            await storage.read(key: 'survey_onboarding_completed_$userId') == 'true';
+            await storage.read(key: 'survey_onboarding_completed_$userId') ==
+                'true';
       }
-
     } catch (e) {
       print('Invalid token: $e');
       await storage.delete(key: 'jwt');
@@ -58,7 +61,7 @@ void main() async {
     }
   }
 
-  // Disabling the socket connection )(Temporary because of vercel)
+  // Disabling the socket connection )(Temporary because of vercel is serverless)
   // if (token != null) {
   //   socketService.connect(token);  // Commented out
   // }
@@ -96,17 +99,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: AppProviders.getProviders(),
-      child: ShowCaseWidget(
-        builder: (context) => MaterialApp(
-          title: 'Armstrong',
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: ThemeMode.system,
-          debugShowCheckedModeBanner: false,
-          home:
-              onboardingCompleted ? _getInitialScreen() : const SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => FontProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          ...AppProviders.getProviders(),
+        ],
+        child: ShowCaseWidget(
+          builder: (context) => MaterialApp(
+            title: 'Armstrong',
+            theme: AppTheme.light.copyWith(
+              textTheme: AppTheme.light.textTheme.apply(
+                fontFamily: context.watch<FontProvider>().selectedFont,
+              ),
+            ),
+            darkTheme: AppTheme.dark.copyWith(
+              textTheme: AppTheme.dark.textTheme.apply(
+                fontFamily: context.watch<FontProvider>().selectedFont,
+              ),
+            ),
+            themeMode: context.watch<ThemeProvider>().themeMode,
+            debugShowCheckedModeBanner: false,
+            home: onboardingCompleted
+                ? _getInitialScreen()
+                : const SplashScreen(),
+          ),
         ),
       ),
     );

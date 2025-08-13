@@ -104,9 +104,9 @@ class CombinedForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                 Text(
                   "Personal Information",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -176,9 +176,9 @@ class CombinedForm extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 if (userType.toLowerCase() == "patient") ...[
-                  const Text(
+                    Text (
                     "Medical Information",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   TextField(
@@ -198,9 +198,9 @@ class CombinedForm extends StatelessWidget {
                     enabled: isEditing,
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                    Text(
                     "Emergency Contact Information",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   TextField(
@@ -224,9 +224,9 @@ class CombinedForm extends StatelessWidget {
                 ],
 
                 if (userType.toLowerCase() == "specialist") ...[
-                  const Text(
+                    Text(
                     "Professional Information",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
@@ -307,9 +307,9 @@ class CombinedForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  const Text(
+                    Text(
                     "Work Information",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   DropdownButtonFormField<String>(
                     value: availabilityController.text.isNotEmpty

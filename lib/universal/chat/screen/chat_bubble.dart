@@ -29,15 +29,23 @@ class ChatBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isSender ? theme.primary.withOpacity(0.2) : theme.surfaceVariant,
+          color:
+              isSender ? theme.primary.withOpacity(0.2) : theme.surfaceVariant,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!isSender)
-              Text(senderName, style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(content),
+              Text(senderName,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              content,
+              style: const TextStyle(
+                fontSize: 15, 
+                height: 1.4,
+              ),
+            ),
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,

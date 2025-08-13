@@ -13,7 +13,7 @@ import 'package:armstrong/widgets/forms/profile_picture.dart';
 import 'package:armstrong/widgets/forms/common_fields.dart';
 import 'package:armstrong/models/user/user.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:armstrong/universal/profile/setting_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -111,18 +111,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           clinicController.text = user.clinic ?? "";
           availabilityController.text = user.availability ?? "";
 
-        // Patient Fields
-        if (_userType == "Patient") {
-          addressController.text = user.address ?? "";
-          medicalHistoryController.text = user.medicalHistory ?? "";
-          therapyGoalsController.text = (user.therapyGoals ?? []).join(", ");
+          // Patient Fields
+          if (_userType == "Patient") {
+            addressController.text = user.address ?? "";
+            medicalHistoryController.text = user.medicalHistory ?? "";
+            therapyGoalsController.text = (user.therapyGoals ?? []).join(", ");
 
-          final emergencyContact = user.emergencyContact;
-          emergencyContactNameController.text = emergencyContact?.name ?? "";
-          emergencyContactPhoneController.text = emergencyContact?.phone ?? "";
-          emergencyContactRelationController.text =
-              emergencyContact?.relation ?? "";
-        }
+            final emergencyContact = user.emergencyContact;
+            emergencyContactNameController.text = emergencyContact?.name ?? "";
+            emergencyContactPhoneController.text =
+                emergencyContact?.phone ?? "";
+            emergencyContactRelationController.text =
+                emergencyContact?.relation ?? "";
+          }
         }
       });
     } catch (e) {
@@ -132,7 +133,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
-
 
   Future<void> _pickDateOfBirth() async {
     DateTime? pickedDate = await showDatePicker(
@@ -240,175 +240,210 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  final theme = Theme.of(context);
-  final screenSize = MediaQuery.of(context).size;
-  final screenWidth = screenSize.width;
-  final screenHeight = screenSize.height;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
 
-  double titleFontSize = screenWidth * 0.05; 
-  double bodyFontSize = screenWidth * 0.04; 
-  double buttonFontSize = screenWidth * 0.045; 
+    double titleFontSize = screenWidth * 0.05;
+    double bodyFontSize = screenWidth * 0.04;
+    double buttonFontSize = screenWidth * 0.045;
 
-  return Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onPrimaryContainer),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: Text(
-        "You",
-        style: GoogleFonts.poppins(
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
-          fontWeight: FontWeight.w500,
-          fontSize: 18,
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: Text(
+          "You",
+          style: GoogleFonts.poppins(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 2,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.settings,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+            onPressed: () {
+              showFontSettingsPopup(context);
+            },
+          ),
+        ],
       ),
-      centerTitle: true,
-      elevation: 2,
-
-    ),
-    body: isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : hasError
-            ? const Center(child: Text("Failed to load profile"))
-            : SingleChildScrollView(
-                child: Container(
-                  color: theme.colorScheme.primaryContainer,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      // Profile Picture Container
-                      Container(
-                        padding: EdgeInsets.all(screenWidth * 0.04), 
-                        child: ProfilePictureWidget(
-                          selectedImage: _selectedImage,
-                          imageUrl: _imageUrl,
-                          onPickImage: isEditing ? _pickImage : () {},
-                          isEditing: isEditing,
-                        ),
-                      ),
-
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Appointment History Button
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const CompletedAppointmentsScreen(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.history, size: 28),
-                              color: Theme.of(context).colorScheme.secondary,
-                              tooltip: "Appointment History",
-                            ),
-
-                            // Edit/Save & Cancel Buttons
-                            Row(
-                              children: [
-                                if (isEditing)
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        isEditing = false;
-                                        // Reset fields logic...
-                                      });
-                                    },
-                                    icon: const Icon(Icons.close, size: 28),
-                                    color: Colors.red,
-                                    tooltip: "Cancel Edit",
-                                  ),
-                                IconButton(
-                                  onPressed: () {
-                                    if (isEditing) {
-                                      _saveProfile();
-                                    } else {
-                                      setState(() => isEditing = true);
-                                    }
-                                  },
-                                  icon: Icon(isEditing ? Icons.save : Icons.edit, size: 28),
-                                  color: isEditing ? Colors.green : Theme.of(context).colorScheme.primary,
-                                  tooltip: isEditing ? "Save Changes" : "Edit Profile",
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Combined Form & Logout Button
-                      Container(
-                        padding: EdgeInsets.all(screenWidth * 0.04), // responsive padding
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.background,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(35),
-                            topRight: Radius.circular(35),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : hasError
+              ? const Center(child: Text("Failed to load profile"))
+              : SingleChildScrollView(
+                  child: Container(
+                    color: theme.colorScheme.primaryContainer,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        // Profile Picture Container
+                        Container(
+                          padding: EdgeInsets.all(screenWidth * 0.04),
+                          child: ProfilePictureWidget(
+                            selectedImage: _selectedImage,
+                            imageUrl: _imageUrl,
+                            onPickImage: isEditing ? _pickImage : () {},
+                            isEditing: isEditing,
                           ),
                         ),
-                        child: Column(
-                          children: [
-                            // Form
-                            CombinedForm(
-                              firstNameController: firstNameController,
-                              lastNameController: lastNameController,
-                              phoneNumberController: phoneNumberController,
-                              genderController: genderController,
-                              dateOfBirthController: dateOfBirthController,
-                              addressController: addressController,
-                              medicalHistoryController: medicalHistoryController,
-                              therapyGoalsController: therapyGoalsController,
-                              emergencyContactNameController: emergencyContactNameController,
-                              emergencyContactPhoneController: emergencyContactPhoneController,
-                              emergencyContactRelationController: emergencyContactRelationController,
-                              specializationController: specializationController,
-                              licenseNumberController: licenseNumberController,
-                              bioController: bioController,
-                              yearsOfExperienceController: yearsOfExperienceController,
-                              languagesSpokenController: languagesSpokenController,
-                              availabilityController: availabilityController,
-                              locationController: locationController,
-                              clinicController: clinicController,
-                              isEditing: isEditing,
-                              onPickDateOfBirth: _pickDateOfBirth,
-                              userType: _userType!,
-                            ),
 
-                            const SizedBox(height: 20),
-
-                            // Logout Button
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  await _logout(context);
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.04),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Appointment History Button
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CompletedAppointmentsScreen(),
+                                    ),
+                                  );
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(screenWidth * 0.4, 40), // Responsive size
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: Text("Logout", style: TextStyle(fontSize: buttonFontSize)), // Dynamic font size
+                                icon: const Icon(Icons.history, size: 28),
+                                color: Theme.of(context).colorScheme.secondary,
+                                tooltip: "Appointment History",
                               ),
-                            ),
-                          ],
+
+                              // Edit/Save & Cancel Buttons
+                              Row(
+                                children: [
+                                  if (isEditing)
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isEditing = false;
+                                          // Reset fields logic...
+                                        });
+                                      },
+                                      icon: const Icon(Icons.close, size: 28),
+                                      color: Colors.red,
+                                      tooltip: "Cancel Edit",
+                                    ),
+                                  IconButton(
+                                    onPressed: () {
+                                      if (isEditing) {
+                                        _saveProfile();
+                                      } else {
+                                        setState(() => isEditing = true);
+                                      }
+                                    },
+                                    icon: Icon(
+                                        isEditing ? Icons.save : Icons.edit,
+                                        size: 28),
+                                    color: isEditing
+                                        ? Colors.green
+                                        : Theme.of(context).colorScheme.primary,
+                                    tooltip: isEditing
+                                        ? "Save Changes"
+                                        : "Edit Profile",
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+
+                        // Combined Form & Logout Button
+                        Container(
+                          padding: EdgeInsets.all(
+                              screenWidth * 0.04), // responsive padding
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.background,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(35),
+                              topRight: Radius.circular(35),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              // Form
+                              CombinedForm(
+                                firstNameController: firstNameController,
+                                lastNameController: lastNameController,
+                                phoneNumberController: phoneNumberController,
+                                genderController: genderController,
+                                dateOfBirthController: dateOfBirthController,
+                                addressController: addressController,
+                                medicalHistoryController:
+                                    medicalHistoryController,
+                                therapyGoalsController: therapyGoalsController,
+                                emergencyContactNameController:
+                                    emergencyContactNameController,
+                                emergencyContactPhoneController:
+                                    emergencyContactPhoneController,
+                                emergencyContactRelationController:
+                                    emergencyContactRelationController,
+                                specializationController:
+                                    specializationController,
+                                licenseNumberController:
+                                    licenseNumberController,
+                                bioController: bioController,
+                                yearsOfExperienceController:
+                                    yearsOfExperienceController,
+                                languagesSpokenController:
+                                    languagesSpokenController,
+                                availabilityController: availabilityController,
+                                locationController: locationController,
+                                clinicController: clinicController,
+                                isEditing: isEditing,
+                                onPickDateOfBirth: _pickDateOfBirth,
+                                userType: _userType!,
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Logout Button
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _logout(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(screenWidth * 0.4,
+                                        40), // Responsive size
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                  ),
+                                  child: Text("Logout",
+                                      style: TextStyle(
+                                          fontSize:
+                                              buttonFontSize)), // Dynamic font size
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-  );
-}
+    );
+  }
 }
