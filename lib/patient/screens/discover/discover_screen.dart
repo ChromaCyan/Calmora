@@ -84,6 +84,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 ),
                 const SizedBox(height: 20),
 
+                // Search bar
+
                 CustomSearchBar(
                   hintText: 'Search',
                   searchController: searchController,
