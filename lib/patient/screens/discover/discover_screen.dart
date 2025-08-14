@@ -27,7 +27,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   String selectedArticleCategory = '';
   String selectedSpecialistType = '';
   String selectedGender = '';
-  String selectedArticleGender = 'everyone';
+  String selectedArticleGender = '';
 
   // Specialist Type
   final List<String> specialistTypes = [
