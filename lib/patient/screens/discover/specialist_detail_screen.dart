@@ -128,136 +128,228 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Profile Image and Name
-                    Center(
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundImage: profileImage.isNotEmpty
-                                ? NetworkImage(profileImage)
-                                : const AssetImage('images/armstrong_transparent.png')
-                                    as ImageProvider,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            specialization,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(LucideIcons.mapPin,
-                            color: Colors.blue, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          location,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundImage: profileImage.isNotEmpty
+                              ? NetworkImage(profileImage)
+                              : const AssetImage(
+                                      'images/armstrong_transparent.png')
+                                  as ImageProvider,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  const Icon(LucideIcons.cross,
+                                      color: Colors.green, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    clinic,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                specialization,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    /// --- Profession Card ---
+                    _SectionCard(
+                      title: "Professional Details",
+                      children: [
+                        ProDeetsCard(
+                          yearsOfExperience: specialist.yearsOfExperience ?? 0,
+                          languagesSpoken: specialist.languagesSpoken ?? [],
+                          licenseNumber: specialist.licenseNumber ?? 'N/A',
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(height: 20),
+
+                    _SectionCard(
+                      title: "Biography",
                       children: [
-                        const Icon(LucideIcons.cross,
-                            color: Colors.green, size: 20),
-                        const SizedBox(width: 8),
                         Text(
-                          clinic,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          bio.isNotEmpty ? bio : "No bio available.",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
+                              height: 1.4),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+
+                    const SizedBox(height: 20),
+
+                    _SectionCard(
+                      title: "Contact Information",
+                      children: [
+                        ContactInfoCard(
+                          email: specialist.email ?? 'No email',
+                          phoneNumber: specialist.phoneNumber ?? 'No phone',
+                        )
+                      ],
+                    ),
+
+                    // Center(
+                    //   child: Column(
+                    //     children: [
+                    //       CircleAvatar(
+                    //         radius: 60,
+                    //         backgroundImage: profileImage.isNotEmpty
+                    //             ? NetworkImage(profileImage)
+                    //             : const AssetImage('images/armstrong_transparent.png')
+                    //                 as ImageProvider,
+                    //       ),
+                    //       const SizedBox(height: 16),
+                    //       Text(
+                    //         name,
+                    //         style: const TextStyle(
+                    //           fontSize: 24,
+                    //           fontWeight: FontWeight.bold,
+                    //         ),
+                    //       ),
+                    //       const SizedBox(height: 8),
+                    //       Text(
+                    //         specialization,
+                    //         style: TextStyle(
+                    //           fontSize: 18,
+                    //           color: Colors.grey[600],
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 8),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     const Icon(LucideIcons.mapPin,
+                    //         color: Colors.blue, size: 20),
+                    //     const SizedBox(width: 8),
+                    //     Text(
+                    //       location,
+                    //       style: const TextStyle(
+                    //         fontSize: 16,
+                    //         fontWeight: FontWeight.w600,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    //const SizedBox(height: 8),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     const Icon(LucideIcons.cross,
+                    //         color: Colors.green, size: 20),
+                    //     const SizedBox(width: 8),
+                    //     Text(
+                    //       clinic,
+                    //       style: const TextStyle(
+                    //         fontSize: 16,
+                    //         fontWeight: FontWeight.w600,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    // const SizedBox(height: 24),
 
                     // Bio
-                    SpecialistBioSection(bio: bio),
+                    //SpecialistBioSection(bio: bio),
 
-                    const SizedBox(height: 16),
+                    //const SizedBox(height: 16),
 
                     // Contact Information
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.30,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.4),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Toggle Buttons
-                          ToggleButton(
-                            onToggle: (isContactInfo) {
-                              setState(() {
-                                showContactInfo = isContactInfo;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
+                    // Container(
+                    //   height: MediaQuery.of(context).size.height * 0.30,
+                    //   margin: const EdgeInsets.symmetric(horizontal: 10),
+                    //   padding: const EdgeInsets.all(16),
+                    //   decoration: BoxDecoration(
+                    //     color: Theme.of(context).cardColor,
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: Colors.grey.withOpacity(0.4),
+                    //         blurRadius: 10,
+                    //         spreadRadius: 2,
+                    //         offset: const Offset(0, 4),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // child: Column(
+                    //   children: [
+                    //     // Toggle Buttons
+                    //     ToggleButton(
+                    //       onToggle: (isContactInfo) {
+                    //         setState(() {
+                    //           showContactInfo = isContactInfo;
+                    //         });
+                    //       },
+                    //     ),
+                    //     const SizedBox(height: 16),
 
-                          // Display the selected section
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: showContactInfo
-                                  ? ContactInfoCard(
-                                      email: specialist.email ?? 'No email',
-                                      phoneNumber:
-                                          specialist.phoneNumber ?? 'No phone',
-                                    )
-                                  : ProDeetsCard(
-                                      yearsOfExperience:
-                                          specialist.yearsOfExperience ?? 0,
-                                      languagesSpoken:
-                                          specialist.languagesSpoken ?? [],
-                                      licenseNumber:
-                                          specialist.licenseNumber ?? 'N/A',
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Display the selected section
+                    //       Expanded(
+                    //         child: SingleChildScrollView(
+                    //           child: showContactInfo
+                    //               ? ContactInfoCard(
+                    //                   email: specialist.email ?? 'No email',
+                    //                   phoneNumber:
+                    //                       specialist.phoneNumber ?? 'No phone',
+                    //                 )
+                    //               : ProDeetsCard(
+                    //                   yearsOfExperience:
+                    //                       specialist.yearsOfExperience ?? 0,
+                    //                   languagesSpoken:
+                    //                       specialist.languagesSpoken ?? [],
+                    //                   licenseNumber:
+                    //                       specialist.licenseNumber ?? 'N/A',
+                    //                 ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
                     const SizedBox(height: 16),
 
                     // Availability
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                    _SectionCard(
+                      title: "Availability",
                       children: [
-                        _buildSectionTitle('Availability:'),
                         _buildAvailabilityCard(availability),
                       ],
                     ),
@@ -353,4 +445,92 @@ Widget _buildAvailabilityCard(String availability) {
       ),
     ),
   );
+}
+
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _SectionCard({required this.title, required this.children, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+/// --- Reusable Info Row ---
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoRow(
+      {required this.icon,
+      required this.label,
+      required this.value,
+      super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            "$label: $value",
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// --- Chip Tag ---
+class _ChipTag extends StatelessWidget {
+  final String label;
+  const _ChipTag({required this.label, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      backgroundColor: Colors.blueAccent.withOpacity(0.15),
+      label: Text(
+        label,
+        style: const TextStyle(color: Colors.white),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
 }
