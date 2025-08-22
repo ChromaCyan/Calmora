@@ -131,57 +131,118 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Profile Image and Name
-
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundImage: profileImage.isNotEmpty
-                              ? NetworkImage(profileImage)
-                              : const AssetImage(
-                                      'images/armstrong_transparent.png')
-                                  as ImageProvider,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  const Icon(LucideIcons.cross,
-                                      color: Colors.green, size: 20),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    clinic,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                specialization,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                    Center(
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 80,
+                            backgroundImage: profileImage.isNotEmpty
+                                ? NetworkImage(profileImage)
+                                : const AssetImage(
+                                        'images/armstrong_transparent.png')
+                                    as ImageProvider,
                           ),
-                        )
+                          const SizedBox(height: 16),
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            specialization,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(LucideIcons.mapPin,
+                            color: Colors.blue, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          location,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(LucideIcons.cross,
+                            color: Colors.green, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          clinic,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Row(
+                    //   children: [
+                    //     CircleAvatar(
+                    //       radius: 60,
+                    //       backgroundImage: profileImage.isNotEmpty
+                    //           ? NetworkImage(profileImage)
+                    //           : const AssetImage(
+                    //                   'images/armstrong_transparent.png')
+                    //               as ImageProvider,
+                    //     ),
+                    //     const SizedBox(width: 16),
+                    //     Expanded(
+                    //       child: Column(
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Text(
+                    //             name,
+                    //             style: const TextStyle(
+                    //               fontSize: 24,
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //           SizedBox(height: 6),
+                    //           Row(
+                    //             children: [
+                    //               const Icon(LucideIcons.cross,
+                    //                   color: Colors.green, size: 20),
+                    //               const SizedBox(width: 8),
+                    //               Text(
+                    //                 clinic,
+                    //                 style: const TextStyle(
+                    //                   fontSize: 16,
+                    //                   fontWeight: FontWeight.w600,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //           SizedBox(height: 6),
+                    //           Text(
+                    //             specialization,
+                    //             style: TextStyle(
+                    //               fontSize: 18,
+                    //               color: Colors.grey[600],
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
                     const SizedBox(height: 20),
 
                     /// --- Profession Card ---
@@ -223,67 +284,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       ],
                     ),
 
-                    // Center(
-                    //   child: Column(
-                    //     children: [
-                    //       CircleAvatar(
-                    //         radius: 60,
-                    //         backgroundImage: profileImage.isNotEmpty
-                    //             ? NetworkImage(profileImage)
-                    //             : const AssetImage('images/armstrong_transparent.png')
-                    //                 as ImageProvider,
-                    //       ),
-                    //       const SizedBox(height: 16),
-                    //       Text(
-                    //         name,
-                    //         style: const TextStyle(
-                    //           fontSize: 24,
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //       ),
-                    //       const SizedBox(height: 8),
-                    //       Text(
-                    //         specialization,
-                    //         style: TextStyle(
-                    //           fontSize: 18,
-                    //           color: Colors.grey[600],
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 8),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     const Icon(LucideIcons.mapPin,
-                    //         color: Colors.blue, size: 20),
-                    //     const SizedBox(width: 8),
-                    //     Text(
-                    //       location,
-                    //       style: const TextStyle(
-                    //         fontSize: 16,
-                    //         fontWeight: FontWeight.w600,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                    //const SizedBox(height: 8),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     const Icon(LucideIcons.cross,
-                    //         color: Colors.green, size: 20),
-                    //     const SizedBox(width: 8),
-                    //     Text(
-                    //       clinic,
-                    //       style: const TextStyle(
-                    //         fontSize: 16,
-                    //         fontWeight: FontWeight.w600,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                     // const SizedBox(height: 24),
 
                     // Bio
