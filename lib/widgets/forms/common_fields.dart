@@ -57,7 +57,7 @@ class CombinedForm extends StatelessWidget {
   }) : super(key: key);
 
   InputDecoration customInputDecoration(String label, BuildContext context,
-      {bool readOnly = false}) {
+      {bool readOnly = false, bool hideStandbyBorder = false}) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -71,9 +71,12 @@ class CombinedForm extends StatelessWidget {
       filled: false,
       enabledBorder: UnderlineInputBorder(
         borderSide: BorderSide(
-          color: isEditing
-              ? colorScheme.onSurface.withOpacity(0.5)
-              : colorScheme.onSurface.withOpacity(0.1),
+          color: hideStandbyBorder
+              ? Colors.transparent
+              : (isEditing
+                  ? colorScheme.onSurface.withOpacity(0.5)
+                  : colorScheme.onSurface.withOpacity(0.1)
+              ),
           width: 1.5,
         ),
       ),
@@ -85,7 +88,7 @@ class CombinedForm extends StatelessWidget {
       ),
       disabledBorder: UnderlineInputBorder(
         borderSide: BorderSide(
-          color: colorScheme.onSurface.withOpacity(0.1),
+          color: colorScheme.onSurface.withOpacity(0.0),
           width: 1.5,
         ),
       ),
@@ -138,7 +141,7 @@ class CombinedForm extends StatelessWidget {
                   value: genderController.text.isNotEmpty
                       ? genderController.text
                       : null,
-                  decoration: customInputDecoration("Gender", context),
+                  decoration: customInputDecoration("Gender", context, hideStandbyBorder: true),
                   items: [
                     {"label": "Male", "value": "male"},
                     {"label": "Female", "value": "female"}
@@ -153,6 +156,7 @@ class CombinedForm extends StatelessWidget {
                           genderController.text = newValue!;
                         }
                       : null,
+                  icon: isEditing ? const Icon(Icons.arrow_drop_down) : const SizedBox.shrink(),
                 ),
 
                 // Only show the date picker for patients
@@ -165,9 +169,9 @@ class CombinedForm extends StatelessWidget {
                         readOnly: true,
                         decoration: customInputDecoration(
                                 "Date of Birth", context,
-                                readOnly: true)
+                                hideStandbyBorder: true)
                             .copyWith(
-                          suffixIcon: const Icon(Icons.calendar_today),
+                          suffixIcon: isEditing ? const Icon(Icons.calendar_today) : null,
                         ),
                       ),
                     ),
