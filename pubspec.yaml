@@ -66,7 +66,7 @@ dependencies:
   image_picker: ^1.1.2
   fl_chart: ^0.70.2
   flutter_svg: ^2.0.17
-  flutter_local_notifications: ^18.0.1
+  flutter_local_notifications: ^19.4.0
   flutter_keyboard_visibility: ^6.0.0
   table_calendar: ^3.1.3
   
