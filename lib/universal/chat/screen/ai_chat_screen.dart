@@ -1,9 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:armstrong/services/tts.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:audioplayers/audioplayers.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -13,10 +15,12 @@ class AIChatScreen extends StatefulWidget {
 }
 
 class _AIChatScreenState extends State<AIChatScreen> {
-  final TTSService _ttsService = TTSService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
   final ApiRepository _apiRepository = ApiRepository();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _voiceModeEnabled = false;
+
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _lastWords = '';
@@ -26,31 +30,28 @@ class _AIChatScreenState extends State<AIChatScreen> {
   @override
   void initState() {
     super.initState();
-    _initTTSVoice();
     _sendInitialMessage();
     _speech = stt.SpeechToText();
   }
 
-  void _initTTSVoice() async {
-    await _ttsService.initTTS();
-  }
-
   void _sendInitialMessage() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    _addBotMessage("Hi there, I'm Calmora. How are you feeling today?");
+    _addBotMessage(
+        "Hi there, I'm Calmora. To help save the developers money, each response will be limited to 250-400 characters each..");
   }
 
-  void _addBotMessage(String text) {
+  int _addBotMessage(String text, {bool isLoading = false}) {
     final msg = {
       'content': text,
       'timestamp': DateTime.now().toIso8601String(),
       'isSender': false,
+      'isLoading': isLoading,
     };
     setState(() {
       _messages.add(msg);
     });
     _scrollToBottom();
-    _speak(text);
+    return _messages.length - 1;
   }
 
   void _addUserMessage(String text) {
@@ -73,8 +74,41 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _addUserMessage(content);
 
     try {
-      final aiReply = await _apiRepository.askGemini(content);
-      _addBotMessage(aiReply);
+      final aiResponse =
+          await _apiRepository.askGemini(content, withVoice: _voiceModeEnabled);
+
+      final aiReply = aiResponse['reply'];
+      final ttsId = aiResponse['id'];
+      final ttsPending = aiResponse['ttsPending'] ?? false;
+
+      if (_voiceModeEnabled && ttsPending && ttsId != null) {
+        String? audioBase64;
+        int retries = 0;
+
+        // Poll until audio is ready (max 15 retries)
+        while (audioBase64 == null && retries < 20) {
+          await Future.delayed(
+              const Duration(seconds: 1)); // faster polling
+          audioBase64 = await _apiRepository.fetchAudio(ttsId);
+          retries++;
+        }
+
+        if (audioBase64 != null) {
+          final audioBytes = base64Decode(audioBase64);
+          await _audioPlayer.stop();
+          await _audioPlayer.play(BytesSource(audioBytes));
+
+          // Only add message after audio is ready
+          _addBotMessage(aiReply);
+        } else {
+          print('Audio not ready after polling.');
+
+          _addBotMessage(aiReply);
+        }
+      } else {
+        // No voice mode: display immediately
+        _addBotMessage(aiReply);
+      }
     } catch (e) {
       _addBotMessage("Oops! Something went wrong. Please try again later.");
       print("Gemini error: $e");
@@ -125,9 +159,11 @@ class _AIChatScreenState extends State<AIChatScreen> {
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  void _speak(String text) async {
-    await _ttsService.stop();
-    await _ttsService.speak(text);
+  @override
+  void dispose() {
+    _audioPlayer.stop();
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   @override
@@ -136,6 +172,19 @@ class _AIChatScreenState extends State<AIChatScreen> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text("Calmora AI Chatbot"),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _voiceModeEnabled ? Icons.volume_up : Icons.volume_off,
+              color: _voiceModeEnabled ? Colors.blue : Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                _voiceModeEnabled = !_voiceModeEnabled;
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -146,7 +195,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
               itemBuilder: (context, index) {
                 final msg = _messages[index];
                 return GestureDetector(
-                  onTap: () => _speak(msg['content']),
                   child: ChatBubble(
                     content: msg['content'],
                     timestamp: _formatTimestamp(msg['timestamp']),

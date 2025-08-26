@@ -15,7 +15,8 @@ import 'package:armstrong/models/mood/mood.dart';
 import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
-  final String baseUrl = 'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
+  final String baseUrl =
+      'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
   //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
@@ -161,22 +162,6 @@ class ApiRepository {
 
   /////////////////////////////////////////////////////////////////////////////////
   // Profile (API)
-
-  // // Get Profile
-  // Future<Map<String, dynamic>> getProfile() async {
-  //   final token = await _storage.read(key: 'token');
-  //   final url = Uri.parse('$baseUrl/auth/profile');
-  //   final response = await http.get(
-  //     url,
-  //     headers: {'Authorization': 'Bearer $token'},
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw Exception('Failed to fetch profile: ${response.body}');
-  //   }
-  // }
 
   // Get Profile
   Future<Profile> getProfile() async {
@@ -398,7 +383,7 @@ class ApiRepository {
     }
   }
 
-// Create a new appointment
+  // Create a new appointment
   Future<Map<String, dynamic>> addAppointment(
     String patientId,
     String specialistId,
@@ -563,8 +548,7 @@ class ApiRepository {
   }) async {
     final token = await _storage.read(key: 'token');
 
-    String url =
-        '$baseUrl/appointment/completed/weekly/$specialistId';
+    String url = '$baseUrl/appointment/completed/weekly/$specialistId';
 
     if (startDate != null && endDate != null) {
       url += '?startDate=$startDate&endDate=$endDate';
@@ -630,24 +614,6 @@ class ApiRepository {
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   // Survey API
-
-  // // Get all surveys
-  // Future<List<Survey>> getSurveys() async {
-  //   final token = await _storage.read(key: 'token');
-  //   final url = Uri.parse('$baseUrl/survey/all');
-
-  //   final response = await http.get(
-  //     url,
-  //     headers: {'Authorization': 'Bearer $token'},
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     final List<dynamic> data = json.decode(response.body)['data'];
-  //     return data.map((surveyJson) => Survey.fromJson(surveyJson)).toList();
-  //   } else {
-  //     throw Exception('Failed to fetch surveys: ${response.body}');
-  //   }
-  // }
 
   // Get all surveys
   Future<List<Map<String, dynamic>>> getSurveys() async {
@@ -839,15 +805,14 @@ class ApiRepository {
   }
 
   // Edit an article
-  Future<Map<String, dynamic>> updateArticle({
-    required String articleId,
-    String? title,
-    String? content,
-    String? heroImage,
-    List<String>? additionalImages,
-    List<String>? categories,
-    String? targetGender
-  }) async {
+  Future<Map<String, dynamic>> updateArticle(
+      {required String articleId,
+      String? title,
+      String? content,
+      String? heroImage,
+      List<String>? additionalImages,
+      List<String>? categories,
+      String? targetGender}) async {
     final token = await _storage.read(key: 'token');
     final url = Uri.parse('$baseUrl/article/$articleId');
 
@@ -1134,27 +1099,37 @@ class ApiRepository {
     }
   }
 
-  Future<String> askGemini(String message) async {
-  final token = await _storage.read(key: 'token');
-  final url = Uri.parse('$baseUrl/chatbot/ask-ai');
+  Future<Map<String, dynamic>> askGemini(String message,
+      {bool withVoice = false}) async {
+    final url = Uri.parse('$baseUrl/chatbot/ask-ai');
 
-  final response = await http.post(
-    url,
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': 'Bearer $token',
-    },
-    body: jsonEncode({
-      'message': message,
-    }),
-  );
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'message': message, 'withVoice': withVoice}),
+    );
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    return data['reply'];
-  } else {
-    throw Exception('Gemini error: ${response.body}');
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data;
+    } else {
+      throw Exception('Gemini error: ${response.body}');
+    }
   }
-}
 
+  Future<String?> fetchAudio(String id) async {
+    final url = Uri.parse('$baseUrl/chatbot/fetch-audio?id=$id');
+
+    final response =
+        await http.get(url, headers: {'Content-Type': 'application/json'});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['audioBase64'];
+    } else if (response.statusCode == 404) {
+      return null; // audio not ready yet
+    } else {
+      throw Exception('Fetch audio error: ${response.body}');
+    }
+  }
 }
