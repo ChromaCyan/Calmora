@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:armstrong/universal/chat/screen/ai_voice_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:armstrong/services/api.dart';
@@ -86,9 +87,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
         int retries = 0;
 
         // Poll until audio is ready (max 15 retries)
-        while (audioBase64 == null && retries < 20) {
-          await Future.delayed(
-              const Duration(seconds: 1)); // faster polling
+        while (audioBase64 == null && retries < 60) {
+          await Future.delayed(const Duration(seconds: 1));
           audioBase64 = await _apiRepository.fetchAudio(ttsId);
           retries++;
         }
@@ -174,13 +174,19 @@ class _AIChatScreenState extends State<AIChatScreen> {
         title: const Text("Calmora AI Chatbot"),
         actions: [
           IconButton(
-            icon: Icon(
-              _voiceModeEnabled ? Icons.volume_up : Icons.volume_off,
-              color: _voiceModeEnabled ? Colors.blue : Colors.grey,
-            ),
-            onPressed: () {
+            icon: const Icon(Icons.graphic_eq),
+            tooltip: "Voice Mode",
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VoiceChatScreen(),
+                ),
+              );
+
+              // when user comes back, reset backend flag
               setState(() {
-                _voiceModeEnabled = !_voiceModeEnabled;
+                _voiceModeEnabled = false;
               });
             },
           ),

@@ -3,6 +3,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 class TTSService {
   final FlutterTts _flutterTts = FlutterTts();
 
+  Function()? _onComplete;
+  Function()? _onCancel;
+  Function(String msg)? _onError;
+
   TTSService();
 
   Future<void> initTTS() async {
@@ -40,6 +44,19 @@ class TTSService {
     await _flutterTts.setPitch(1.0);
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
+
+    // ✅ Attach lifecycle handlers
+    _flutterTts.setCompletionHandler(() {
+      if (_onComplete != null) _onComplete!();
+    });
+
+    _flutterTts.setCancelHandler(() {
+      if (_onCancel != null) _onCancel!();
+    });
+
+    _flutterTts.setErrorHandler((msg) {
+      if (_onError != null) _onError!(msg);
+    });
   }
 
   Future<void> speak(String text) async {
@@ -49,4 +66,9 @@ class TTSService {
   Future<void> stop() async {
     await _flutterTts.stop();
   }
+
+  // Expose handlers so UI can subscribe
+  void setOnComplete(Function() handler) => _onComplete = handler;
+  void setOnCancel(Function() handler) => _onCancel = handler;
+  void setOnError(Function(String msg) handler) => _onError = handler;
 }
