@@ -10,6 +10,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 class PatientHomeScreen extends StatefulWidget {
+  
   const PatientHomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -229,9 +230,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               DashboardScreen(),
               DiscoverScreen(),
               ChatListScreen(),
-              _userId != null
-                  ? AppointmentListScreen(patientId: _userId!)
-                  : Center(child: CircularProgressIndicator()),
+_userId != null
+    ? AppointmentListScreen(patientId: _userId!)
+    : Center(child: CircularProgressIndicator()),
+
             ],
           ),
         ),

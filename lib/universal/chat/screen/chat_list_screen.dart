@@ -7,6 +7,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/universal/chat/screen/chat_card.dart';
 
 class ChatListScreen extends StatefulWidget {
+  const ChatListScreen({
+    Key? key,
+  }) : super(key: key);
+
   @override
   _ChatListScreenState createState() => _ChatListScreenState();
 }
@@ -19,11 +23,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
   String _errorMessage = '';
+  String? _role;
 
   @override
   void initState() {
     super.initState();
     _loadChats();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final role = await _storage.read(key: 'userType');
+    setState(() {
+      _role = role;
+    });
   }
 
   Future<void> _loadChats() async {
@@ -75,8 +88,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           children: [
             /// Search Bar
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 16), 
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: CustomSearchBar(
                 hintText: 'Search chats...',
                 searchController: _searchController,
@@ -88,44 +100,45 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
             ),
 
-            /// Talk to AI Therapist Button (Placeholder since i haven't implemented the feature yet)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AIChatScreen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 3,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.psychology_alt, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      'Talk to our AI Chatbot',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+            /// Show AI Therapist Button only for Patients
+            if (_role == 'Patient')
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AIChatScreen(),
                       ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ],
+                    elevation: 3,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.psychology_alt, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text(
+                        'Talk to our AI Chatbot',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // End of the AI Chat button (Just pushing this temporarily until i replace this with functioning chat to differentiate the users)
 
             /// Chat List with Pull-to-Refresh
             Expanded(

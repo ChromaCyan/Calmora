@@ -150,8 +150,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       children: [
                         _genderOption("Female", Icons.female, "female"),
                         _genderOption("Male", Icons.male, "male"),
-                        _genderOption(
-                            "Everyone", Icons.transgender, "everyone"),
                       ],
                     ),
                   ),
@@ -214,8 +212,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       children: [
                         _articleGenderOption("Female", Icons.female, "female"),
                         _articleGenderOption("Male", Icons.male, "male"),
-                        _articleGenderOption(
-                            "Everyone", Icons.transgender, "everyone"),
                       ],
                     ),
                   ),
@@ -349,42 +345,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     Color baseColor;
     if (value == "female") {
       baseColor = Colors.pinkAccent;
-    } else if (value == "male") {
+    } else {
       baseColor = Colors.blueAccent;
-    } else {
-      baseColor = Colors.purpleAccent;
-    }
-
-    BoxDecoration boxDecoration;
-    if (value == "everyone") {
-      boxDecoration = BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.pinkAccent, Colors.blueAccent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? Colors.white : Colors.grey.shade600,
-          width: 1.5,
-        ),
-      );
-    } else {
-      boxDecoration = BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? baseColor : Colors.grey.shade600,
-          width: 1.5,
-        ),
-      );
     }
 
     return GestureDetector(
       onTap: () {
         setState(() {
+          // Toggle selection
           if (selectedGender == value) {
-            selectedGender = "";
+            selectedGender = ""; 
           } else {
             selectedGender = value;
           }
@@ -395,24 +365,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         width: 80,
         height: 80,
         padding: EdgeInsets.all(8),
-        decoration: boxDecoration,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? baseColor : Colors.grey.shade600,
+            width: 1.5,
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              color: value == "everyone"
-                  ? Colors.white
-                  : (isSelected ? baseColor : Colors.grey.shade400),
+              color: isSelected ? baseColor : Colors.grey.shade400,
             ),
             SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: value == "everyone"
-                    ? Colors.white
-                    : (isSelected ? baseColor : Colors.grey.shade400),
+                color: isSelected ? baseColor : Colors.grey.shade400,
               ),
             ),
           ],
@@ -428,42 +401,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     Color baseColor;
     if (value == "female") {
       baseColor = Colors.pinkAccent;
-    } else if (value == "male") {
+    } else {
       baseColor = Colors.blueAccent;
-    } else {
-      baseColor = Colors.purpleAccent;
-    }
-
-    BoxDecoration boxDecoration;
-    if (value == "everyone") {
-      boxDecoration = BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.pinkAccent, Colors.blueAccent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? Colors.white : Colors.grey.shade600,
-          width: 1.5,
-        ),
-      );
-    } else {
-      boxDecoration = BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? baseColor : Colors.grey.shade600,
-          width: 1.5,
-        ),
-      );
     }
 
     return GestureDetector(
       onTap: () {
         setState(() {
+          // Toggle selection
           if (selectedArticleGender == value) {
-            selectedArticleGender = "";
+            selectedArticleGender = ""; 
           } else {
             selectedArticleGender = value;
           }
@@ -474,24 +421,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         width: 80,
         height: 80,
         padding: EdgeInsets.all(8),
-        decoration: boxDecoration,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? baseColor : Colors.grey.shade600,
+            width: 1.5,
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              color: value == "everyone"
-                  ? Colors.white
-                  : (isSelected ? baseColor : Colors.grey.shade400),
+              color: isSelected ? baseColor : Colors.grey.shade400,
             ),
             SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: value == "everyone"
-                    ? Colors.white
-                    : (isSelected ? baseColor : Colors.grey.shade400),
+                color: isSelected ? baseColor : Colors.grey.shade400,
               ),
             ),
           ],
