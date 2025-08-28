@@ -19,31 +19,50 @@ class SocketService {
   /// Initialize local notifications
   Future<void> initNotifications() async {
     print("🔔 Initializing Local Notifications...");
+
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final InitializationSettings settings =
         InitializationSettings(android: androidSettings);
 
-    await _localNotifications.initialize(settings);
+    await _localNotifications.initialize(
+      settings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {},
+    );
   }
 
   /// Show local notification
-  Future<void> showNotification(String title, String message) async {
-    print("📢 Showing Notification: $title - $message");
-    const AndroidNotificationDetails androidDetails =
+  Future<void> showNotification(String senderName, String message) async {
+    print("📢 Showing Notification from $senderName - $message");
+
+    // Combine sender and message for body
+    final String notificationBody = "$senderName: $message";
+
+    final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'channel_id',
-      'Notifications',
-      importance: Importance.high,
+      'chat_channel',
+      'Chat Notifications',
+      channelDescription: 'Messages from your chats',
+      importance: Importance.max,
       priority: Priority.high,
       playSound: true,
+      enableVibration: true,
+      styleInformation: BigTextStyleInformation(
+        notificationBody,
+        contentTitle: "New Message", 
+      ),
     );
 
-    const NotificationDetails platformDetails =
+    final NotificationDetails platformDetails =
         NotificationDetails(android: androidDetails);
 
-    await _localNotifications.show(0, title, message, platformDetails);
+    await _localNotifications.show(
+      0,
+      "New Message", 
+      notificationBody,
+      platformDetails,
+    );
   }
 
   /// Connect to the Socket.IO server
@@ -75,21 +94,28 @@ class SocketService {
     socket!.on('receiveMessage', (data) {
       print('📩 Received message: $data');
       onMessageReceived?.call(Map<String, dynamic>.from(data));
-      showNotification("New Message", data["message"] ?? "You have a new message");
+
+      final senderName = "${data["senderFirstName"]} ${data["senderLastName"]}";
+      final messageContent = data["content"] ?? "You have a new message";
+
+      showNotification(senderName, messageContent);
     });
 
     // Incoming notification listener
     socket!.on('new_notification', (data) {
-      print('🔔 New notification: $data');
-      onNotificationReceived?.call(Map<String, dynamic>.from(data));
-      if (data["message"] != null) {
-        showNotification("New Notification", data["message"]);
-      }
+      final senderName = "${data["senderFirstName"]} ${data["senderLastName"]}";
+      final messageContent = data["message"] ?? "You have a new message";
+
+      showNotification(
+        senderName,
+        messageContent,
+      );
     });
   }
 
   /// Send a message
-  void sendMessage(String senderId, String recipientId, String message, String chatId) {
+  void sendMessage(
+      String senderId, String recipientId, String message, String chatId) {
     if (socket == null || !socket!.connected) return;
     socket!.emit('sendMessage', {
       'senderId': senderId,
