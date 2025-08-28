@@ -38,7 +38,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   void _sendInitialMessage() async {
     await Future.delayed(const Duration(milliseconds: 500));
     _addBotMessage(
-        "Hi there, I'm Calmora. To help save the developers money, each response will be limited to 250-400 characters each..");
+        "Hi there, I'm Calmora. How are you feeling today?");
   }
 
   int _addBotMessage(String text, {bool isLoading = false}) {
