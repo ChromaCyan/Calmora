@@ -12,6 +12,8 @@ import 'package:armstrong/providers/font_provider.dart';
 import 'package:armstrong/providers/theme_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:armstrong/services/socket_service.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
@@ -27,10 +29,6 @@ void main() async {
   // Initialize Local Notifications
   await NotificationService.initNotifications();
 
-  Future.delayed(Duration(seconds: 3), () {
-    // socketService.showNotification(
-    //     "Welcome to Armstrong", "Men's Mental Health App!");
-  });
 
   String? token = await storage.read(key: 'jwt');
   String? role;
@@ -60,11 +58,6 @@ void main() async {
       role = null;
     }
   }
-
-  // Disabling the socket connection )(Temporary because of vercel is serverless)
-  // if (token != null) {
-  //   socketService.connect(token);  // Commented out
-  // }
 
   runApp(MyApp(
     isLoggedIn: token != null,

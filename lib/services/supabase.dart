@@ -58,7 +58,7 @@ class SupabaseService {
 
     try {
       final supabase =
-          await client; // Ensure Supabase is initialized before using it
+          await client; 
 
       await supabase.storage.from(folder).upload(fileName, image);
 

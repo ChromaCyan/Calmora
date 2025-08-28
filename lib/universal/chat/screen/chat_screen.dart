@@ -64,13 +64,21 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     }
 
+    // Initialize socket **after** you have userId
+    _initializeSocket();
+
     _loadMessages();
   }
 
   void _initializeSocket() async {
-    final token = await _storage.read(key: 'token');
-    if (token != null) {
-      _socketService.connect(token);
+    final token = await _storage.read(key: 'jwt');
+    final userId = _userId;
+
+    if (token != null && userId != null) {
+      // Connect socket only here
+      _socketService.connect(token, userId);
+
+      // Listen for incoming messages
       _socketService.onMessageReceived = (message) {
         setState(() {
           _messages.add(message);
@@ -85,42 +93,124 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // void _loadMessages() async {
+  //   final token = await _storage.read(key: 'token');
+  //   if (token != null) {
+  //     try {
+  //       final messages =
+  //           await _apiRepository.getChatHistory(widget.chatId, token);
+  //       setState(() {
+  //         _messages = messages.map((message) {
+  //           return {
+  //             'senderId': message['sender']['_id'],
+  //             'content': message['content'],
+  //             'timestamp': message['timestamp'],
+  //             'status': message['status'] ?? 'sent',
+  //           };
+  //         }).toList();
+  //         _isLoading = false;
+  //       });
+
+  //       Future.delayed(const Duration(milliseconds: 300), () {
+  //         _scrollToBottom();
+  //       });
+  //     } catch (e) {
+  //       print("Error loading messages: $e");
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
+
   void _loadMessages() async {
     final token = await _storage.read(key: 'token');
     if (token != null) {
       try {
         final messages =
             await _apiRepository.getChatHistory(widget.chatId, token);
+
         setState(() {
           _messages = messages.map((message) {
+            // Handle senderId as string or object
+            String senderId;
+            if (message['sender'] is String) {
+              senderId = message['sender'];
+            } else if (message['sender'] is Map &&
+                message['sender']['_id'] != null) {
+              senderId = message['sender']['_id'];
+            } else {
+              senderId = 'unknown';
+            }
+
+            // Handle timestamp safely
+            String timestamp =
+                message['timestamp'] ?? DateTime.now().toIso8601String();
+
             return {
-              'senderId': message['sender']['_id'],
-              'content': message['content'],
-              'timestamp': message['timestamp'],
+              'senderId': senderId,
+              'content': message['content'] ?? '',
+              'timestamp': timestamp,
               'status': message['status'] ?? 'sent',
             };
           }).toList();
+
           _isLoading = false;
         });
 
-        Future.delayed(const Duration(milliseconds: 300), () {
-          _scrollToBottom();
-        });
+        // Scroll to bottom after loading
+        Future.delayed(const Duration(milliseconds: 300), _scrollToBottom);
       } catch (e) {
         print("Error loading messages: $e");
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
 
+  // void _sendMessage() async {
+  //   final token = await _storage.read(key: 'jwt');
+  //   if (token != null &&
+  //       _controller.text.trim().isNotEmpty &&
+  //       _userId != null) {
+  //     final messageContent = _controller.text.trim();
+  //     final message = {
+  //       'senderId': _userId, // <-- Mongo ObjectId as string
+  //       'content': messageContent,
+  //       'timestamp': DateTime.now().toIso8601String(),
+  //       'status': 'sent',
+  //     };
+
+  //     setState(() {
+  //       _messages.add(message);
+  //       _controller.clear();
+  //     });
+
+  //     try {
+  //       // send to API
+  //       await _apiRepository.sendMessage(widget.chatId, messageContent, token);
+
+  //       // send to Socket
+  //       _socketService.sendMessage(
+  //           _userId!, widget.recipientId, messageContent, widget.chatId);
+
+  //       setState(() {
+  //         message['status'] = 'delivered';
+  //       });
+  //     } catch (e) {
+  //       print("Error sending message: $e");
+  //     }
+  //   }
+  // }
+
   void _sendMessage() async {
-    final token = await _storage.read(key: 'token');
-    if (token != null && _controller.text.trim().isNotEmpty) {
+    final token = await _storage.read(key: 'jwt');
+    if (token != null &&
+        _controller.text.trim().isNotEmpty &&
+        _userId != null) {
       final messageContent = _controller.text.trim();
+
       final message = {
-        'senderId': _userId,
+        'senderId': _userId!, // always non-null
         'content': messageContent,
         'timestamp': DateTime.now().toIso8601String(),
         'status': 'sent',
@@ -133,8 +223,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
       try {
         await _apiRepository.sendMessage(widget.chatId, messageContent, token);
+
         _socketService.sendMessage(
-            token, widget.recipientId, messageContent, widget.chatId);
+            _userId!, widget.recipientId, messageContent, widget.chatId);
 
         setState(() {
           message['status'] = 'delivered';

@@ -4,6 +4,8 @@ import 'package:armstrong/splash_screen/models/splash_message.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:armstrong/services/socket_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,6 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   bool onboardingCompleted = false;
+  final socketService = SocketService();
 
   @override
   void initState() {

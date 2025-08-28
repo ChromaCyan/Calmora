@@ -2,15 +2,17 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SocketService {
+  // Singleton setup
   static final SocketService _instance = SocketService._internal();
   factory SocketService() => _instance;
   SocketService._internal();
 
-  IO.Socket? socket; // Make nullable to avoid late initialization errors
+  // Socket and callbacks
+  IO.Socket? socket;
+  Function(Map<String, dynamic>)? onMessageReceived;
+  Function(Map<String, dynamic>)? onNotificationReceived;
 
-  Function? onMessageReceived;
-  Function? onNotificationReceived;
-
+  // Local notifications
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -45,62 +47,49 @@ class SocketService {
   }
 
   /// Connect to the Socket.IO server
-  void connect(String token) {
+  void connect(String token, String userId) {
+    // Avoid reconnecting if already connected
     if (socket != null && socket!.connected) return;
 
     socket = IO.io(
-        'https://armstrong-api.vercel.app/api',
-        IO.OptionBuilder()
-            .setTransports(['websocket'])
-            .disableAutoConnect()
-            .setExtraHeaders({'Authorization': 'Bearer $token'})
-            .build());
+      'https://calmora-chat-real-time.onrender.com',
+      IO.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .setExtraHeaders({'Authorization': 'Bearer $token'})
+          .build(),
+    );
 
     socket!.connect();
 
     socket!.onConnect((_) {
       print('✅ Connected to Socket.IO server');
+      joinRoom(userId); // Join user's personal room
     });
 
-    socket!.onDisconnect((_) {
-      print('❌ Disconnected from server');
-    });
+    socket!.onDisconnect((_) => print('❌ Disconnected from server'));
+    socket!.onError((error) => print('⚠️ Socket error: $error'));
+    socket!.onReconnect((_) => print('🔄 Reconnecting to server...'));
 
-    socket!.onError((error) {
-      print('⚠️ Socket error: $error');
-    });
-
-    socket!.onReconnect((_) {
-      print('🔄 Reconnecting to server...');
-    });
-
-    /// Listen for incoming messages
+    // Incoming message listener
     socket!.on('receiveMessage', (data) {
       print('📩 Received message: $data');
-      onMessageReceived?.call(data);
-      showNotification(
-          "New Message", data["message"] ?? "You have a new message");
+      onMessageReceived?.call(Map<String, dynamic>.from(data));
+      showNotification("New Message", data["message"] ?? "You have a new message");
     });
 
-    /// Listen for new notifications
+    // Incoming notification listener
     socket!.on('new_notification', (data) {
       print('🔔 New notification: $data');
-      onNotificationReceived?.call(data);
-
-      // Ensuring messages exist
-      if (data["message"] == null) {
-        print("❌ Error: 'message' field is missing in notification payload!");
-        return; 
+      onNotificationReceived?.call(Map<String, dynamic>.from(data));
+      if (data["message"] != null) {
+        showNotification("New Notification", data["message"]);
       }
-
-      showNotification(
-          "New Message", data["message"] ?? "You have a new message");
     });
   }
 
-  /// Emit a message to the server
-  void sendMessage(
-      String senderId, String recipientId, String message, String chatId) {
+  /// Send a message
+  void sendMessage(String senderId, String recipientId, String message, String chatId) {
     if (socket == null || !socket!.connected) return;
     socket!.emit('sendMessage', {
       'senderId': senderId,
@@ -110,13 +99,13 @@ class SocketService {
     });
   }
 
-  /// Join a specific chat room
+  /// Join a chat room
   void joinRoom(String roomId) {
     if (socket == null || !socket!.connected) return;
     socket!.emit('joinRoom', roomId);
   }
 
-  /// Disconnect from the server
+  /// Disconnect from server
   void disconnect() {
     if (socket != null && socket!.connected) {
       socket!.disconnect();
