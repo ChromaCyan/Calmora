@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/authentication/blocs/auth_event.dart';
 import 'package:armstrong/authentication/blocs/auth_state.dart';
-import 'package:armstrong/authentication/screens/registration_screen.dart';
+import 'package:armstrong/authentication/screens/usertype_select_screen.dart';
 import 'package:armstrong/widgets/forms/forget_password.dart';
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
