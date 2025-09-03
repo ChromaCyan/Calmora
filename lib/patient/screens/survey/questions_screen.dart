@@ -221,6 +221,7 @@
 // }
 
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
+import 'package:armstrong/widgets/forms/progress_bar_widget.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/forms/question_form.dart';
@@ -380,10 +381,84 @@ class _QuestionScreenState extends State<QuestionScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                /// 🔹 Progress Bar on Top
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  child: Column(
+                    children: [
+                      SegmentedProgressBar(
+                        progress: (_pageController.hasClients &&
+                                _questions.isNotEmpty)
+                            ? (_pageController.page ?? 0) /
+                                (_questions.length - 1)
+                            : 0,
+                        segments: _questions.length,
+                        filledColor: Theme.of(context).colorScheme.primary,
+                        emptyColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[800]!
+                                : Colors.grey[400]!,
+                        height: 10,
+                        spacing: 3,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "Question ${(_pageController.hasClients ? (_pageController.page?.round() ?? 0) + 1 : 1)} / ${_questions.length}",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                /// 🔹 Questions Below
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Questions
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: _questions.length,
+                          itemBuilder: (context, index) {
+                            final question = _questions[index];
+                            final choices = question['choices'] ?? [];
+                            final answers =
+                                List<Map<String, dynamic>>.from(choices);
+
+                            return QuestionWidget(
+                              question: question['questionText'],
+                              choices: answers,
+                              selectedChoiceId: _selectedAnswers[index] ?? '',
+                              onAnswerSelected: (choiceId) {
+                                setState(() {
+                                  _selectedAnswers[index] = choiceId;
+                                });
+                                Future.delayed(Duration(milliseconds: 300), () {
+                                  _nextQuestion(index);
+                                });
+                              },
+                              progress: (index + 1) / _questions.length,
+                              currentQuestion: index + 1,
+                              totalQuestions: _questions.length,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 🔹 Skip Button at Bottom
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
-                    alignment: Alignment.topRight,
+                    alignment: Alignment.bottomRight,
                     child: TextButton(
                       onPressed: () {
                         Navigator.pushReplacement(
@@ -397,37 +472,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         style: TextStyle(fontSize: 16, color: Colors.blue),
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: _questions.length,
-                    itemBuilder: (context, index) {
-                      final question = _questions[index];
-                      final choices = question['choices'] ?? [];
-                      final answers = List<Map<String, dynamic>>.from(choices);
-
-                      double progress = (index + 1) / 20; // Calculate progress
-
-                      return QuestionWidget(
-                        question: question['questionText'],
-                        choices: answers,
-                        selectedChoiceId: _selectedAnswers[index] ?? '',
-                        onAnswerSelected: (choiceId) {
-                          setState(() {
-                            _selectedAnswers[index] = choiceId;
-                          });
-                          Future.delayed(Duration(milliseconds: 300), () {
-                            _nextQuestion(index);
-                          });
-                        },
-                        progress: progress,
-                        currentQuestion: index + 1,
-                        totalQuestions: _questions.length,
-                      );
-                    },
                   ),
                 ),
               ],

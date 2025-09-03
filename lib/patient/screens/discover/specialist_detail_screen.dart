@@ -1,6 +1,7 @@
 import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
+import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: UniversalAppBar(
         title: "Specialist Details",
@@ -193,57 +195,87 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         ),
                       ],
                     ),
-                    // Row(
-                    //   children: [
-                    //     CircleAvatar(
-                    //       radius: 60,
-                    //       backgroundImage: profileImage.isNotEmpty
-                    //           ? NetworkImage(profileImage)
-                    //           : const AssetImage(
-                    //                   'images/armstrong_transparent.png')
-                    //               as ImageProvider,
-                    //     ),
-                    //     const SizedBox(width: 16),
-                    //     Expanded(
-                    //       child: Column(
-                    //         crossAxisAlignment: CrossAxisAlignment.start,
-                    //         children: [
-                    //           Text(
-                    //             name,
-                    //             style: const TextStyle(
-                    //               fontSize: 24,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //           SizedBox(height: 6),
-                    //           Row(
-                    //             children: [
-                    //               const Icon(LucideIcons.cross,
-                    //                   color: Colors.green, size: 20),
-                    //               const SizedBox(width: 8),
-                    //               Text(
-                    //                 clinic,
-                    //                 style: const TextStyle(
-                    //                   fontSize: 16,
-                    //                   fontWeight: FontWeight.w600,
-                    //                 ),
-                    //               ),
-                    //             ],
-                    //           ),
-                    //           SizedBox(height: 6),
-                    //           Text(
-                    //             specialization,
-                    //             style: TextStyle(
-                    //               fontSize: 18,
-                    //               color: Colors.grey[600],
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     )
-                    //   ],
-                    // ),
-                    const SizedBox(height: 20),
+                    Center(
+                      child: _buildAvailabilityCard(availability),
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    Row(
+                      children: [
+                        // Book Appointment Button
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () =>
+                                _bookAppointment(context, widget.specialistId),
+                            icon: const Icon(Icons.calendar_today, size: 22),
+                            label: const Text(
+                              "Book Appointment",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // Chat with Specialist Button (Message)
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              final token = await _storage.read(key: 'token');
+                              if (token != null) {
+                                try {
+                                  final existingChatId =
+                                      await _apiRepository.getExistingChatId(
+                                          widget.specialistId, token);
+                                  final newChatId = existingChatId ??
+                                      await _apiRepository.createChat(
+                                          widget.specialistId, token);
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatScreen(
+                                        chatId: newChatId,
+                                        recipientId: widget.specialistId,
+                                        recipientName: name,
+                                      ),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  print('Error starting chat: $e');
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.message, size: 22),
+                            label: const Text(
+                              "Message",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    const Divider(
+                      thickness: 1,
+                      color: Colors.grey, // you can tweak the shade
+                      height: 24, // space before/after the divider
+                    ),
+                    const SizedBox(height: 15),
 
                     /// --- Profession Card ---
                     _SectionCard(
@@ -256,6 +288,18 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 20),
+
+                    _SectionCard(
+                      title: "Contact Information",
+                      children: [
+                        ContactInfoCard(
+                          email: specialist.email ?? 'No email',
+                          phoneNumber: specialist.phoneNumber ?? 'No phone',
+                        )
+                      ],
+                    ),
+
                     const SizedBox(height: 20),
 
                     _SectionCard(
@@ -272,97 +316,26 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
-
-                    _SectionCard(
-                      title: "Contact Information",
-                      children: [
-                        ContactInfoCard(
-                          email: specialist.email ?? 'No email',
-                          phoneNumber: specialist.phoneNumber ?? 'No phone',
-                        )
-                      ],
-                    ),
-
-                    // const SizedBox(height: 24),
-
-                    // Bio
-                    //SpecialistBioSection(bio: bio),
-
                     //const SizedBox(height: 16),
-
-                    // Contact Information
-                    // Container(
-                    //   height: MediaQuery.of(context).size.height * 0.30,
-                    //   margin: const EdgeInsets.symmetric(horizontal: 10),
-                    //   padding: const EdgeInsets.all(16),
-                    //   decoration: BoxDecoration(
-                    //     color: Theme.of(context).cardColor,
-                    //     borderRadius: BorderRadius.circular(12),
-                    //     boxShadow: [
-                    //       BoxShadow(
-                    //         color: Colors.grey.withOpacity(0.4),
-                    //         blurRadius: 10,
-                    //         spreadRadius: 2,
-                    //         offset: const Offset(0, 4),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // child: Column(
-                    //   children: [
-                    //     // Toggle Buttons
-                    //     ToggleButton(
-                    //       onToggle: (isContactInfo) {
-                    //         setState(() {
-                    //           showContactInfo = isContactInfo;
-                    //         });
-                    //       },
-                    //     ),
-                    //     const SizedBox(height: 16),
-
-                    // Display the selected section
-                    //       Expanded(
-                    //         child: SingleChildScrollView(
-                    //           child: showContactInfo
-                    //               ? ContactInfoCard(
-                    //                   email: specialist.email ?? 'No email',
-                    //                   phoneNumber:
-                    //                       specialist.phoneNumber ?? 'No phone',
-                    //                 )
-                    //               : ProDeetsCard(
-                    //                   yearsOfExperience:
-                    //                       specialist.yearsOfExperience ?? 0,
-                    //                   languagesSpoken:
-                    //                       specialist.languagesSpoken ?? [],
-                    //                   licenseNumber:
-                    //                       specialist.licenseNumber ?? 'N/A',
-                    //                 ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
-                    const SizedBox(height: 16),
 
                     // Availability
 
-                    _SectionCard(
-                      title: "Availability",
-                      children: [
-                        _buildAvailabilityCard(availability),
-                      ],
-                    ),
+                    // _SectionCard(
+                    //   title: "Availability",
+                    //   children: [
+                    //     _buildAvailabilityCard(availability),
+                    //   ],
+                    // ),
 
-                    const SizedBox(height: 24),
+                    //const SizedBox(height: 24),
 
                     // Action Buttons
-                    SpecialistActionButtons(
-                      specialistId: widget.specialistId,
-                      name: name,
-                      onBookAppointment: () =>
-                          _bookAppointment(context, widget.specialistId),
-                    ),
+                    // SpecialistActionButtons(
+                    //   specialistId: widget.specialistId,
+                    //   name: name,
+                    //   onBookAppointment: () =>
+                    //       _bookAppointment(context, widget.specialistId),
+                    // ),
                   ],
                 ),
               ),
@@ -459,13 +432,19 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(0.3),
+        //     blurRadius: 10,
+        //     offset: const Offset(0, 4),
+        //   ),
+        //],
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.3) // light border in dark mode
+              : Colors.black.withOpacity(0.2), // dark border in light mode
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
