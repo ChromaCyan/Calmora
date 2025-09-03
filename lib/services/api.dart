@@ -66,14 +66,14 @@ class ApiRepository {
       body: json.encode({'email': email.toLowerCase(), 'password': password}),
     );
 
+    final data = json.decode(response.body);
+
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
       await _storage.write(key: 'token', value: data['token']);
-
       return data;
     } else {
-      throw Exception('Failed to login: ${response.body}');
+      final errorMessage = data['message'] ?? 'Failed to login';
+      throw Exception(errorMessage);
     }
   }
 

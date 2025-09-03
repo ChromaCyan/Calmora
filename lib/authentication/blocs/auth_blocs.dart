@@ -34,18 +34,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final userData = await apiRepository.loginUser(event.email, event.password);
+      final userData =
+          await apiRepository.loginUser(event.email, event.password);
       print("Login successful: $userData");
       emit(AuthSuccess(userData: userData));
-    } catch (error) {
-      emit(AuthError(message: error.toString()));
+    } catch (e) {
+      final errorMessage = e.toString().replaceFirst('Exception: ', '');
+      emit(AuthError(message: errorMessage));
     }
   }
 
-  Future<void> _onVerifyOtp(VerifyOtpEvent event, Emitter<AuthState> emit) async {
+  Future<void> _onVerifyOtp(
+      VerifyOtpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final verificationDetails = await apiRepository.verifyOTP(event.email, event.otp);
+      final verificationDetails =
+          await apiRepository.verifyOTP(event.email, event.otp);
       emit(OtpVerified(verificationDetails: verificationDetails));
     } catch (e) {
       print("Login failed with error: $e");
