@@ -6,6 +6,7 @@ import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:armstrong/services/socket_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -105,17 +106,22 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 15), // Reduce the spacing between the indicator and buttons
               ValueListenableBuilder<int>(
                 valueListenable: _currentPage,
-                builder: (_, value, __) => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (value > 0)
-                      _PreviousButton(onPressed: _onPreviousPressed),
-                    const SizedBox(width: 20),
-                    _NextButton(
-                      isLastPage: value == onBoardData.length - 1,
-                      onPressed: _onNextPressed,
-                    ),
-                  ],
+                builder: (_, value, __) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 35), // optional horizontal padding
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (value > 0)
+                      _PreviousButton(onPressed: _onPreviousPressed)
+                      else
+                      SizedBox(width: 50), // keep space when no previous button
+
+                      _NextButton(
+                        isLastPage: value == onBoardData.length - 1,
+                        onPressed: _onNextPressed,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: height * 0.05), // Adjust the bottom padding dynamically
@@ -151,7 +157,7 @@ class _OnboardingItem extends StatelessWidget {
           child: Text(
             _getTitle(index),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.montserrat(
               fontSize: size.height * 0.04,  // Adjust font size dynamically
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.bold,
@@ -173,9 +179,9 @@ class _OnboardingItem extends StatelessWidget {
 
   String _getTitle(int index) {
     const titles = [
-      "Armstrong",
-      "It's Okay\nto Not be Okay",
-      "Sorting through\nthe Noise",
+      "Calmora",
+      // "It's Okay\nto Not be Okay",
+      // "Sorting through\nthe Noise",
       "Browse Resources!",
       "Find a Specialist",
       "Join Us",
@@ -184,6 +190,8 @@ class _OnboardingItem extends StatelessWidget {
   }
 }
 
+
+//✅✅✅<<<---Next Button--->>>✅✅✅
 class _NextButton extends StatelessWidget {
   final bool isLastPage;
   final VoidCallback onPressed;
@@ -193,26 +201,24 @@ class _NextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Color buttonColor = isLastPage ? Colors.green : theme.colorScheme.primary;
-    Color textColor = isLastPage ? Colors.white : (theme.brightness == Brightness.dark ? Colors.black : Colors.white);
+    // Color textColor = isLastPage
+    //     ? Colors.white
+    //     : (theme.brightness == Brightness.dark ? Colors.black : Colors.white);
+    final Color iconColor = isLastPage ? Colors.green : Colors.grey;
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: 50, // Adjusted to make it responsive
-        width: MediaQuery.of(context).size.width * 0.45,
-        decoration: BoxDecoration(
-          color: buttonColor,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Center(
-          child: Text(
-            isLastPage ? "Get Started!" : "Continue",
-            style: TextStyle(
-              color: textColor,
-              fontSize: 18, // Adjusted for responsiveness
-              fontWeight: FontWeight.bold,
-            ),
+    return Material(
+      color: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: onPressed,
+        child: Container(
+          height: 50,
+          width: 50,
+          child: Icon(
+            Icons.arrow_forward_ios_rounded,
+            color: iconColor,
+            size: 28,
           ),
         ),
       ),
@@ -220,6 +226,8 @@ class _NextButton extends StatelessWidget {
   }
 }
 
+
+//✅✅✅<<<---Previous Button--->>>✅✅✅
 class _PreviousButton extends StatelessWidget {
   final VoidCallback onPressed;
 
@@ -228,26 +236,22 @@ class _PreviousButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Color buttonColor = Colors.grey[500]!;
-    Color textColor = theme.brightness == Brightness.dark ? Colors.black : Colors.white;
+    final Color splashColor = Colors.grey.withOpacity(0.3);   
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: 50, // Adjusted for responsiveness
-        width: MediaQuery.of(context).size.width * 0.45,
-        decoration: BoxDecoration(
-          color: buttonColor,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Center(
-          child: Text(
-            "Previous",
-            style: TextStyle(
-              color: textColor,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+    return Material(
+      color: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        splashColor: splashColor,
+        onTap: onPressed,
+        child: Container(
+          height: 50,
+          width: 50,
+          child: Icon(
+            Icons.arrow_back_ios_outlined,
+            color: Colors.grey,
+            size: 28,
           ),
         ),
       ),
@@ -255,6 +259,8 @@ class _PreviousButton extends StatelessWidget {
   }
 }
 
+
+//✅✅✅<<<---Progress Bar/Dots--->>>✅✅✅
 class _Indicator extends StatelessWidget {
   final bool isActive;
 
