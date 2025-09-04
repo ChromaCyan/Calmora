@@ -10,9 +10,11 @@ import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-
+import 'dart:ui';
 import 'package:armstrong/authentication/screens/registration_screens/patient_registration_screen.dart';
 import 'package:armstrong/authentication/screens/registration_screens/specialist_registration_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -285,61 +287,202 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
 // <---Frontend part--->
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Choose Your Account Type",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PatientRegistrationScreen(),
+@override
+Widget build(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    appBar: AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        color: colorScheme.onSurface, // adjust color for visibility
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    ),
+    extendBodyBehindAppBar: true,
+    body: Stack(
+      fit: StackFit.expand,
+      children: [
+        /// Background image
+        Image.asset(
+          "images/login_bg_image.png", // <-- replace with your asset path
+          fit: BoxFit.cover,
+        ),
+
+        /// Glass morphism full screen
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.6)
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+
+                    const SizedBox(height: 130),
+                    
+                    Text(
+                      "What are you?",
+                      style: GoogleFonts.montserrat(
+                        textStyle: Theme.of(context)
+                          .textTheme
+                          .headlineSmall,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 60),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+
+                    const SizedBox(height: 100),
+
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "Do you seek help? Register as",
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              textAlign: TextAlign.center,
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animaiton, secondaryAnimation) => const PatientRegistrationScreen(),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                      transitionDuration: const Duration(milliseconds: 300),
+                                      // builder: (_) => const PatientRegistrationScreen(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  shadowColor: Colors.transparent,
+                                  minimumSize: const Size(double.infinity, 60),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  backgroundColor: colorScheme.primaryContainer,
+                                  foregroundColor: colorScheme.onPrimaryContainer,
+                                ).copyWith(
+                                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                                    (Set<MaterialState> state) {
+                                      if (state.contains(MaterialState.hovered)) {
+                                        return Colors.blue.withOpacity(0.1);
+                                      }
+                                    }
+                                  ),
+                                ),
+                                child: Text(
+                                  "Patient",
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 30),
+
+                            const Divider(
+                              thickness: 1.5,
+                              color: Colors.grey,
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+
+                            const SizedBox(height: 30),
+
+                            Text(
+                              "Do you provide support? Register as",
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              textAlign: TextAlign.center,
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation, secondaryAnimation) => const SpecialistRegistrationScreen(),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child);
+                                      },
+                                      transitionDuration: const Duration(milliseconds: 300),
+                                      // builder: (_) => const SpecialistRegistrationScreen(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  shadowColor: Colors.transparent,
+                                  minimumSize: const Size(double.infinity, 60),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  backgroundColor: colorScheme.primaryContainer,
+                                  foregroundColor: colorScheme.onPrimaryContainer,
+                                ).copyWith(
+                                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                                    (Set<MaterialState> state) {
+                                      if (state.contains(MaterialState.hovered)) {
+                                        return Colors.blue.withOpacity(0.1);
+                                      }
+                                    }
+                                  ),
+                                ),
+                                child: Text(
+                                  "Specialist",
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),                                      
+                  ],
                 ),
-                child: const Text("I’m a Patient"),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SpecialistRegistrationScreen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 60),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text("I’m a Specialist"),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }
 
 

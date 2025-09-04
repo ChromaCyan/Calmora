@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class LoginButton extends StatelessWidget {
   final Function()? onTap;
@@ -18,7 +20,7 @@ class LoginButton extends StatelessWidget {
           color: isEnabled
               ? Theme.of(context).colorScheme.secondary
               : Theme.of(context).disabledColor.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(15),
           boxShadow: isEnabled
               ? [
                   BoxShadow(
@@ -36,11 +38,12 @@ class LoginButton extends StatelessWidget {
             // const Icon(Icons.lock_outline, color: Colors.white),
             // const SizedBox(width: 8),
             Text(
-              "Log In",
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+              "LOG IN",
+              style: GoogleFonts.montserrat(
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
             ),
           ],
         ),

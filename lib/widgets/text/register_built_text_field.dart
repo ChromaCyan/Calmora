@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final FocusNode? focusNode;
   final Widget? suffixIcon;
+  final TextInputType? keyboardtype;
 
   const CustomTextField({
     Key? key,
@@ -22,6 +23,7 @@ class CustomTextField extends StatefulWidget {
     this.onChanged,
     this.focusNode,
     this.suffixIcon,
+    this.keyboardtype,
   }) : super(key: key);
 
   @override
@@ -151,6 +153,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           readOnly: widget.readOnly,
           onTap: widget.onTap,
           focusNode: _focusNode,
+          keyboardType: widget.keyboardtype,
           onChanged: (value) {
             _validateField();
             if (widget.onChanged != null) widget.onChanged!(value);

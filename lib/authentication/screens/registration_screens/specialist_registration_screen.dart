@@ -1,4 +1,6 @@
 // import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
+import 'dart:ui';
+
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,16 +58,17 @@ class _SpecialistRegistrationScreenState
     return InputDecoration(
       labelText: label,
       labelStyle: TextStyle(color: theme.colorScheme.onSurface),
-      filled: true,
-      fillColor: theme.colorScheme.background,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: theme.colorScheme.primary),
+      filled: false,
+      fillColor: Colors.transparent,
+      enabledBorder: UnderlineInputBorder(
+        // borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+      focusedBorder: UnderlineInputBorder(
+        // borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
       ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
     );
   }
 
@@ -219,270 +222,366 @@ class _SpecialistRegistrationScreenState
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) async {
-          if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                elevation: 0,
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.transparent,
-                content: AwesomeSnackbarContent(
-                  title: 'Account Created!',
-                  message: 'Registration Successful!',
-                  contentType: ContentType.success,
-                ),
-                duration: Duration(seconds: 3),
-              ),
-            );
-
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LoginScreen(),
-              ),
-            );
-          } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                elevation: 0,
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.transparent,
-                content: AwesomeSnackbarContent(
-                  title: 'Error',
-                  message: 'Registration Failed: ${state.message}',
-                  contentType: ContentType.failure,
-                ),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // First Name
-                  CustomTextField(
-                    label: "First Name",
-                    controller: _firstNameController,
-                    focusNode: _firstNameFocus,
-                    onChanged: (_) => _checkFields(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Last Name
-                  CustomTextField(
-                    label: "Last Name",
-                    controller: _lastNameController,
-                    focusNode: _lastNameFocus,
-                    onChanged: (_) => _checkFields(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Email
-                  CustomTextField(
-                    label: "Email",
-                    controller: _emailController,
-                    focusNode: _emailFocus,
-                    onChanged: (_) => _checkFields(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Phone Number
-                  CustomTextField(
-                    label: "Phone Number",
-                    controller: _phoneNumberController,
-                    focusNode: _phoneFocus,
-                    onChanged: (_) => _checkFields(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Gender
-                  DropdownButtonFormField<String>(
-                    value: _genderController.text.isNotEmpty
-                        ? _genderController.text
-                        : null,
-                    decoration: customInputDecoration("Gender", context),
-                    items: genderOptions.map((option) {
-                      return DropdownMenuItem<String>(
-                        value: option["value"],
-                        child: Text(option["label"]!),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _genderController.text = value!);
-                      _checkFields();
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Password
-                  CustomTextField(
-                    label: "Password",
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
-                    ),
-                    onChanged: (value) {
-                      _checkPasswordStrength(value);
-                      _checkPasswordMatch();
-                      _checkFields();
-                    },
-                  ),
-                  Text(
-                    _passwordStrength,
-                    style: TextStyle(
-                      color: _passwordStrength == "Strong Password ✅"
-                          ? Colors.green
-                          : Colors.red,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Confirm Password
-                  CustomTextField(
-                    label: "Confirm Password",
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() =>
-                            _obscureConfirmPassword = !_obscureConfirmPassword);
-                      },
-                    ),
-                    onChanged: (_) {
-                      _checkPasswordMatch();
-                      _checkFields();
-                    },
-                  ),
-                  Text(
-                    _passwordMatchMessage,
-                    style: TextStyle(color: _passwordMatchColor),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Specialization
-                  DropdownButtonFormField<String>(
-                    value: _specializationController.text.isNotEmpty
-                        ? _specializationController.text
-                        : null,
-                    decoration:
-                        customInputDecoration("Specialization", context),
-                    items: specializationOptions.map((value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _specializationController.text = value!);
-                      _checkFields();
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Location
-                  DropdownButtonFormField<String>(
-                    value: _locationController.text.isNotEmpty
-                        ? _locationController.text
-                        : null,
-                    decoration: customInputDecoration("Location", context),
-                    items: locationOptions.map((value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _locationController.text = value!);
-                      _checkFields();
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Clinic
-                  CustomTextField(
-                    label: "Clinic",
-                    controller: _clinicController,
-                    onChanged: (_) => _checkFields(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // License Number
-                  CustomTextField(
-                    label: "License Number",
-                    controller: _licenseNumberController,
-                    onChanged: (_) => _checkFields(),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Register Button
-                  ValueListenableBuilder<bool>(
-                    valueListenable: isRegisterButtonEnabled,
-                    builder: (context, isEnabled, child) {
-                      return ElevatedButton(
-                        onPressed: isEnabled ? _onRegisterButtonPressed : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isEnabled
-                              ? Theme.of(context).colorScheme.secondary
-                              : Colors.grey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          color: colorScheme.onSurface, // ensures visibility in both modes
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface.withOpacity(0.6),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, state) async {
+                  if (state is AuthSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Account Created!',
+                          message: 'Registration Successful!',
+                          contentType: ContentType.success,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
-                          child: Text(
-                            "Sign up",
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
+                  } else if (state is AuthError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Error',
+                          message: 'Registration Failed: ${state.message}',
+                          contentType: ContentType.failure,
+                        ),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 30),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          
+                          const SizedBox(height: 20),
+
+                          Text(
+                            "Create Your Account",
                             style: Theme.of(context)
                                 .textTheme
-                                .titleMedium
+                                .headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          // First Name
+                          CustomTextField(
+                            label: "First Name",
+                            controller: _firstNameController,
+                            focusNode: _firstNameFocus,
+                            onChanged: (_) => _checkFields(),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Last Name
+                          CustomTextField(
+                            label: "Last Name",
+                            controller: _lastNameController,
+                            focusNode: _lastNameFocus,
+                            onChanged: (_) => _checkFields(),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Email
+                          CustomTextField(
+                            label: "Email",
+                            controller: _emailController,
+                            focusNode: _emailFocus,
+                            onChanged: (_) => _checkFields(),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Phone Number
+                          CustomTextField(
+                            label: "Phone Number",
+                            controller: _phoneNumberController,
+                            focusNode: _phoneFocus,
+                            keyboardtype: TextInputType.phone,
+                            onChanged: (_) => _checkFields(),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Gender
+                          DropdownButtonFormField<String>(
+                            value: _genderController.text.isNotEmpty
+                                ? _genderController.text
+                                : null,
+                            decoration: customInputDecoration("Gender", context),
+                            icon: const Icon(Icons.arrow_drop_down_rounded),
+                            dropdownColor: Theme.of(context)
+                                .colorScheme.surface,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
                                 ?.copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .onSecondary,
+                                      .onSurface,
                                 ),
+                            items: genderOptions.map((option) {
+                              return DropdownMenuItem<String>(
+                                value: option["value"],
+                                child: Text(option["label"]!),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() => _genderController.text = value!);
+                              _checkFields();
+                            },
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                          
+                          const SizedBox(height: 10),
+
+                          // Specialization
+                          DropdownButtonFormField<String>(
+                            value: _specializationController.text.isNotEmpty
+                                ? _specializationController.text
+                                : null,
+                            decoration:customInputDecoration("Specialization", context),
+                            icon: const Icon(Icons.arrow_drop_down_rounded),
+                            dropdownColor: Theme.of(context)
+                                .colorScheme.surface,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface,
+                                ),
+                            items: specializationOptions.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() => _specializationController.text = value!);
+                              _checkFields();
+                            },
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Location
+                          DropdownButtonFormField<String>(
+                            value: _locationController.text.isNotEmpty
+                                ? _locationController.text
+                                : null,
+                            decoration: customInputDecoration("Location", context),
+                            icon: const Icon(Icons.arrow_drop_down_rounded),
+                            dropdownColor: Theme.of(context)
+                                .colorScheme.surface,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface,
+                                ),
+                            items: locationOptions.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() => _locationController.text = value!);
+                              _checkFields();
+                            },
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Clinic
+                          CustomTextField(
+                            label: "Clinic Name",
+                            controller: _clinicController,
+                            onChanged: (_) => _checkFields(),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // License Number
+                          CustomTextField(
+                            label: "License Number",
+                            controller: _licenseNumberController,
+                            onChanged: (_) => _checkFields(),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Password
+                          CustomTextField(
+                            label: "Password",
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscurePassword = !_obscurePassword);
+                              },
+                            ),
+                            onChanged: (value) {
+                              _checkPasswordStrength(value);
+                              _checkPasswordMatch();
+                              _checkFields();
+                            },
+                          ),
+                          Text(
+                            _passwordStrength,
+                            style: TextStyle(
+                              color: _passwordStrength == "Strong Password ✅"
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          ),
+                          
+                          // const SizedBox(height: 20),
+
+                          // Confirm Password
+                          CustomTextField(
+                            label: "Confirm Password",
+                            controller: _confirmPasswordController,
+                            obscureText: _obscureConfirmPassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() =>
+                                    _obscureConfirmPassword = !_obscureConfirmPassword);
+                              },
+                            ),
+                            onChanged: (_) {
+                              _checkPasswordMatch();
+                              _checkFields();
+                            },
+                          ),
+                          Text(
+                            _passwordMatchMessage,
+                            style: TextStyle(color: _passwordMatchColor),
+                          ),
+
+                          const SizedBox(height: 35),
+
+                          // const Divider(
+                          //   thickness: 1.5,
+                          //   color: Colors.grey,
+                          //   indent: 40,
+                          //   endIndent: 40,
+                          // ),
+
+                          // const SizedBox(height: 45),
+
+                          // Register Button
+                          ValueListenableBuilder<bool>(
+                            valueListenable: isRegisterButtonEnabled,
+                            builder: (context, isEnabled, child) {
+                              return ElevatedButton(
+                                onPressed: isEnabled ? _onRegisterButtonPressed : null,
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  shadowColor: Colors.transparent,
+                                  backgroundColor: isEnabled
+                                      ? colorScheme.primaryContainer
+                                      : Colors.grey,
+                                  foregroundColor: isEnabled
+                                      ? colorScheme.onPrimaryContainer
+                                      : Colors.black45,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 50, vertical: 15),
+                                  child: Text(
+                                    "Sign up",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          // color: Theme.of(context)
+                                          //     .colorScheme
+                                          //     .onSecondary,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-          );
-        },
-      ),
+          )
+        ],
+      )      
     );
   }
 }
