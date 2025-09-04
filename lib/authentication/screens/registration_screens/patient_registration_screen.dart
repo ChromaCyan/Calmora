@@ -477,34 +477,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             style: TextStyle(color: _passwordMatchColor),
                           ),
 
-                          const SizedBox(height: 20),
-
-                          //✅✅✅ <----Optional Fields----> ✅✅✅
-                          CustomTextField(
-                              label: "Emergency Contact Name (optional)",
-                              controller: _emergencyContactNameController,
-                              isRequired: false),
-                          const SizedBox(height: 20),
-                          CustomTextField(
-                              label: "Emergency Contact Phone (optional)",
-                              controller: _emergencyContactPhoneController,
-                              isRequired: false),
-                          const SizedBox(height: 20),
-                          CustomTextField(
-                              label: "Emergency Contact Relation (optional)",
-                              controller: _emergencyContactRelationController,
-                              isRequired: false),
-                          const SizedBox(height: 20),
-                          CustomTextField(
-                              label: "Medical History (optional)",
-                              controller: _medicalHistoryController,
-                              isRequired: false),
-                          const SizedBox(height: 20),
-                          CustomTextField(
-                              label: "Therapy Goals (optional)",
-                              controller: _therapyGoalsController,
-                              isRequired: false),
-
                           const SizedBox(height: 50),
                           
                           // const Divider(
