@@ -97,7 +97,7 @@ flutter_icons:
   ios: true
   image_path: "images/calmora_circle_crop.png"
   adaptive_icon_background: "#00296b" 
-  adaptive_icon_foreground: "images/calmora_circle_crop.png"
+  adaptive_icon_foreground: "images/Calmora.png"
 
 # Flutter Splash Launch Screen
 flutter_native_splash:
@@ -177,6 +177,7 @@ flutter:
     - images/members_pfp/oliver.jpg
     - images/members_pfp/raven.jpg
     - images/login_bg_image.png
+    - images/Calmora.png
 
     # Fonts Assets
   fonts:

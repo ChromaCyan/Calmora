@@ -1,6 +1,5 @@
 import 'package:armstrong/patient/screens/dashboard/men_health.dart';
 import 'package:armstrong/widgets/cards/welcome_card.dart';
-import 'package:armstrong/widgets/charts/survey_result.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/mood_graph.dart';
 import 'package:armstrong/widgets/cards/journal_card.dart';
@@ -10,7 +9,6 @@ import 'package:armstrong/widgets/cards/meditation_card.dart';
 import 'package:armstrong/widgets/cards/app_section.dart';
 import 'package:armstrong/patient/screens/dashboard/meditation_details.dart';
 import 'package:armstrong/patient/screens/dashboard/breathing_details.dart';
-import 'package:armstrong/patient/screens/dashboard/men_health.dart';
 import 'package:armstrong/patient/screens/dashboard/emergency_services.dart';
 import 'package:armstrong/patient/screens/dashboard/about_us.dart';
 
@@ -51,10 +49,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Card
-              const WelcomeSection(),
-
-              const SizedBox(height: 30),
               Center(
                 child: Text(
                   'What is this app about?',
@@ -70,7 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Expanded(
                     child: AppSection(
-                      title: "Men's Mental health awareness!",
+                      title: "Understanding Mental Health",
                       imageUrl: "images/splash/image6.png",
                       onTap: () {
                         Navigator.push(
@@ -101,12 +95,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) {
-                              return EmergencyServicePage();  // Destination page
+                              return EmergencyServicePage();  
                             },
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              // Fade transition
                               var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), // Slide from the right
+                                begin: Offset(1.0, 0.0), 
                                 end: Offset.zero,
                               ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
                               return SlideTransition(position: slideAnimation, child: child);
@@ -118,19 +111,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Expanded(
                     child: AppSection(
-                      title: "What is Armstrong?",
-                      imageUrl: "images/armstrong_white.png",
+                      title: "What is Calmora?",
+                      imageUrl: "images/Calmora.png",
                       onTap: () {
                         Navigator.push(
                           context,
                           PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) {
-                              return AboutUsPage();  // Destination page
+                              return AboutUsPage(); 
                             },
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              // Fade transition
                               var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), // Slide from the right
+                                begin: Offset(1.0, 0.0),
                                 end: Offset.zero,
                               ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
                               return SlideTransition(position: slideAnimation, child: child);
@@ -191,12 +183,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           context,
                           PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) {
-                              return BreathingGuideScreen();  // Destination page
+                              return BreathingGuideScreen();  
                             },
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                               // Fade transition
                               var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), // Slide from the right
+                                begin: Offset(1.0, 0.0), 
                                 end: Offset.zero,
                               ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
                               return SlideTransition(position: slideAnimation, child: child);
@@ -220,24 +212,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               const SizedBox(height: 20),
 
-              Center(
-                child: Text(
-                  'What is on your mind?',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
-                  ),
-                ),
-              ),
-
-              // Highlight Journal Card
-              const JournalSection(),
-
-              const SizedBox(height: 30),
+              // Removed Journal Section
+              // Center(
+              //   child: Text(
+              //     'What is on your mind?',
+              //     style: theme.textTheme.titleLarge?.copyWith(
+              //       fontWeight: FontWeight.bold,
+              //       color: theme.colorScheme.onBackground,
+              //     ),
+              //   ),
+              // ),       
+              // const JournalSection(),
 
               Center(
                 child: Text(
-                  'Recommended Articles For You!',
+                  'Recommended Articles',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
@@ -250,21 +239,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               const SizedBox(height: 30),
 
-              Center(
-                child: Text(
-                  'Weekly Mood Chart',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
-                  ),
-                ),
-              ),
+              // Removed Daily Mood Chart
+              // Center(
+              //   child: Text(
+              //     'Weekly Mood Chart',
+              //     style: theme.textTheme.headlineSmall?.copyWith(
+              //       fontWeight: FontWeight.bold,
+              //       color: theme.colorScheme.onBackground,
+              //     ),
+              //   ),
+              // ),
 
-              Center(
-                child: _userId != null
-                    ? MoodCalendarScreen(userId: _userId!)
-                    : const Center(child: CircularProgressIndicator()),
-              ),
+              // Center(
+              //   child: _userId != null
+              //       ? MoodCalendarScreen(userId: _userId!)
+              //       : const Center(child: CircularProgressIndicator()),
+              // ),
             ],
           ),
         ),

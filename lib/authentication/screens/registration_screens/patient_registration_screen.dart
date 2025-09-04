@@ -17,7 +17,8 @@ class PatientRegistrationScreen extends StatefulWidget {
   const PatientRegistrationScreen({super.key});
 
   @override
-  State<PatientRegistrationScreen> createState() => _PatientRegistrationScreenState();
+  State<PatientRegistrationScreen> createState() =>
+      _PatientRegistrationScreenState();
 }
 
 class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
@@ -76,6 +77,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   }
 
   void _checkFields() {
+    final isValidEmail = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+        .hasMatch(_emailController.text);
     final isCommonFieldsFilled = _firstNameController.text.isNotEmpty &&
         _lastNameController.text.isNotEmpty &&
         _emailController.text.isNotEmpty &&
@@ -86,7 +89,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
 
     final isPatientFieldsFilled = _dateOfBirthController.text.isNotEmpty;
 
-    isRegisterButtonEnabled.value = isCommonFieldsFilled && isPatientFieldsFilled;
+    isRegisterButtonEnabled.value =
+        isCommonFieldsFilled && isPatientFieldsFilled;
   }
 
   final genderOptions = [
@@ -189,6 +193,26 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
     );
 
+    final email = _emailController.text;
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+
+    if (!emailRegex.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: const AwesomeSnackbarContent(
+            title: 'Invalid Email!',
+            message: 'Please enter a valid email address.',
+            contentType: ContentType.warning,
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     if (!strongPasswordRegExp.hasMatch(password)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -281,8 +305,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                     final FlutterSecureStorage storage = FlutterSecureStorage();
                     final hasCompletedSurvey =
                         await storage.read(key: 'hasCompletedSurvey_$userId');
-                    final surveyOnboardingCompleted =
-                        await storage.read(key: 'survey_onboarding_completed_$userId');
+                    final surveyOnboardingCompleted = await storage.read(
+                        key: 'survey_onboarding_completed_$userId');
 
                     if (hasCompletedSurvey == 'true' &&
                         surveyOnboardingCompleted == 'true') {
@@ -320,13 +344,13 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                   }
 
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 30),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 100, horizontal: 30),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-
                           const SizedBox(height: 20),
 
                           Text(
@@ -381,17 +405,17 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             value: _genderController.text.isNotEmpty
                                 ? _genderController.text
                                 : null,
-                            decoration: customInputDecoration("Gender", context),
+                            decoration:
+                                customInputDecoration("Gender", context),
                             icon: const Icon(Icons.arrow_drop_down_rounded),
-                            dropdownColor: Theme.of(context)
-                                .colorScheme.surface,
+                            dropdownColor:
+                                Theme.of(context).colorScheme.surface,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
                                 ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                             items: genderOptions.map((option) {
                               return DropdownMenuItem<String>(
@@ -432,7 +456,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() => _obscurePassword = !_obscurePassword);
+                                setState(
+                                    () => _obscurePassword = !_obscurePassword);
                               },
                             ),
                             onChanged: (value) {
@@ -478,21 +503,22 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                           ),
 
                           const SizedBox(height: 50),
-                          
+
                           // const Divider(
                           //   thickness: 1.5,
                           //   color: Colors.grey,
                           //   indent: 40,
                           //   endIndent: 40,
                           // ),
-                          
+
                           // const SizedBox(height: 45),
 
                           ValueListenableBuilder<bool>(
                             valueListenable: isRegisterButtonEnabled,
                             builder: (context, isEnabled, child) {
                               return ElevatedButton(
-                                onPressed: isEnabled ? _onRegisterButtonPressed : null,
+                                onPressed:
+                                    isEnabled ? _onRegisterButtonPressed : null,
                                 style: ElevatedButton.styleFrom(
                                   elevation: 0,
                                   shadowColor: Colors.transparent,
@@ -511,17 +537,16 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                       horizontal: 50, vertical: 15),
                                   child: Text(
                                     "Sign up",
-                                    style:
-                                        Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              // color: Theme.of(context)
-                                              //     .colorScheme
-                                              //     .onSecondary,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          // color: Theme.of(context)
+                                          //     .colorScheme
+                                          //     .onSecondary,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -537,7 +562,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
           )
         ],
       ),
-      
     );
   }
 }

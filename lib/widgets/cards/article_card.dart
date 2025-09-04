@@ -55,16 +55,16 @@ class ArticleCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: theme.brightness == Brightness.dark
-            ? Colors.grey[200]!.withOpacity(0.25)  // Dark mode shadow color
-            : Colors.grey[800]!.withOpacity(0.15),  // Light mode shadow color
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 0),
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: theme.brightness == Brightness.dark
+          //   ? Colors.grey[200]!.withOpacity(0.25)  // Dark mode shadow color
+          //   : Colors.grey[800]!.withOpacity(0.15),  // Light mode shadow color
+          //     spreadRadius: 1,
+          //     blurRadius: 4,
+          //     offset: const Offset(0, 0),
+          //   ),
+          // ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
