@@ -421,6 +421,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     await _logout(context);
                                   },
                                   style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
                                     minimumSize: Size(screenWidth * 0.4,
                                         40), // Responsive size
                                     shape: RoundedRectangleBorder(

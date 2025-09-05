@@ -1,5 +1,6 @@
 // import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CombinedForm extends StatelessWidget {
   final TextEditingController firstNameController;
@@ -136,6 +137,8 @@ class CombinedForm extends StatelessWidget {
                   controller: phoneNumberController,
                   decoration: customInputDecoration("Phone Number", context),
                   enabled: isEditing,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
                 DropdownButtonFormField<String>(
                   value: genderController.text.isNotEmpty
@@ -185,11 +188,11 @@ class CombinedForm extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: addressController,
-                    decoration: customInputDecoration("Address", context),
-                    enabled: isEditing,
-                  ),
+                  // TextField(
+                  //   controller: addressController,
+                  //   decoration: customInputDecoration("Address", context),
+                  //   enabled: isEditing,
+                  // ),
                   TextField(
                     controller: medicalHistoryController,
                     decoration:
@@ -202,29 +205,29 @@ class CombinedForm extends StatelessWidget {
                     enabled: isEditing,
                   ),
                   const SizedBox(height: 20),
-                    Text(
-                    "Emergency Contact Information",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: emergencyContactNameController,
-                    decoration: customInputDecoration(
-                        "Emergency Contact Name", context),
-                    enabled: isEditing,
-                  ),
-                  TextField(
-                    controller: emergencyContactPhoneController,
-                    decoration: customInputDecoration(
-                        "Emergency Contact Phone", context),
-                    enabled: isEditing,
-                  ),
-                  TextField(
-                    controller: emergencyContactRelationController,
-                    decoration: customInputDecoration(
-                        "Emergency Contact Relation", context),
-                    enabled: isEditing,
-                  ),
+                  //   Text(
+                  //   "Emergency Contact Information",
+                  //   style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                  // ),
+                  // const SizedBox(height: 8),
+                  // TextField(
+                  //   controller: emergencyContactNameController,
+                  //   decoration: customInputDecoration(
+                  //       "Emergency Contact Name", context),
+                  //   enabled: isEditing,
+                  // ),
+                  // TextField(
+                  //   controller: emergencyContactPhoneController,
+                  //   decoration: customInputDecoration(
+                  //       "Emergency Contact Phone", context),
+                  //   enabled: isEditing,
+                  // ),
+                  // TextField(
+                  //   controller: emergencyContactRelationController,
+                  //   decoration: customInputDecoration(
+                  //       "Emergency Contact Relation", context),
+                  //   enabled: isEditing,
+                  // ),
                 ],
 
                 if (userType.toLowerCase() == "specialist") ...[
