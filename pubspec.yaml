@@ -137,6 +137,10 @@ flutter:
     - images/splash/image5.png
     - images/splash/image6.png
     - images/splash/image7.png
+    - images/splash/chatbot.png
+    - images/splash/peace.png
+    - images/splash/resources.png
+    - images/splash/specialist.png
     - images/meditation.jpg
     - images/meditation2.jpeg
     - images/meditation3.jpg
