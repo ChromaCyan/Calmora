@@ -14,6 +14,7 @@ import 'dart:ui';
 import 'package:armstrong/authentication/screens/registration_screens/patient_registration_screen.dart';
 import 'package:armstrong/authentication/screens/registration_screens/specialist_registration_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:armstrong/authentication/screens/login_screen.dart';
 
 
 class RegistrationScreen extends StatefulWidget {
@@ -292,18 +293,18 @@ Widget build(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   return Scaffold(
     resizeToAvoidBottomInset: false,
-    appBar: AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        color: colorScheme.onSurface, // adjust color for visibility
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
-    ),
-    extendBodyBehindAppBar: true,
+    // appBar: AppBar(
+    //   backgroundColor: Colors.transparent,
+    //   elevation: 0,
+    //   leading: IconButton(
+    //     icon: const Icon(Icons.arrow_back_ios_new_rounded),
+    //     color: colorScheme.onSurface, // adjust color for visibility
+    //     onPressed: () {
+    //       Navigator.of(context).pop();
+    //     },
+    //   ),
+    // ),
+    // extendBodyBehindAppBar: true,
     body: Stack(
       fit: StackFit.expand,
       children: [
@@ -328,7 +329,7 @@ Widget build(BuildContext context) {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
 
-                    const SizedBox(height: 130),
+                    const SizedBox(height: 100),
                     
                     Text(
                       "What are you?",
@@ -337,7 +338,26 @@ Widget build(BuildContext context) {
                           .textTheme
                           .headlineSmall,
                         fontWeight: FontWeight.bold,
-                        fontSize: 25,
+                        fontSize: 30,
+                        letterSpacing: 2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const Divider(
+                      thickness: 1.5,
+                      color: Colors.grey,
+                      indent: 140,
+                      endIndent: 140,
+                    ),
+
+                    Text(
+                      "Select which type of user are you",
+                      style: GoogleFonts.montserrat(
+                        textStyle: Theme.of(context)
+                          .textTheme
+                          .headlineSmall,
+                        fontSize: 15,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -356,7 +376,7 @@ Widget build(BuildContext context) {
                               textAlign: TextAlign.center,
                             ),
 
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 10),
 
                             Container(
                               margin: const EdgeInsets.symmetric(vertical: 8),
@@ -422,7 +442,7 @@ Widget build(BuildContext context) {
                               textAlign: TextAlign.center,
                             ),
 
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 10),
 
                             Container(
                               margin: const EdgeInsets.symmetric(vertical: 8),
@@ -468,6 +488,58 @@ Widget build(BuildContext context) {
                                       ),
                                 ),
                               ),
+                            ),
+                            
+                            const SizedBox(height: 30),
+
+                            // const Divider(
+                            //   thickness: 1.5,
+                            //   color: Colors.grey,
+                            //   indent: 40,
+                            //   endIndent: 40,
+                            // ),
+
+                            // const SizedBox(height: 20),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Already have an account?",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                          LoginScreen(),
+                                          transitionsBuilder: (context,
+                                          animation,
+                                          secondaryAnimation,
+                                        child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Log in",
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ],
                         ),
