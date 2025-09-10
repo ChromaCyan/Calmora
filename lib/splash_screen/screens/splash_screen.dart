@@ -7,6 +7,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:armstrong/services/socket_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -83,7 +84,33 @@ class _SplashScreenState extends State<SplashScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.start, 
             children: [
-              SizedBox(height: height * 0.1),  // Adjust the initial spacing dynamically
+              SizedBox(height: height * 0.1),
+              Text(
+                "CALMORA",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.montserrat(
+                  fontSize: size.height * 0.055,
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 4,
+                ),
+              ),
+              Divider(
+                thickness: 3,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+                indent: 140,
+                endIndent: 140,
+              ),
+              Text(
+                "Mental Health App",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.montserrat(
+                  fontSize: size.height * 0.025,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
               Expanded(
                 child: PageView.builder(
                   itemCount: onBoardData.length,
@@ -93,29 +120,51 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              ValueListenableBuilder<int>(
-                valueListenable: _currentPage,
-                builder: (_, value, __) => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    onBoardData.length,
-                    (index) => _Indicator(isActive: value == index),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 120),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25.0),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      padding: EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(30.0),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.light
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.6),
+                        ),
+                      ),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: _currentPage,
+                        builder: (_, value, __) => Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            onBoardData.length,
+                            (index) => _Indicator(isActive: value == index),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 15), // Reduce the spacing between the indicator and buttons
+              const SizedBox(height: 15),
               ValueListenableBuilder<int>(
                 valueListenable: _currentPage,
                 builder: (_, value, __) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 35), // optional horizontal padding
+                  padding: const EdgeInsets.symmetric(horizontal: 35),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (value > 0)
                       _PreviousButton(onPressed: _onPreviousPressed)
                       else
-                      SizedBox(width: 50), // keep space when no previous button
-
+                      SizedBox(width: 50),
                       _NextButton(
                         isLastPage: value == onBoardData.length - 1,
                         onPressed: _onNextPressed,
@@ -124,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: height * 0.05), // Adjust the bottom padding dynamically
+              SizedBox(height: height * 0.05),
             ],
           ),
         ],
@@ -133,61 +182,146 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class _OnboardingItem extends StatelessWidget {
+class _OnboardingItem extends StatefulWidget {
   final Size size;
   final int index;
 
-  const _OnboardingItem({required this.size, required this.index});
+  const _OnboardingItem({required this.size, required this.index, Key ? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  State<_OnboardingItem> createState() => _OnboardingItemState();
+}
 
-    return Column(
-      children: [
-        Container(
-          height: size.height * 0.3,  // Adjust image height dynamically
-          width: size.width * 0.7,    // Adjust image width dynamically
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
-          child: Image.asset(onBoardData[index].image, fit: BoxFit.contain),
-        ),
-        SizedBox(height: size.height * 0.05),  // Adjust spacing between image and title dynamically
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            _getTitle(index),
-            textAlign: TextAlign.center,
-            style: GoogleFonts.montserrat(
-              fontSize: size.height * 0.04,  // Adjust font size dynamically
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            onBoardData[index].text,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: size.height * 0.025, color: theme.colorScheme.onBackground),
-          ),
-        ),
-      ],
+class _OnboardingItemState extends State<_OnboardingItem> 
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
     );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.2, 0), // start slightly below
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    ));
+
+    _controller.forward();
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   String _getTitle(int index) {
     const titles = [
-      "Calmora",
-      // "It's Okay\nto Not be Okay",
-      // "Sorting through\nthe Noise",
+      "Welcome",
       "Browse Resources!",
+      "AI Assistance",
       "Find a Specialist",
-      "Join Us",
+      "Find Peace",
     ];
     return titles[index];
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final size = widget.size;
+    final index = widget.index;
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Column(
+          children: [
+            SizedBox(height: size.height * 0.05),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: theme.brightness == Brightness.light
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.white.withOpacity(0.6),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      _getTitle(index),
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(
+                        fontSize: size.height * 0.027,
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: size.height * 0.3,
+              width: size.width * 0.7,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+              child: Image.asset(onBoardData[index].image, fit: BoxFit.contain),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                onBoardData[index].text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: size.height * 0.020,
+                  color: theme.colorScheme.onBackground,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // String _getTitle(int index) {
+  //   const titles = [
+  //     "Welcome",
+  //     // "It's Okay\nto Not be Okay",
+  //     // "Sorting through\nthe Noise",
+  //     "Browse Resources!",
+  //     "AI Assistance",
+  //     "Find a Specialist",
+  //     "Find Peace",
+  //   ];
+  //   return titles[index];
+  // }
 }
 
 
