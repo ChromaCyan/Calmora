@@ -8,6 +8,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:armstrong/services/socket_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
+import 'package:armstrong/authentication/screens/usertype_select_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -35,14 +36,14 @@ class _SplashScreenState extends State<SplashScreen> {
       setState(() {
         onboardingCompleted = true;
       });
-      _navigateToLogin();
+      _navigateToUserTypeSelectScreen();
     }
   }
 
-  void _navigateToLogin() {
+  void _navigateToUserTypeSelectScreen() {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      MaterialPageRoute(builder: (_) => const RegistrationScreen()),
       (route) => false,
     );
   }
@@ -50,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _onNextPressed() async {
     if (_currentPage.value == onBoardData.length - 1) {
       await _storage.write(key: 'onboarding_completed', value: 'true');
-      _navigateToLogin();
+      _navigateToUserTypeSelectScreen();
     } else {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
