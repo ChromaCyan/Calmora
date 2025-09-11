@@ -140,8 +140,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                             radius: 80,
                             backgroundImage: profileImage.isNotEmpty
                                 ? NetworkImage(profileImage)
-                                : const AssetImage(
-                                        'images/armstrong_transparent.png')
+                                : const AssetImage('images/no_profile.png')
                                     as ImageProvider,
                           ),
                           const SizedBox(height: 16),
@@ -152,7 +151,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8),
                           Text(
                             specialization,
                             style: TextStyle(
@@ -163,40 +161,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(LucideIcons.mapPin,
-                            color: Colors.blue, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          location,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(LucideIcons.cross,
-                            color: Colors.green, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          clinic,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
                     Center(
-                      child: _buildAvailabilityCard(availability),
+                      child: _buildAvailabilityCard(context, specialist.availability ?? 'Unavailable')
                     ),
 
                     const SizedBox(height: 5),
@@ -285,9 +251,12 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                           yearsOfExperience: specialist.yearsOfExperience ?? 0,
                           languagesSpoken: specialist.languagesSpoken ?? [],
                           licenseNumber: specialist.licenseNumber ?? 'N/A',
+                          location: specialist.location ?? 'Unknown',
+                          clinic: specialist.clinic ?? 'Not Provided',
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 20),
 
                     _SectionCard(
@@ -383,42 +352,47 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
 }
 
 // Availability Section as a Card
-Widget _buildAvailabilityCard(String availability) {
-  Color bgColor =
-      availability == 'Available' ? Colors.green[100]! : Colors.red[100]!;
-  Color textColor =
-      availability == 'Available' ? Colors.green[800]! : Colors.red[800]!;
+Widget _buildAvailabilityCard(BuildContext context, String availability) {
+  final isAvailable = availability == 'Available';
+  final theme = Theme.of(context);
+
+  final Color borderColor = isAvailable
+      ? Colors.green
+      : Colors.red;
+
+  final Color textColor = isAvailable
+      ? Colors.green
+      : Colors.red;
+
+  final IconData icon = isAvailable ? Icons.check_circle : Icons.cancel;
 
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Card(
-      color: bgColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              availability == 'Available' ? Icons.check_circle : Icons.cancel,
+    padding: const EdgeInsets.symmetric(vertical: 6.0),
+    child: Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor.withOpacity(0.7), width: 1.5),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 14.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: textColor, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            availability,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
               color: textColor,
-              size: 20,
             ),
-            const SizedBox(width: 8),
-            Text(
-              availability,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textColor,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );
 }
+
 
 class _SectionCard extends StatelessWidget {
   final String title;
