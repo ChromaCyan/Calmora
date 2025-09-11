@@ -10,6 +10,7 @@ import 'package:armstrong/specialist/screens/pages.dart';
 import 'package:armstrong/widgets/navigation/specialist_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/services/socket_service.dart';
 
 class SpecialistHomeScreen extends StatefulWidget {
   const SpecialistHomeScreen({Key? key}) : super(key: key);
@@ -23,22 +24,51 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   late PageController _pageController;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   String? _userId;
-  int _unreadCount = 0; // Track unread notifications
+  int _unreadCount = 0;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
     _loadUserId();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final userId = await _storage.read(key: 'userId');
+    final token = await _storage.read(key: 'token');
+
+    if (userId != null && token != null) {
+      setState(() => _userId = userId);
+
+      SocketService().connect(token, userId);
+
+      SocketService().onNotificationReceived = (data) async {
+        print("🔔 Notification event received: $data");
+        if (!mounted) return;
+
+        setState(() {
+          _unreadCount++;
+        });
+      };
+
+      await _fetchUnreadNotificationsCount();
+    }
   }
 
   Future<void> _loadUserId() async {
     final userId = await _storage.read(key: 'userId');
+
     setState(() {
       _userId = userId;
     });
+
     if (_userId != null) {
       await _fetchUnreadNotificationsCount();
+      SocketService().onNotificationReceived = (data) async {
+        if (!mounted) return;
+        await _fetchUnreadNotificationsCount();
+      };
     }
   }
 
@@ -71,6 +101,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+    SocketService().disconnect();
   }
 
   @override

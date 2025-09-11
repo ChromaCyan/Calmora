@@ -8,9 +8,9 @@ import 'package:armstrong/widgets/navigation/nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:armstrong/services/socket_service.dart';
 
 class PatientHomeScreen extends StatefulWidget {
-  
   const PatientHomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -36,18 +36,45 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     super.initState();
     _pageController = PageController(initialPage: 0);
     _loadUserId();
+    _init();
     _checkShowcaseStatus();
   }
 
-  // Method to load the userId from secure storage
+  Future<void> _init() async {
+    final userId = await _storage.read(key: 'userId');
+    final token = await _storage.read(key: 'token');
+
+    if (userId != null && token != null) {
+      setState(() => _userId = userId);
+
+      SocketService().connect(token, userId);
+
+      SocketService().onNotificationReceived = (data) async {
+        print("🔔 Notification event received: $data");
+        if (!mounted) return;
+
+        setState(() {
+          _unreadCount++;
+        });
+      };
+
+      await _fetchUnreadNotificationsCount();
+    }
+  }
+
   Future<void> _loadUserId() async {
     final userId = await _storage.read(key: 'userId');
+
     setState(() {
       _userId = userId;
     });
 
     if (_userId != null) {
       await _fetchUnreadNotificationsCount();
+      SocketService().onNotificationReceived = (data) async {
+        if (!mounted) return;
+        await _fetchUnreadNotificationsCount();
+      };
     }
   }
 
@@ -230,17 +257,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               DashboardScreen(),
               DiscoverScreen(),
               ChatListScreen(),
-_userId != null
-    ? AppointmentListScreen(patientId: _userId!)
-    : Center(child: CircularProgressIndicator()),
-
+              _userId != null
+                  ? AppointmentListScreen(patientId: _userId!)
+                  : Center(child: CircularProgressIndicator()),
             ],
           ),
         ),
         bottomNavigationBar: CustomBottomNavBar(
           selectedIndex: _selectedIndex,
           onItemTapped: _onTabSelected,
-          showcaseCompleted: _showcaseCompleted, 
+          showcaseCompleted: _showcaseCompleted,
           completeShowcase: _completeShowcase,
           homeKey: _homeKey,
           discoverKey: _discoverKey,

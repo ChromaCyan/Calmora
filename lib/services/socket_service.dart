@@ -50,7 +50,7 @@ class SocketService {
       enableVibration: true,
       styleInformation: BigTextStyleInformation(
         notificationBody,
-        contentTitle: "New Message", 
+        contentTitle: "New Message",
       ),
     );
 
@@ -59,7 +59,7 @@ class SocketService {
 
     await _localNotifications.show(
       0,
-      "New Message", 
+      "New Message",
       notificationBody,
       platformDetails,
     );
@@ -101,15 +101,13 @@ class SocketService {
       showNotification(senderName, messageContent);
     });
 
-    // Incoming notification listener
     socket!.on('new_notification', (data) {
       final senderName = "${data["senderFirstName"]} ${data["senderLastName"]}";
       final messageContent = data["message"] ?? "You have a new message";
 
-      showNotification(
-        senderName,
-        messageContent,
-      );
+      showNotification(senderName, messageContent);
+
+      onNotificationReceived?.call(Map<String, dynamic>.from(data));
     });
   }
 

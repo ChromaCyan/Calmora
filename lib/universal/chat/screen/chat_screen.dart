@@ -158,7 +158,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final messageContent = _controller.text.trim();
 
       final message = {
-        'senderId': _userId!, 
+        'senderId': _userId!,
         'content': messageContent,
         'timestamp': DateTime.now().toIso8601String(),
         'status': 'sent',
