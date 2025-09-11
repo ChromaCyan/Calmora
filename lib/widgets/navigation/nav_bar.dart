@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'dart:ui';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -37,15 +38,15 @@ class CustomBottomNavBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color:
-            theme.bottomNavigationBarTheme.backgroundColor ?? theme.cardColor,
+            theme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(0.1),
+        //     blurRadius: 10,
+        //     offset: const Offset(0, -2),
+        //   ),
+        // ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
