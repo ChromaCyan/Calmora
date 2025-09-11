@@ -332,14 +332,14 @@ Widget build(BuildContext context) {
                     const SizedBox(height: 100),
                     
                     Text(
-                      "What are you?",
-                      style: GoogleFonts.montserrat(
+                      "HOLA!",
+                      style: GoogleFonts.pacifico(
                         textStyle: Theme.of(context)
                           .textTheme
                           .headlineSmall,
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
-                        letterSpacing: 2,
+                        letterSpacing: 8,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -352,7 +352,7 @@ Widget build(BuildContext context) {
                     ),
 
                     Text(
-                      "Select which type of user are you",
+                      "Please select which type of user are you",
                       style: GoogleFonts.montserrat(
                         textStyle: Theme.of(context)
                           .textTheme

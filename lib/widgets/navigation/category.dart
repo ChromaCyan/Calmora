@@ -37,7 +37,7 @@ class _CategoryChipState extends State<CategoryChip> {
               height: 45,  // Box style with fixed height
               decoration: BoxDecoration(
                 color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(10), // Less rounded for a box-style look
+                borderRadius: BorderRadius.circular(25), // Less rounded for a box-style look
                 border: Border.all(
                   color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
                   width: 1.5,

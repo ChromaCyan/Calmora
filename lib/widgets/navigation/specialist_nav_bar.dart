@@ -52,15 +52,15 @@ class SpecialistBottomNavBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface, // Use theme background color
+        color: theme.colorScheme.primaryContainer, // Use theme background color
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withOpacity(0.1), // Themed shadow
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: theme.colorScheme.shadow.withOpacity(0.1), // Themed shadow
+        //     blurRadius: 10,
+        //     offset: const Offset(0, -2),
+        //   ),
+        // ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

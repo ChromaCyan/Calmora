@@ -15,7 +15,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
             SizedBox(height: 20),
             Center(
               child: Text(
-                "Men’s Mental Health Matters",
+                "Mental Health Matters",
                 style: GoogleFonts.lato(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -89,7 +89,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
                         ),
                         SizedBox(height: 5),
                         Text(
-                          "Many men face similar challenges. Sharing your experiences can foster connection and understanding.",
+                          "Everyone face similar and different challenges. Sharing your experiences can foster connection and understanding.",
                           style: GoogleFonts.lato(
                             fontSize: 16,
                             color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7), // Dynamic color with opacity
