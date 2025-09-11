@@ -40,13 +40,36 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  // void _navigateToUserTypeSelectScreen() {
+  //   Navigator.pushAndRemoveUntil(
+  //     context,
+  //     MaterialPageRoute(builder: (_) => const RegistrationScreen()),
+  //     (route) => false,
+  //   );
+  // }
+
   void _navigateToUserTypeSelectScreen() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const RegistrationScreen()),
-      (route) => false,
-    );
-  }
+  Navigator.pushAndRemoveUntil(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (_, __, ___) => const RegistrationScreen(),
+      transitionsBuilder: (_, animation, __, child) {
+        const begin = Offset(1.0, 0.0); // Slide from right to left
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    ),
+    (route) => false,
+  );
+}
+
 
   void _onNextPressed() async {
     if (_currentPage.value == onBoardData.length - 1) {

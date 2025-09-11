@@ -73,15 +73,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+          // physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: HealthAdviceSection(items: carouselData),
-                ),
+                // Center(
+                //   child: HealthAdviceSection(items: carouselData),
+                // ),
                 const SizedBox(height: 20),
 
                 // Search bar
@@ -216,25 +216,32 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 20),
+                // const SizedBox(height: 10),
+
+                const Divider(
+                  thickness: 1.5,
+                  color: Colors.grey,
+                  indent: 40,
+                  endIndent: 40,
+                ),
 
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? theme.cardColor.withOpacity(0.65)
-                        : theme.cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white12
-                            : Colors.black12,
-                        blurRadius: 10,
-                        spreadRadius: 3,
-                      ),
-                    ],
-                  ),
+                  // decoration: BoxDecoration(
+                  //   color: Theme.of(context).brightness == Brightness.dark
+                  //       ? theme.cardColor.withOpacity(0.65)
+                  //       : theme.cardColor,
+                  //   borderRadius: BorderRadius.circular(16),
+                  //   boxShadow: [
+                  //     BoxShadow(
+                  //       color: Theme.of(context).brightness == Brightness.dark
+                  //           ? Colors.white12
+                  //           : Colors.black12,
+                  //       blurRadius: 10,
+                  //       spreadRadius: 3,
+                  //     ),
+                  //   ],
+                  // ),
                   child: selectedCategory == 'Specialist'
                       ? _buildSpecialistList(
                           searchQuery, selectedSpecialistType)
@@ -259,7 +266,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(25),
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
       ),
       child: Column(
@@ -310,7 +317,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(25),
                 border: Border.all(
                   color: isSelected ? baseColor : Colors.grey.shade600,
                   width: 1.5,
@@ -367,7 +374,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(25),
           border: Border.all(
             color: isSelected ? baseColor : Colors.grey.shade600,
             width: 1.5,
@@ -423,7 +430,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(25),
           border: Border.all(
             color: isSelected ? baseColor : Colors.grey.shade600,
             width: 1.5,
