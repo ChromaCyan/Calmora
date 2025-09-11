@@ -381,6 +381,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                const SizedBox(height: 30),
                 /// 🔹 Progress Bar on Top
                 Padding(
                   padding:
@@ -413,7 +414,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
 
                 /// 🔹 Questions Below
                 Expanded(

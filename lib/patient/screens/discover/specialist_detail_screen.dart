@@ -210,7 +210,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                 _bookAppointment(context, widget.specialistId),
                             icon: const Icon(Icons.calendar_today, size: 22),
                             label: const Text(
-                              "Book Appointment",
+                              "Schedule",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w600),
                             ),

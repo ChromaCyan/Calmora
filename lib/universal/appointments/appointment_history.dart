@@ -61,14 +61,15 @@ class _CompletedAppointmentsScreenState
   }
 
   String _formatAppointmentTime(dynamic appointment) {
-    if (appointment["appointmentDate"] == null || appointment["timeSlot"] == null) {
+    if (appointment["appointmentDate"] == null ||
+        appointment["timeSlot"] == null) {
       return "N/A";
     }
 
     final appointmentDate = DateTime.parse(appointment["appointmentDate"]);
     final startTime = appointment["timeSlot"]["startTime"];
     final endTime = appointment["timeSlot"]["endTime"];
-    
+
     // Format the date and time range
     final formattedDate = DateFormat("MMM dd, yyyy").format(appointmentDate);
     return "$formattedDate - $startTime to $endTime";
@@ -85,38 +86,127 @@ class _CompletedAppointmentsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Completed Appointments")),
+      appBar: AppBar(
+        title: Text(
+          "Completed Appointments",
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        elevation: isDark ? 0 : 1,
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
+      ),
+      backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[100],
       body: completedAppointments.isEmpty
-          ? const Center(child: Text("No completed appointments"))
+          ? Center(
+              child: Text(
+                "No completed appointments",
+                style:
+                    TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+              ),
+            )
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: completedAppointments.length,
               itemBuilder: (context, index) {
                 final appointment = completedAppointments[index];
+                final Color stripColor = Colors.green; // dynamic if needed
+
                 return GestureDetector(
                   onTap: () => _showAppointmentDetails(context, appointment),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
+                  child: Container(
                     margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      leading: const Icon(Icons.check_circle,
-                          color: Colors.green, size: 32),
-                      title: Text(
-                        "With: ${appointment["specialist"]?["firstName"] ?? "Unknown"}",
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.3)
+                            : Colors.black.withOpacity(0.2),
+                        width: 1,
                       ),
-                      subtitle: Row(
+                    ),
+                    child: IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Icon(Icons.access_time, size: 18),
-                          const SizedBox(width: 6),
-                          Text(_formatAppointmentTime(appointment))
+                          // thin colored strip on the left
+                          Container(
+                            width: 10, // slightly thinner
+                            decoration: BoxDecoration(
+                              color: stripColor,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                bottomLeft: Radius.circular(12),
+                              ),
+                            ),
+                          ),
+
+                          // content
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      'With: ${appointment["specialist"]?["firstName"] ?? "Unknown"}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.calendar_today,
+                                          size: 16,
+                                          color: isDark
+                                              ? Colors.white70
+                                              : Colors.black54),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          _formatAppointmentTime(appointment),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: isDark
+                                                ? Colors.white70
+                                                : Colors.black54,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          // trailing chevron
+                          Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 18,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
                         ],
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 18),
                     ),
                   ),
                 );
