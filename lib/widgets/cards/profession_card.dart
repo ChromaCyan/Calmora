@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 class ProDeetsCard extends StatelessWidget {
   final int yearsOfExperience;
   final List languagesSpoken;
-  final String licenseNumber;
 
   const ProDeetsCard({
     Key? key,
     required this.yearsOfExperience,
     required this.languagesSpoken,
-    required this.licenseNumber,
   }) : super(key: key);
 
   @override
@@ -21,7 +19,6 @@ class ProDeetsCard extends StatelessWidget {
       children: [
         _buildInfoRow(Icons.work, 'Years of Experience: $yearsOfExperience', theme.colorScheme.primary),
         _buildInfoRow(Icons.language, 'Languages: ${languagesSpoken.join(", ")}', theme.colorScheme.primary),
-        _buildInfoRow(Icons.assignment, 'License Number: $licenseNumber', theme.colorScheme.primary),
       ],
     );
   }

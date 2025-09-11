@@ -157,58 +157,89 @@ class CustomBottomNavBar extends StatelessWidget {
   }
 
   Widget _buildNavItemWithBadge(
-      IconData icon,
-      String label,
-      int index,
-      int count,
-      Color primaryColor,
-      Color badgeColor,
-      GlobalKey key,
-      BuildContext context,
-      String description) {
-    bool isSelected = selectedIndex == index;
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: () => onItemTapped(index),
-      child: Showcase(
-        key: key,
-        description: description,
-        textColor: theme.colorScheme.onPrimary,
-        tooltipBackgroundColor: theme.colorScheme.primary,
-        targetPadding: const EdgeInsets.all(16),
-        targetShapeBorder: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        descTextStyle: TextStyle(
-          fontSize: 18,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
-              : Colors.white,
-        ),
-        child: Stack(
+  IconData icon,
+  String label,
+  int index,
+  int count,
+  Color primaryColor,
+  Color badgeColor,
+  GlobalKey key,
+  BuildContext context,
+  String description,
+) {
+  bool isSelected = selectedIndex == index;
+  final theme = Theme.of(context);
+  return GestureDetector(
+    onTap: () {
+      onItemTapped(index);
+      if (!showcaseCompleted) {
+        completeShowcase();
+      }
+    },
+    child: Showcase(
+      key: key,
+      description: description,
+      textColor: theme.colorScheme.onPrimary,
+      tooltipBackgroundColor: theme.colorScheme.primary,
+      targetPadding: const EdgeInsets.all(16),
+      targetShapeBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      descTextStyle: TextStyle(
+        fontSize: 18,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black
+            : Colors.white,
+      ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: isSelected
+            ? BoxDecoration(
+                color: primaryColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              )
+            : null,
+        child: Row(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? primaryColor : Colors.grey,
+            Stack(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? primaryColor : Colors.grey,
+                ),
+                if (count > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          color: badgeColor, shape: BoxShape.circle),
+                      child: Text('$count',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+              ],
             ),
-            if (count > 0)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration:
-                      BoxDecoration(color: badgeColor, shape: BoxShape.circle),
-                  child: Text('$count',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
+            if (isSelected)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -284,7 +284,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                         ProDeetsCard(
                           yearsOfExperience: specialist.yearsOfExperience ?? 0,
                           languagesSpoken: specialist.languagesSpoken ?? [],
-                          licenseNumber: specialist.licenseNumber ?? 'N/A',
                         ),
                       ],
                     ),
