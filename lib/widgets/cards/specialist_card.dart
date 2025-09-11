@@ -26,6 +26,10 @@ class SpecialistCard extends StatelessWidget {
     if (screenWidth > 600) cardWidth = screenWidth * 0.25;
     cardWidth = cardWidth.clamp(160, 250);
 
+    const nameFontSize = 18.0;
+    const specializationFontSize = 16.0;
+    const locationFontSize = 14.0;
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -52,13 +56,13 @@ class SpecialistCard extends StatelessWidget {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'images/no_profile.png', // fallback asset
+                                'images/no_profile.png', 
                                 fit: BoxFit.cover,
                               );
                             },
                           )
                         : Image.asset(
-                            'images/no_profile.png', // fallback if null/empty
+                            'images/no_profile.png', 
                             fit: BoxFit.cover,
                           ),
                   ),
@@ -70,10 +74,7 @@ class SpecialistCard extends StatelessWidget {
                     formatName(
                         "${specialist.firstName} ${specialist.lastName}"),
                     style: TextStyle(
-                      fontSize: (nameFontSize *
-                              MediaQuery.of(context).size.width /
-                              375)
-                          .clamp(16, 22), // Adjust size based on screen width
+                      fontSize: (nameFontSize * screenWidth / 375).clamp(16, 22),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -85,10 +86,8 @@ class SpecialistCard extends StatelessWidget {
                   child: Text(
                     specialist.specialization,
                     style: TextStyle(
-                      fontSize: (specializationFontSize *
-                              MediaQuery.of(context).size.width /
-                              375)
-                          .clamp(14, 18), // Adjust size based on screen width
+                      fontSize: (specializationFontSize * screenWidth / 375)
+                          .clamp(14, 18),
                       color: Colors.grey[600],
                     ),
                     textAlign: TextAlign.center,
@@ -103,19 +102,15 @@ class SpecialistCard extends StatelessWidget {
                     Icon(
                       Icons.location_on,
                       color: Colors.blue,
-                      size: (18 * MediaQuery.of(context).size.width / 375)
-                          .clamp(16, 24), // Make icon size responsive
+                      size: (18 * screenWidth / 375).clamp(16, 24),
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         specialist.location ?? 'Unknown Location',
                         style: TextStyle(
-                          fontSize: (locationFontSize *
-                                  MediaQuery.of(context).size.width /
-                                  375)
-                              .clamp(
-                                  12, 16), // Adjust size based on screen width
+                          fontSize: (locationFontSize * screenWidth / 375)
+                              .clamp(12, 16),
                           color: Colors.grey[600],
                         ),
                         textAlign: TextAlign.center,
@@ -123,7 +118,7 @@ class SpecialistCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
