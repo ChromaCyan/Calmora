@@ -72,7 +72,8 @@ class _ChatScreenState extends State<ChatScreen> {
     final userId = _userId;
 
     if (token != null && userId != null) {
-      _socketService.connect(token, userId);
+      _socketService.registerUserRoom(userId);
+      _socketService.joinChatRoom(widget.chatId);
 
       _socketService.onMessageReceived = (message) {
         final isDuplicate = _messages.any((m) =>

@@ -48,11 +48,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       setState(() => _userId = userId);
 
       SocketService().connect(token, userId);
+      SocketService().registerUserRoom(userId);
 
       SocketService().onNotificationReceived = (data) async {
-        print("🔔 Notification event received: $data");
         if (!mounted) return;
-
         setState(() {
           _unreadCount++;
         });

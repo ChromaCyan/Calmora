@@ -1,13 +1,15 @@
-import 'package:armstrong/models/user/specialist.dart';
 import 'package:flutter/material.dart';
+import 'package:armstrong/models/user/specialist.dart';
 
 class SpecialistCard extends StatelessWidget {
   final Specialist specialist;
   final VoidCallback onTap;
 
-  const SpecialistCard(
-      {Key? key, required this.specialist, required this.onTap})
-      : super(key: key);
+  const SpecialistCard({
+    Key? key,
+    required this.specialist,
+    required this.onTap,
+  }) : super(key: key);
 
   String formatName(String name) {
     List<String> words = name.split(" ");
@@ -17,10 +19,12 @@ class SpecialistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double nameFontSize = screenWidth * 0.045;
-    double specializationFontSize = screenWidth * 0.035;
-    double locationFontSize = screenWidth * 0.032;
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    double cardWidth = screenWidth * 0.4;
+    if (screenWidth > 600) cardWidth = screenWidth * 0.25;
+    cardWidth = cardWidth.clamp(160, 250);
 
     return GestureDetector(
       onTap: onTap,
@@ -119,7 +123,7 @@ class SpecialistCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

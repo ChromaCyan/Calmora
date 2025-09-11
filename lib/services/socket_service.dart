@@ -102,12 +102,48 @@ class SocketService {
     });
 
     socket!.on('new_notification', (data) {
-      final senderName = "${data["senderFirstName"]} ${data["senderLastName"]}";
-      final messageContent = data["message"] ?? "You have a new message";
+      final Map<String, dynamic> notification = Map<String, dynamic>.from(data);
+      print("🔔 New Notification: $notification");
 
-      showNotification(senderName, messageContent);
+      // Handle based on type
+      final String type = notification["type"] ?? "general";
+      String title = "Notification";
+      String body = notification["message"] ?? "You have a new notification";
 
-      onNotificationReceived?.call(Map<String, dynamic>.from(data));
+      switch (type) {
+        case "chat":
+          final senderName =
+              "${notification["senderFirstName"] ?? ""} ${notification["senderLastName"] ?? ""}"
+                  .trim();
+          title = "New Message";
+          body = senderName.isNotEmpty
+              ? "$senderName: ${notification["message"]}"
+              : notification["message"];
+          break;
+
+        case "appointment":
+          title = "Appointment Update";
+          body = notification["message"] ??
+              "You have a new update regarding your appointment.";
+          break;
+
+        case "article":
+          title = "Article Update";
+          body = notification["message"] ??
+              "Your article status has been updated.";
+          break;
+
+        default:
+          title = "Notification";
+          body = notification["message"] ?? "You have a new notification";
+          break;
+      }
+
+      // Show local notification
+      showNotification(title, body);
+
+      // Pass to app listener (if UI wants to react)
+      onNotificationReceived?.call(notification);
     });
   }
 
@@ -127,6 +163,20 @@ class SocketService {
   void joinRoom(String roomId) {
     if (socket == null || !socket!.connected) return;
     socket!.emit('joinRoom', roomId);
+  }
+
+  void joinChatRoom(String chatId) {
+    if (socket != null && socket!.connected) {
+      socket!.emit('joinRoom', chatId);
+      print("✅ Joined chat room $chatId");
+    }
+  }
+
+  void registerUserRoom(String userId) {
+    if (socket != null && socket!.connected) {
+      socket!.emit('registerUser', userId);
+      print("✅ Registered to personal room $userId for notifications");
+    }
   }
 
   /// Disconnect from server
