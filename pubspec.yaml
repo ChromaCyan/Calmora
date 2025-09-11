@@ -182,6 +182,7 @@ flutter:
     - images/members_pfp/raven.jpg
     - images/login_bg_image.png
     - images/Calmora.png
+    - images/no_profile.png
 
     # Fonts Assets
   fonts:
