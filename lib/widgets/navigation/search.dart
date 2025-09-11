@@ -49,7 +49,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
           filled: true,
           fillColor: theme.colorScheme.surfaceVariant, // Background color
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
               color: theme.colorScheme.outline, // Edge color from theme
               width: 1.5,

@@ -59,7 +59,16 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               ),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+
+            const Divider(
+              thickness: 1.5,
+              color: Colors.grey,
+              indent: 40,
+              endIndent: 40,
+            ),
+            
+            const SizedBox(height: 20),
 
             /// 🟢 Choices
             ...widget.choices.map((choice) {
