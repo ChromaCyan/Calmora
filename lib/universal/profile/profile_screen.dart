@@ -14,6 +14,7 @@ import 'package:armstrong/widgets/forms/common_fields.dart';
 import 'package:armstrong/models/user/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:armstrong/universal/profile/setting_screen.dart';
+import 'package:armstrong/services/socket_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -175,12 +176,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
+    // 🔌 Disconnect socket
+    SocketService().disconnect();
+
+    // 🗑 Clear storage
     await _storage.delete(key: 'jwt');
     await _storage.delete(key: 'userId');
 
-    Navigator.pushReplacement(
+    // ⬅ Clear entire navigation stack (prevents back button issue)
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
+      (Route<dynamic> route) => false,
     );
   }
 
