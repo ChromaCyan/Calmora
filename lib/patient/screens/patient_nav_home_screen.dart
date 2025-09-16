@@ -147,106 +147,108 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         extendBodyBehindAppBar: true,
         extendBody: true,
         appBar: PreferredSize(
-  preferredSize: Size.fromHeight(kToolbarHeight + MediaQuery.of(context).padding.top + 20),
-  child: Container(
-    margin: EdgeInsets.only(
-      top: MediaQuery.of(context).padding.top + 5,
-      left: 10,
-      right: 10,
-    ),
-    padding: EdgeInsets.symmetric(horizontal: 12),
-    decoration: BoxDecoration(
-      color: theme.cardColor.withOpacity(0.7),
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 10,
-          offset: Offset(0, 4),
-        ),
-      ],
-      // Optional: add a backdrop blur effect here for frosted glass
-    ),
-    child: SafeArea(
-      bottom: false,
-      child: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(
-          color: theme.iconTheme.color,
-          size: 28,
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.person_2,
-            size: 28,
-            color: theme.iconTheme.color ?? Colors.black,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()),
-            );
-          },
-        ),
-        title: AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
-          child: Text(
-            _getDynamicTitle(),
-            key: ValueKey<int>(_selectedIndex),
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.textTheme.headlineMedium?.color ?? Colors.black,
+          preferredSize: Size.fromHeight(
+              kToolbarHeight + MediaQuery.of(context).padding.top + 20),
+          child: Container(
+            margin: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 5,
+              left: 10,
+              right: 10,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Stack(
-              children: [
-                Icon(Icons.notifications, size: 28),
-                if (_unreadCount > 0)
-                  Positioned(
-                    right: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Text(
-                        '$_unreadCount',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: theme.cardColor.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
               ],
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NotificationsScreen()),
-              ).then((_) {
-                if (_userId != null) _fetchUnreadNotificationsCount();
-              });
-            },
+            child: SafeArea(
+              bottom: false,
+              child: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                iconTheme: IconThemeData(
+                  color: theme.iconTheme.color,
+                  size: 28,
+                ),
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.person_2,
+                    size: 28,
+                    color: theme.iconTheme.color ?? theme.colorScheme.onSurfaceVariant,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfileScreen()),
+                    );
+                  },
+                ),
+                title: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  child: Text(
+                    _getDynamicTitle(),
+                    key: ValueKey<int>(_selectedIndex),
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color:
+                          theme.textTheme.headlineMedium?.color ?? Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                    icon: Stack(
+                      children: [
+                        Icon(Icons.notifications, size: 28, color: theme.iconTheme.color ?? theme.colorScheme.onSurfaceVariant,),
+                        if (_unreadCount > 0)
+                          Positioned(
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                '$_unreadCount',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsScreen()),
+                      ).then((_) {
+                        if (_userId != null) _fetchUnreadNotificationsCount();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
-    ),
-  ),
-),
+        ),
         body: Stack(
           children: [
             // --- 1) Background Image ---

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class SpecialistBottomNavBar extends StatelessWidget {
@@ -16,106 +17,96 @@ class SpecialistBottomNavBar extends StatelessWidget {
 
   Widget _buildBadge(BuildContext context, int count) {
     final theme = Theme.of(context);
-    return count > 0
-        ? Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.error, // Use theme error color
-                shape: BoxShape.circle,
-              ),
-              constraints: const BoxConstraints(
-                minWidth: 18,
-                minHeight: 18,
-              ),
-              child: Center(
-                child: Text(
-                  '$count',
-                  style: TextStyle(
-                    color: theme.colorScheme.onError, // Ensure text contrast
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+    if (count <= 0) return const SizedBox.shrink();
+
+    return Positioned(
+      right: -6,
+      top: -6,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.error,
+          shape: BoxShape.circle,
+        ),
+        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+        child: Center(
+          child: Text(
+            '$count',
+            style: TextStyle(
+              color: theme.colorScheme.onError,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
             ),
-          )
-        : const SizedBox.shrink();
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface, // Use theme background color
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withOpacity(0.1), // Themed shadow
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(context, Icons.home_filled, "Home", 0),
-          _buildNavItem(context, Icons.newspaper, "Articles", 1),
-          _buildNavItemWithBadge(context, Icons.message_outlined, "Messages", 2, chatNotificationCount),
-          _buildNavItem(context, Icons.date_range, "Timeslot", 3),
-          _buildNavItemWithBadge(context, Icons.checklist, "Appointments", 4, notificationCount),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
-    final theme = Theme.of(context);
-    bool isSelected = selectedIndex == index;
-
-    return GestureDetector(
-      onTap: () => onItemTapped(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.2), // Themed selection color
-                borderRadius: BorderRadius.circular(20),
-              )
-            : null,
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant, // Theme-based icon color
-            ),
-            if (isSelected)
-              Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary, // Themed text color
-                  ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withOpacity(0.7),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
                 ),
-              ),
-          ],
+              ],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(context, Icons.home_filled, "Home", 0, false),
+                _buildNavItem(context, Icons.newspaper, "Articles", 1, false),
+                _buildNavItem(context, Icons.message_outlined, "Messages", 2, true, chatNotificationCount),
+                _buildNavItem(context, Icons.date_range, "Timeslot", 3, false),
+                _buildNavItem(context, Icons.checklist, "Appointments", 4, true, notificationCount),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildNavItemWithBadge(BuildContext context, IconData icon, String label, int index, int count) {
+  Widget _buildNavItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    int index,
+    bool hasBadge, [
+    int badgeCount = 0,
+  ]) {
     final theme = Theme.of(context);
-    bool isSelected = selectedIndex == index;
+    final bool isSelected = selectedIndex == index;
+
+    Widget iconWidget = Icon(
+      icon,
+      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+    );
+
+    if (hasBadge && badgeCount > 0) {
+      iconWidget = Stack(
+        clipBehavior: Clip.none,
+        children: [
+          iconWidget,
+          _buildBadge(context, badgeCount),
+        ],
+      );
+    }
 
     return GestureDetector(
       onTap: () => onItemTapped(index),
@@ -124,29 +115,21 @@ class SpecialistBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.2),
+                color: theme.colorScheme.primary.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
               )
             : null,
         child: Row(
           children: [
-            Stack(
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant, // Themed icon color
-                ),
-                _buildBadge(context, count),
-              ],
-            ),
+            iconWidget,
             if (isSelected)
               Padding(
                 padding: const EdgeInsets.only(left: 6),
                 child: Text(
                   label,
                   style: TextStyle(
+                    color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary, // Themed text color
                   ),
                 ),
               ),

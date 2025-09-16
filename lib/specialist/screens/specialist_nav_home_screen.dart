@@ -11,6 +11,7 @@ import 'package:armstrong/widgets/navigation/specialist_nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/socket_service.dart';
+import 'dart:ui';
 
 class SpecialistHomeScreen extends StatefulWidget {
   const SpecialistHomeScreen({Key? key}) : super(key: key);
@@ -109,46 +110,53 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
+        extendBodyBehindAppBar: true,
+        extendBody: true,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(80),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 5, right: 5),
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
+          preferredSize: Size.fromHeight(
+              kToolbarHeight + MediaQuery.of(context).padding.top + 20),
+          child: Container(
+            margin: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 5,
+              left: 10,
+              right: 10,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: theme.cardColor.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              bottom: false,
               child: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.transparent,
                 iconTheme: IconThemeData(
                   color: theme.iconTheme.color,
-                  size: 28.0,
+                  size: 28,
                 ),
                 leading: IconButton(
                   icon: Icon(
                     Icons.person_2,
                     size: 28,
-                    color: theme.iconTheme.color ?? Colors.black,
+                    color: theme.iconTheme.color ?? theme.colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfileScreen(),
-                      ),
+                      MaterialPageRoute(builder: (context) => ProfileScreen()),
                     );
                   },
                 ),
                 title: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
+                  duration: Duration(milliseconds: 300),
                   child: Text(
                     _getDynamicTitle(),
                     key: ValueKey<int>(_selectedIndex),
@@ -165,23 +173,23 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                   IconButton(
                     icon: Stack(
                       children: [
-                        const Icon(Icons.notifications, size: 28),
+                        Icon(Icons.notifications, size: 28, color: theme.iconTheme.color ?? theme.colorScheme.onSurfaceVariant,),
                         if (_unreadCount > 0)
                           Positioned(
                             right: 0,
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,
                               ),
-                              constraints: const BoxConstraints(
+                              constraints: BoxConstraints(
                                 minWidth: 16,
                                 minHeight: 16,
                               ),
                               child: Text(
                                 '$_unreadCount',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -196,12 +204,9 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NotificationsScreen(),
-                        ),
-                      ).then((value) {
-                        if (_userId != null) {
-                          _fetchUnreadNotificationsCount();
-                        }
+                            builder: (context) => NotificationsScreen()),
+                      ).then((_) {
+                        if (_userId != null) _fetchUnreadNotificationsCount();
                       });
                     },
                   ),
@@ -210,30 +215,54 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
             ),
           ),
         ),
-        body: SafeArea(
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            children: [
-              _userId != null
-                  ? SpecialistDashboardScreen(specialistId: _userId!)
-                  : const Center(child: CircularProgressIndicator()),
-              _userId != null
-                  ? SpecialistArticleScreen(specialistId: _userId!)
-                  : const Center(child: CircularProgressIndicator()),
-              ChatListScreen(),
-              _userId != null
-                  ? TimeSlotListScreen(specialistId: _userId!)
-                  : const Center(child: CircularProgressIndicator()),
-              _userId != null
-                  ? SpecialistAppointmentListScreen(specialistId: _userId!)
-                  : const Center(child: CircularProgressIndicator()),
-            ],
-          ),
+        body: Stack(
+          children: [
+            // --- 1) Background Image ---
+            Positioned.fill(
+              child: Image.asset(
+                "images/login_bg_image.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            // --- 2) Blur Layer ---
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(
+                  color: Colors.black
+                      .withOpacity(0.2), // adjust opacity/color as needed
+                ),
+              ),
+            ),
+
+            // --- 3) Main Content ---
+            SafeArea(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+                children: [
+                  _userId != null
+                      ? SpecialistDashboardScreen(specialistId: _userId!)
+                      : const Center(child: CircularProgressIndicator()),
+                  _userId != null
+                      ? SpecialistArticleScreen(specialistId: _userId!)
+                      : const Center(child: CircularProgressIndicator()),
+                  ChatListScreen(),
+                  _userId != null
+                      ? TimeSlotListScreen(specialistId: _userId!)
+                      : const Center(child: CircularProgressIndicator()),
+                  _userId != null
+                      ? SpecialistAppointmentListScreen(specialistId: _userId!)
+                      : const Center(child: CircularProgressIndicator()),
+                ],
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: SpecialistBottomNavBar(
           selectedIndex: _selectedIndex,
