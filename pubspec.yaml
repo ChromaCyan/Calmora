@@ -183,6 +183,8 @@ flutter:
     - images/login_bg_image.png
     - images/Calmora.png
     - images/no_profile.png
+    - images/no_profile2.png
+    - images/no_profile3.png
 
     # Fonts Assets
   fonts:

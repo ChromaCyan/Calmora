@@ -67,14 +67,14 @@ class GuideCard extends StatelessWidget {
       child: Card(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(14),
         ),
         clipBehavior: Clip.antiAlias, // ensures child respects border radius
         child: Stack(
           children: [
             // Full-sized image
             SizedBox(
-              height: 150,
+              height: 130,
               width: double.infinity,
               child: Image.asset(
                 imageUrl,
