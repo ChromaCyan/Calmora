@@ -1,30 +1,42 @@
-import 'package:armstrong/widgets/text/register_built_text_field.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:armstrong/services/api.dart';
 
-class ForgotPasswordDialog extends StatefulWidget {
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
   @override
-  _ForgotPasswordDialogState createState() => _ForgotPasswordDialogState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
-  String currentStep = "verify";
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController otpController = TextEditingController();
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  final ApiRepository _apiRepository = ApiRepository();
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _emailController = TextEditingController();
+  final _otpController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  final _apiRepository = ApiRepository();
+
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _otpFocus = FocusNode();
+  final FocusNode _newPasswordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool isLoading = false;
-  bool _isNewPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
   String? errorMessage;
 
-  //Password Fields part
   String _passwordStrength = "";
   String _passwordMatchMessage = "";
   Color _passwordMatchColor = Colors.red;
 
+  String step = "verify"; // verify → enter_code → reset_password → success
+
+  // 🔹 Password strength check
   void _checkPasswordStrength(String password) {
     if (password.length < 8) {
       setState(() => _passwordStrength = "Too Short");
@@ -36,21 +48,20 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
       setState(() => _passwordStrength = "Needs a Number");
     } else if (!RegExp(r'^(?=.*[!@#$%^&*(),.?":{}|<>_\-+=\\/\[\]`~;])')
         .hasMatch(password)) {
-      setState(() => _passwordStrength = "Needs a Special Character");
+      setState(() => _passwordStrength = "Needs Special Character");
     } else {
       setState(() => _passwordStrength = "Strong Password ✅");
     }
   }
 
+  // 🔹 Password match check
   void _checkPasswordMatch() {
-    if (confirmPasswordController.text.isEmpty) {
-      setState(() {
-        _passwordMatchMessage = "";
-      });
+    if (_confirmPasswordController.text.isEmpty) {
+      setState(() => _passwordMatchMessage = "");
       return;
     }
 
-    if (newPasswordController.text == confirmPasswordController.text) {
+    if (_newPasswordController.text == _confirmPasswordController.text) {
       setState(() {
         _passwordMatchMessage = "Passwords Match ✅";
         _passwordMatchColor = Colors.green;
@@ -63,152 +74,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isLoading)
-              const CircularProgressIndicator()
-            else if (currentStep == "verify") ...[
-              _buildHeader("Change Password"),
-              _buildTextField("Enter your Email:", emailController),
-              _buildNextButton(),
-            ] else if (currentStep == "enter_code") ...[
-              _buildHeader("We've sent a code to your email."),
-              _buildTextField("Enter code:", otpController),
-              _buildNextButton(),
-            ] else if (currentStep == "reset_password") ...[
-              _buildHeader("Enter your new password"),
-              _buildPasswordField("New password:", newPasswordController, true),
-
-              Text(
-                _passwordStrength,
-                style: TextStyle(
-                  color: _passwordStrength == "Strong Password ✅"
-                      ? Colors.green
-                      : Colors.red,
-                ),
-              ),
-              _buildPasswordField("Confirm new password:", confirmPasswordController, true),
-
-              Text(
-                _passwordMatchMessage,
-                style: TextStyle(color: _passwordMatchColor),
-              ),
-              _buildNextButton(),
-            ] else if (currentStep == "success") ...[
-              Icon(Icons.check_circle, size: 80, color: colorScheme.primary),
-              const SizedBox(height: 20),
-              _buildHeader("Your password has been reset successfully!"),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: _buttonStyle(),
-                child: Text("Close",
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: colorScheme.onPrimary)),
-              ),
-            ],
-            if (errorMessage != null) ...[
-              const SizedBox(height: 10),
-              Text(errorMessage!, style: TextStyle(color: colorScheme.error)),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-Widget _buildPasswordField(
-    String label, TextEditingController controller, bool isNewPassword) {
-  bool isVisible =
-      isNewPassword ? _isNewPasswordVisible : _isConfirmPasswordVisible;
-
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 10),
-    child: TextField(
-      controller: controller,
-      obscureText: !isVisible,
-      onChanged: (value) {
-        if (isNewPassword) _checkPasswordStrength(value);
-        _checkPasswordMatch();
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(),
-        suffixIcon: IconButton(
-          icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
-          onPressed: () {
-            setState(() {
-              if (isNewPassword) {
-                _isNewPasswordVisible = !_isNewPasswordVisible;
-              } else {
-                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-              }
-            });
-          },
-        ),
-      ),
-    ),
-  );
-}
-
-
-  Widget _buildHeader(String title) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return Column(
-      children: [
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold, color: colorScheme.onBackground),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool isPassword = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: CustomTextField(
-        label: label,
-        controller: controller,
-        obscureText: isPassword,
-      ),
-    );
-  }
-
-  Widget _buildNextButton() {
-    return ElevatedButton(
-      onPressed: () => _handleNextStep(),
-      style: _buttonStyle(),
-      child: Text("Next",
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-    );
-  }
-
-  ButtonStyle _buttonStyle() {
-    return ElevatedButton.styleFrom(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
-    );
-  }
-
+  // 🔹 Handle next steps with API
   Future<void> _handleNextStep() async {
     setState(() {
       isLoading = true;
@@ -216,31 +82,35 @@ Widget _buildPasswordField(
     });
 
     try {
-      if (currentStep == "verify") {
-        if (emailController.text.isEmpty) {
+      if (step == "verify") {
+        if (_emailController.text.isEmpty) {
           throw Exception("Email field cannot be empty.");
         }
-        await _apiRepository
-            .requestPasswordReset(emailController.text.toLowerCase());
-        setState(() => currentStep = "enter_code");
-      } else if (currentStep == "enter_code") {
-        if (otpController.text.isEmpty) {
+        await _apiRepository.requestPasswordReset(_emailController.text.trim());
+        setState(() => step = "enter_code");
+        FocusScope.of(context).requestFocus(_otpFocus);
+
+      } else if (step == "enter_code") {
+        if (_otpController.text.isEmpty) {
           throw Exception("Please enter the OTP code.");
         }
 
         final response = await _apiRepository.verifyResetOTP(
-            emailController.text.toLowerCase(), otpController.text);
+          _emailController.text.trim(),
+          _otpController.text.trim(),
+        );
 
         if (response.containsKey("message") &&
             response["message"] == "OTP verified, proceed to reset password") {
-          setState(() => currentStep = "reset_password");
+          setState(() => step = "reset_password");
+          FocusScope.of(context).requestFocus(_newPasswordFocus);
         } else {
-          throw Exception(
-              response["message"] ?? "OTP verification failed. Try again.");
+          throw Exception(response["message"] ?? "OTP verification failed.");
         }
-      } else if (currentStep == "reset_password") {
-        final password = newPasswordController.text;
-        final confirmPassword = confirmPasswordController.text;
+
+      } else if (step == "reset_password") {
+        final password = _newPasswordController.text;
+        final confirmPassword = _confirmPasswordController.text;
 
         if (password.isEmpty || confirmPassword.isEmpty) {
           throw Exception("Password fields cannot be empty.");
@@ -248,27 +118,213 @@ Widget _buildPasswordField(
         if (password != confirmPassword) {
           throw Exception("Passwords do not match!");
         }
-
-        // **Enforce Password Strength**
         if (_passwordStrength != "Strong Password ✅") {
           throw Exception(
-              "Weak password! Must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.");
+              "Weak password! Must be at least 8 characters, include uppercase, lowercase, a number, and a special character.");
         }
 
         final response = await _apiRepository.resetPassword(
-            emailController.text.toLowerCase(), password);
+          _emailController.text.trim(),
+          password,
+        );
 
         if (response.containsKey("message") &&
             response["message"] == "Password reset successfully") {
-          setState(() => currentStep = "success");
+          setState(() => step = "success");
         } else {
           throw Exception(response["message"] ?? "Failed to reset password.");
         }
+
+      } else {
+        Navigator.pop(context); // after success
       }
     } catch (e) {
       setState(() => errorMessage = e.toString().replaceAll("Exception: ", ""));
     } finally {
       setState(() => isLoading = false);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          color: colorScheme.onSurface,
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset("images/login_bg_image.png", fit: BoxFit.cover),
+          Container(
+            color: colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 100),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          "Forgot Password",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 40),
+
+                        if (isLoading)
+                          const Center(child: CircularProgressIndicator())
+                        else if (step == "verify") ...[
+                          Text("Step 1 of 3: Email",
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.primary,
+                                  )),
+                          const SizedBox(height: 10),
+                          CustomTextField(
+                            label: "Email",
+                            controller: _emailController,
+                            focusNode: _emailFocus,
+                            keyboardtype: TextInputType.emailAddress,
+                          ),
+                        ] else if (step == "enter_code") ...[
+                          Text("Step 2 of 3: OTP Code",
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.primary,
+                                  )),
+                          const SizedBox(height: 10),
+                          CustomTextField(
+                            label: "Enter OTP Code",
+                            controller: _otpController,
+                            focusNode: _otpFocus,
+                            keyboardtype: TextInputType.number,
+                          ),
+                        ] else if (step == "reset_password") ...[
+                          Text("Step 3 of 3: New & Confirm Password",
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.primary,
+                                  )),
+                          const SizedBox(height: 10),
+                          CustomTextField(
+                            label: "New Password",
+                            controller: _newPasswordController,
+                            focusNode: _newPasswordFocus,
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscurePassword = !_obscurePassword);
+                              },
+                            ),
+                            onChanged: (val) {
+                              _checkPasswordStrength(val);
+                              _checkPasswordMatch();
+                            },
+                          ),
+                          Text(
+                            _passwordStrength,
+                            style: TextStyle(
+                              color: _passwordStrength == "Strong Password ✅"
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          CustomTextField(
+                            label: "Confirm Password",
+                            controller: _confirmPasswordController,
+                            focusNode: _confirmPasswordFocus,
+                            obscureText: _obscureConfirmPassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscureConfirmPassword =
+                                    !_obscureConfirmPassword);
+                              },
+                            ),
+                            onChanged: (_) => _checkPasswordMatch(),
+                          ),
+                          Text(
+                            _passwordMatchMessage,
+                            style: TextStyle(color: _passwordMatchColor),
+                          ),
+                        ] else if (step == "success") ...[
+                          const Icon(Icons.check_circle,
+                              color: Colors.green, size: 80),
+                          const SizedBox(height: 20),
+                          Text("Password Reset Successful!",
+                              style: Theme.of(context).textTheme.titleLarge,
+                              textAlign: TextAlign.center),
+                        ],
+
+                        if (errorMessage != null) ...[
+                          const SizedBox(height: 10),
+                          Text(errorMessage!,
+                              style: TextStyle(color: colorScheme.error)),
+                        ],
+
+                        const SizedBox(height: 40),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: _handleNextStep,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.secondary,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 50, vertical: 15),
+                              child: Text(
+                                step == "verify"
+                                    ? "Send Code"
+                                    : step == "enter_code"
+                                        ? "Verify Code"
+                                        : step == "reset_password"
+                                            ? "Reset Password"
+                                            : "Done",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(color: colorScheme.onSecondary),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
