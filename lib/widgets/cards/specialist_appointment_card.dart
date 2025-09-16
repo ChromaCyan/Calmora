@@ -63,7 +63,8 @@ class SpecialistAppointmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -88,9 +89,11 @@ class SpecialistAppointmentCard extends StatelessWidget {
         padding: EdgeInsets.all(screenWidth * 0.04),
         width: screenWidth * 0.9,
         decoration: BoxDecoration(
-          color: theme.surface,
-          borderRadius: BorderRadius.circular(screenWidth * 0.04),
-          border: Border.all(color: theme.outlineVariant),
+          color: colorScheme.surfaceVariant.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withOpacity(0.2)
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -108,7 +111,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: screenWidth * 0.045,
                             fontWeight: FontWeight.bold,
-                            color: theme.onSurface,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
@@ -117,10 +120,10 @@ class SpecialistAppointmentCard extends StatelessWidget {
                             fontSize: screenWidth * 0.04,
                             fontWeight: FontWeight.w500,
                             color: status == 'pending'
-                                ? theme.tertiary
+                                ? colorScheme.tertiary
                                 : status == 'accepted'
-                                    ? theme.primary
-                                    : theme.error,
+                                    ? colorScheme.primary
+                                    : colorScheme.error,
                           ),
                         ),
                       ],
@@ -139,7 +142,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                                 patient['profileImage'].isNotEmpty
                             ? NetworkImage(patient['profileImage'])
                             : const AssetImage(
-                                    "lib/icons/profile_placeholder.png")
+                                    "images/no_profile.png")
                                 as ImageProvider,
                         fit: BoxFit.cover,
                       ),
@@ -152,23 +155,23 @@ class SpecialistAppointmentCard extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    color: theme.primary, size: screenWidth * 0.04),
+                    color: colorScheme.primary, size: screenWidth * 0.04),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
                   formattedStartDate,
                   style: TextStyle(
                       fontSize: screenWidth * 0.04,
-                      color: theme.onSurfaceVariant),
+                      color: colorScheme.onSurfaceVariant),
                 ),
                 SizedBox(width: screenWidth * 0.05),
                 Icon(Icons.access_time,
-                    color: theme.secondary, size: screenWidth * 0.04),
+                    color: colorScheme.secondary, size: screenWidth * 0.04),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
                   timeRange,
                   style: TextStyle(
                       fontSize: screenWidth * 0.04,
-                      color: theme.onSurfaceVariant),
+                      color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -182,7 +185,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                       onPressed: () =>
                           _acceptAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primary,
+                        backgroundColor: colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.circular(screenWidth * 0.02),
@@ -201,7 +204,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                       onPressed: () =>
                           _declineAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.error,
+                        backgroundColor: colorScheme.error,
                         shape: RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.circular(screenWidth * 0.02),
@@ -230,7 +233,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primary,
+                  backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(screenWidth * 0.02),
                   ),
