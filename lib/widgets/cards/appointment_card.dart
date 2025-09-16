@@ -4,10 +4,7 @@ import 'package:intl/intl.dart';
 class AppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
 
-  const AppointmentCard({
-    Key? key,
-    required this.appointment,
-  }) : super(key: key);
+  const AppointmentCard({Key? key, required this.appointment}) : super(key: key);
 
   String _formatDate(String dateTimeString) {
     try {
@@ -29,7 +26,8 @@ class AppointmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
 
     final specialist = appointment['specialist'];
@@ -39,99 +37,83 @@ class AppointmentCard extends StatelessWidget {
     final timeSlot = appointment['timeSlot'] ?? {};
     final status = appointment['status'] ?? 'unknown';
 
-    // Use timeSlot's start and end time
     final formattedStartTime = _formatTime(timeSlot['startTime'] ?? '');
     final formattedEndTime = _formatTime(timeSlot['endTime'] ?? '');
     final formattedCombinedTime = '$formattedStartTime - $formattedEndTime';
 
-    // Use appointment's appointmentDate
     final formattedStartDate = _formatDate(appointment['appointmentDate']);
 
-    return Center(
-      child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.04),
-        width: screenWidth * 0.9,
-        decoration: BoxDecoration(
-          color: theme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.outlineVariant),
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.2),
+          width: 1,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        specialistName,
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.045,
-                          fontWeight: FontWeight.bold,
-                          color: theme.onSurface,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Status: ${status[0].toUpperCase() + status.substring(1)}',
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          fontWeight: FontWeight.w500,
-                          color: status == 'pending'
-                              ? theme.tertiary
-                              : status == 'accepted'
-                                  ? theme.primary
-                                  : theme.error,
-                        ),
-                      ),
-                    ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Row: Name + Profile
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  specialistName,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                ClipOval(
-                  child: Image.network(
-                    specialist['profileImage']?.isNotEmpty == true
-                        ? specialist['profileImage']
-                        : "https://via.placeholder.com/50",
-                    width: screenWidth * 0.14,
-                    height: screenWidth * 0.14,
-                    fit: BoxFit.cover,
-                  ),
+              ),
+              CircleAvatar(
+                backgroundImage: NetworkImage(
+                  specialist['profileImage']?.isNotEmpty == true
+                      ? specialist['profileImage']
+                      : 'https://via.placeholder.com/150',
                 ),
-              ],
+                radius: 24,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Status: ${status[0].toUpperCase()}${status.substring(1)}',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: status == 'pending'
+                  ? colorScheme.tertiary
+                  : status == 'accepted'
+                      ? colorScheme.primary
+                      : colorScheme.error,
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildIconText(
-                    Icons.calendar_today, formattedStartDate, theme, screenWidth),
-                _buildIconText(
-                    Icons.access_time, formattedCombinedTime, theme, screenWidth),
-              ],
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+
+          // Bottom: Date and Time
+          Row(
+            children: [
+              _buildIconText(Icons.calendar_today, formattedStartDate, colorScheme),
+              const SizedBox(width: 20),
+              _buildIconText(Icons.access_time, formattedCombinedTime, colorScheme),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildIconText(IconData icon, String text, ColorScheme theme, double screenWidth) {
+  Widget _buildIconText(IconData icon, String text, ColorScheme scheme) {
     return Row(
       children: [
-        Icon(icon, color: theme.primary, size: screenWidth * 0.05),
+        Icon(icon, color: scheme.primary, size: 18),
         const SizedBox(width: 6),
         Text(
           text,
-          style: TextStyle(
-            fontSize: screenWidth * 0.04,
-            color: theme.onSurfaceVariant,
-          ),
-          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: scheme.onSurfaceVariant),
         ),
       ],
     );

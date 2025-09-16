@@ -1,75 +1,57 @@
 import 'package:flutter/material.dart';
 
-class CategoryChip extends StatefulWidget {
+class CategoryChip extends StatelessWidget {
   final List<String> categories;
-  final Function(String) onSelected;
   final String selectedCategory;
+  final ValueChanged<String> onSelected;
 
   const CategoryChip({
     Key? key,
     required this.categories,
-    required this.onSelected,
     required this.selectedCategory,
+    required this.onSelected,
   }) : super(key: key);
 
   @override
-  State<CategoryChip> createState() => _CategoryChipState();
-}
-
-class _CategoryChipState extends State<CategoryChip> {
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLight = theme.brightness == Brightness.light;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: widget.categories.map((category) {
-          bool isSelected = widget.selectedCategory == category;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: categories.map((category) {
+        final bool isSelected = category == selectedCategory;
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0), 
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              width: 120, // Adjust width as needed
-              height: 45,  // Box style with fixed height
-              decoration: BoxDecoration(
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(25), // Less rounded for a box-style look
-                border: Border.all(
-                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
-                  width: 1.5,
-                ),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: theme.colorScheme.primary.withOpacity(0.2),
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        )
-                      ]
-                    : [],
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(10), 
-                onTap: () => widget.onSelected(category),
-                child: Center(
-                  child: Text(
-                    category,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isSelected ? Colors.white : theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+        return GestureDetector(
+          onTap: () => onSelected(category),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.colorScheme.primary.withOpacity(0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : (isLight ? Colors.black : Colors.white.withOpacity(0.8)),
+                width: 1.5,
               ),
             ),
-          );
-        }).toList(),
-      ),
+            child: Text(
+              category,
+              style: TextStyle(
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : (isLight ? Colors.black : Colors.white.withOpacity(0.8)),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

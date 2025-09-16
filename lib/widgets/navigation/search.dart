@@ -38,45 +38,34 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: TextField(
-        controller: widget.searchController,
-        focusNode: _focusNode,
-        onChanged: widget.onChanged,
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          filled: true,
-          fillColor: theme.colorScheme.surfaceVariant, // Background color
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide(
-              color: theme.colorScheme.outline, // Edge color from theme
-              width: 1.5,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide(
-              color: theme.colorScheme.primary, // Highlighted color on focus
-              width: 2,
-            ),
-          ),
-          prefixIcon: _isSearching
-              ? IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.primary),
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    setState(() => _isSearching = false);
-                  },
-                )
-              : Icon(Icons.search, color: theme.colorScheme.onSurfaceVariant),
-          suffixIcon: widget.searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: Icon(Icons.clear, color: theme.colorScheme.secondary),
-                  onPressed: widget.onClear,
-                )
-              : null,
+    return TextField(
+      controller: widget.searchController,
+      focusNode: _focusNode,
+      onChanged: widget.onChanged,
+      style: theme.textTheme.bodyLarge,
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        filled: true,
+        fillColor: theme.cardColor.withOpacity(0.4),
+        prefixIcon: Icon(Icons.search, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+        suffixIcon: widget.searchController.text.isNotEmpty
+            ? IconButton(
+                icon: Icon(Icons.clear, color: theme.colorScheme.onSurfaceVariant),
+                onPressed: widget.onClear,
+              )
+            : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.15)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
         ),
       ),
     );

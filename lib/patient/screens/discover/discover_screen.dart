@@ -69,23 +69,31 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          // physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+    return SafeArea(
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: theme.cardColor.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Center(
-                //   child: HealthAdviceSection(items: carouselData),
-                // ),
                 const SizedBox(height: 20),
 
                 // Search bar
-
                 CustomSearchBar(
                   hintText: 'Search',
                   searchController: searchController,
@@ -118,7 +126,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
                 const SizedBox(height: 20),
 
-                // Specialist Type Category
+                // == Specialist Filters ==
                 if (selectedCategory == 'Specialist') ...[
                   _buildFilterCard(
                     'Specialist Type',
@@ -155,7 +163,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                 ],
 
-                // Article Category
+                // == Article Filters ==
                 if (selectedCategory == 'Articles') ...[
                   _buildFilterCard(
                     'Article Category',
@@ -216,7 +224,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                 ],
-                // const SizedBox(height: 10),
 
                 const Divider(
                   thickness: 1.5,
@@ -225,23 +232,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   endIndent: 40,
                 ),
 
+                const SizedBox(height: 10),
+
+                // == Content Section ==
                 Container(
                   padding: const EdgeInsets.all(12),
-                  // decoration: BoxDecoration(
-                  //   color: Theme.of(context).brightness == Brightness.dark
-                  //       ? theme.cardColor.withOpacity(0.65)
-                  //       : theme.cardColor,
-                  //   borderRadius: BorderRadius.circular(16),
-                  //   boxShadow: [
-                  //     BoxShadow(
-                  //       color: Theme.of(context).brightness == Brightness.dark
-                  //           ? Colors.white12
-                  //           : Colors.black12,
-                  //       blurRadius: 10,
-                  //       spreadRadius: 3,
-                  //     ),
-                  //   ],
-                  // ),
                   child: selectedCategory == 'Specialist'
                       ? _buildSpecialistList(
                           searchQuery, selectedSpecialistType)
@@ -257,18 +252,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  // All Widget Design here....
-
   Widget _buildFilterCard(String title, Widget child) {
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -285,7 +273,20 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  // Category Selector (Specialist Type / Article Category)
+  // Helper to detect light mode and get appropriate colors
+  Color _unselectedBorderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? Colors.black
+        : Colors.grey.shade600;
+  }
+
+  Color _unselectedTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? Colors.black87
+        : Colors.grey.shade400;
+  }
+
+// Category Selector (Specialist Type / Article Category)
   Widget buildCategorySelector({
     required String? selectedValue,
     required List<String> categories,
@@ -319,20 +320,26 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
-                  color: isSelected ? baseColor : Colors.grey.shade600,
+                  color:
+                      isSelected ? baseColor : _unselectedBorderColor(context),
                   width: 1.5,
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(icon,
-                      size: 18,
-                      color: isSelected ? baseColor : Colors.grey.shade400),
+                  Icon(
+                    icon,
+                    size: 18,
+                    color:
+                        isSelected ? baseColor : _unselectedTextColor(context),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     category,
                     style: TextStyle(
-                      color: isSelected ? baseColor : Colors.grey.shade400,
+                      color: isSelected
+                          ? baseColor
+                          : _unselectedTextColor(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -345,7 +352,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  // Specialist (Gender Card Widget)
+// Specialist (Gender Card Widget)
   Widget _genderOption(String label, IconData icon, String value) {
     final bool isSelected = selectedGender == value;
 
@@ -359,9 +366,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          // Toggle selection
           if (selectedGender == value) {
-            selectedGender = ""; 
+            selectedGender = "";
           } else {
             selectedGender = value;
           }
@@ -376,7 +382,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
-            color: isSelected ? baseColor : Colors.grey.shade600,
+            color: isSelected ? baseColor : _unselectedBorderColor(context),
             width: 1.5,
           ),
         ),
@@ -385,14 +391,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? baseColor : Colors.grey.shade400,
+              color: isSelected ? baseColor : _unselectedTextColor(context),
             ),
             SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: isSelected ? baseColor : Colors.grey.shade400,
+                color: isSelected ? baseColor : _unselectedTextColor(context),
               ),
             ),
           ],
@@ -401,7 +407,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  // Article (Gender Card Widget)
+// Article (Gender Card Widget)
   Widget _articleGenderOption(String label, IconData icon, String value) {
     final bool isSelected = selectedArticleGender == value;
 
@@ -415,9 +421,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          // Toggle selection
           if (selectedArticleGender == value) {
-            selectedArticleGender = ""; 
+            selectedArticleGender = "";
           } else {
             selectedArticleGender = value;
           }
@@ -432,7 +437,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
-            color: isSelected ? baseColor : Colors.grey.shade600,
+            color: isSelected ? baseColor : _unselectedBorderColor(context),
             width: 1.5,
           ),
         ),
@@ -441,14 +446,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? baseColor : Colors.grey.shade400,
+              color: isSelected ? baseColor : _unselectedTextColor(context),
             ),
             SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: isSelected ? baseColor : Colors.grey.shade400,
+                color: isSelected ? baseColor : _unselectedTextColor(context),
               ),
             ),
           ],

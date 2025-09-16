@@ -21,130 +21,135 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<AppointmentBloc>().add(FetchPatientAppointmentsEvent(
-          patientId: widget.patientId,
-        ));
+    context.read<AppointmentBloc>().add(
+          FetchPatientAppointmentsEvent(patientId: widget.patientId),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocBuilder<AppointmentBloc, AppointmentState>(
-        builder: (context, state) {
-          if (state is AppointmentLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is AppointmentError) {
-            return Center(child: Text('Error: ${state.message}'));
-          } else if (state is PatientAppointmentsLoaded) {
-            final allAppointments = state.appointments
-                .where((appointment) => appointment['status'] != 'declined')
-                .toList();
+    final theme = Theme.of(context);
 
-            if (allAppointments.isEmpty) {
-              return const Center(child: Text('No appointments found.'));
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.cardColor.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: BlocBuilder<AppointmentBloc, AppointmentState>(
+          builder: (context, state) {
+            if (state is AppointmentLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is AppointmentError) {
+              return Center(child: Text('Error: ${state.message}'));
+            } else if (state is PatientAppointmentsLoaded) {
+              final allAppointments = state.appointments
+                  .where((appointment) => appointment['status'] != 'declined')
+                  .toList();
+
+              if (allAppointments.isEmpty) {
+                return const Center(child: Text('No appointments found.'));
+              }
+
+              // Sort by appointment date
+              allAppointments.sort((a, b) {
+                final aTime = DateTime.parse(a['appointmentDate']);
+                final bTime = DateTime.parse(b['appointmentDate']);
+                return aTime.compareTo(bTime);
+              });
+
+              // Filter
+              final pendingAppointments = allAppointments
+                  .where((a) => a['status'] == 'pending')
+                  .toList();
+              final acceptedAppointments = allAppointments
+                  .where((a) => a['status'] == 'accepted')
+                  .toList();
+
+              final filteredAppointments = selectedCategory == 'pending'
+                  ? pendingAppointments
+                  : acceptedAppointments;
+
+              return Column(
+                children: [
+                  _buildCategorySelector(theme),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: filteredAppointments.isEmpty
+                        ? const Center(
+                            child: Text('No appointments available.'))
+                        : ListView.builder(
+                            itemCount: filteredAppointments.length,
+                            itemBuilder: (context, index) {
+                              final appointment = filteredAppointments[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child:
+                                    AppointmentCard(appointment: appointment),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              );
             }
 
-            // Sort by nearest appointment
-            allAppointments.sort((a, b) {
-              final aTime = DateTime.parse(a['appointmentDate']);
-              final bTime = DateTime.parse(b['appointmentDate']);
-              return aTime.compareTo(bTime);
-            });
-
-            // Filter categories
-            final upcomingAppointments = allAppointments
-                .where((a) => a['status'] == 'upcoming')
-                .toList();
-            final pendingAppointments =
-                allAppointments.where((a) => a['status'] == 'pending').toList();
-            final acceptedAppointments = allAppointments
-                .where((a) => a['status'] == 'accepted')
-                .toList();
-
-            // Select correct list based on category
-            List filteredAppointments;
-            if (selectedCategory == 'pending') {
-              filteredAppointments = pendingAppointments;
-            } else {
-              filteredAppointments = acceptedAppointments;
-            }
-
-            return Column(
-              children: [
-                const SizedBox(height: 10),
-                _buildCategorySelector(),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: filteredAppointments.isEmpty
-                      ? const Center(child: Text('No appointments available.'))
-                      : ListView.builder(
-                          itemCount: filteredAppointments.length,
-                          itemBuilder: (context, index) {
-                            final appointment = filteredAppointments[index];
-                            final timeSlot = appointment['timeSlot'] ?? {};
-
-                            // Ensure startTime and endTime are parsed correctly as strings
-                            final startTime =
-                                timeSlot['startTime']?.toString() ?? 'N/A';
-                            final endTime =
-                                timeSlot['endTime']?.toString() ?? 'N/A';
-                            final dayOfWeek =
-                                timeSlot['dayOfWeek'] ?? 'Unknown';
-
-                            // Pass the necessary fields to AppointmentCard
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: AppointmentCard(
-                                appointment: appointment,
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            );
-          }
-          return const Center(child: Text('Unexpected state.'));
-        },
+            return const Center(child: Text('Unexpected state.'));
+          },
+        ),
       ),
     );
   }
 
-  /// Full-width category selector
-  Widget _buildCategorySelector() {
-    return Row(
-      children: [
-        _buildCategoryButton('pending', 'Pending'),
-        _buildCategoryButton('accepted', 'Accepted'),
-      ],
+  Widget _buildCategorySelector(ThemeData theme) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceVariant.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _buildCategoryButton('pending', 'Pending', theme),
+          _buildCategoryButton('accepted', 'Accepted', theme),
+        ],
+      ),
     );
   }
 
-  /// Single category button with full-width style
-  Widget _buildCategoryButton(String category, String label) {
+  Widget _buildCategoryButton(String category, String label, ThemeData theme) {
     final isSelected = selectedCategory == category;
+
     return Expanded(
       child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedCategory = category;
-          });
-        },
-        child: Container(
+        onTap: () => setState(() => selectedCategory = category),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 12),
           alignment: Alignment.center,
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceVariant,
+          decoration: BoxDecoration(
+            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Text(
             label,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
