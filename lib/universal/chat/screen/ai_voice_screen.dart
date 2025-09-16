@@ -4,6 +4,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/tts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'dart:ui';
 
 enum VoiceChatStatus { idle, listening, loading, playing, error }
 
@@ -141,7 +142,8 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
             ListTile(
               leading: const Icon(Icons.record_voice_over),
               title: const Text("Natural AI Voice"),
-              subtitle: const Text("⚠️ Slower, but more realistic, Response limited to 2-3 sentences"),
+              subtitle: const Text(
+                  "⚠️ Slower, but more realistic, Response limited to 2-3 sentences"),
               onTap: () {
                 setState(() => _useNaturalTTS = true);
                 Navigator.pop(ctx);
@@ -208,59 +210,85 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
           ),
         ],
       ),
-      backgroundColor: scheme.background,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Animated circle
-            ScaleTransition(
-              scale: Tween(begin: 0.9, end: 1.2).animate(CurvedAnimation(
-                parent: _animController,
-                curve: Curves.easeInOut,
-              )),
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      scheme.primary,
-                      scheme.primaryContainer,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// Background Image
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
+
+          /// Blur + semi-transparent overlay
+          Container(
+            color: scheme.surface.withOpacity(0.5),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: const SizedBox.expand(), 
+            ),
+          ),
+
+          /// Foreground content
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animated circle
+                ScaleTransition(
+                  scale: Tween(begin: 0.9, end: 1.2).animate(
+                    CurvedAnimation(
+                      parent: _animController,
+                      curve: Curves.easeInOut,
+                    ),
+                  ),
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          scheme.primary,
+                          scheme.primaryContainer,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-            // Mic button
-            GestureDetector(
-              onLongPressStart: (_) {
-                if (_status == VoiceChatStatus.idle) _startListening();
-              },
-              onLongPressEnd: (_) {
-                if (_status == VoiceChatStatus.listening) _stopListening();
-              },
-              child: Icon(
-                statusIcon,
-                size: 64,
-                color: statusColor,
-              ),
-            ),
-            const SizedBox(height: 20),
+                // Mic button
+                GestureDetector(
+                  onLongPressStart: (_) {
+                    if (_status == VoiceChatStatus.idle) _startListening();
+                  },
+                  onLongPressEnd: (_) {
+                    if (_status == VoiceChatStatus.listening) _stopListening();
+                  },
+                  child: Icon(
+                    statusIcon,
+                    size: 64,
+                    color: statusColor,
+                  ),
+                ),
+                const SizedBox(height: 20),
 
-            // Status text
-            Text(
-              statusText,
-              style: TextStyle(color: scheme.onBackground, fontSize: 18),
-              textAlign: TextAlign.center,
-            )
-          ],
-        ),
+                // Status text
+                Text(
+                  statusText,
+                  style: TextStyle(
+                    color: scheme.onBackground,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

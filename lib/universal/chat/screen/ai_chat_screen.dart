@@ -7,6 +7,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:ui';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -167,92 +168,116 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text("Calmora AI Chatbot"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.graphic_eq),
-            tooltip: "Voice Mode",
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const VoiceChatScreen(),
-                ),
-              );
+Widget build(BuildContext context) {
+  final theme = Theme.of(context);
 
-              // when user comes back, reset backend flag
-              setState(() {
-                _voiceModeEnabled = false;
-              });
-            },
+  return Scaffold(
+    resizeToAvoidBottomInset: true,
+    appBar: AppBar(
+      title: const Text("Calmora AI Chatbot"),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.graphic_eq),
+          tooltip: "Voice Mode",
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const VoiceChatScreen(),
+              ),
+            );
+
+            setState(() {
+              _voiceModeEnabled = false;
+            });
+          },
+        ),
+      ],
+    ),
+    body: Stack(
+      fit: StackFit.expand,
+      children: [
+        /// Background Image
+        Image.asset(
+          "images/login_bg_image.png",
+          fit: BoxFit.cover,
+        ),
+
+        /// Blurred Overlay
+        Container(
+          color: theme.colorScheme.surface.withOpacity(0.6),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            child: const SizedBox.expand(),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                return GestureDetector(
-                  child: ChatBubble(
-                    content: msg['content'],
-                    timestamp: _formatTimestamp(msg['timestamp']),
-                    status: 'sent',
-                    isSender: msg['isSender'],
-                    senderName: msg['isSender'] ? 'You' : 'Calmora',
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        hintText: "Type a message or use mic...",
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                      ),
+        ),
+        SizedBox(height: 4),
+
+        /// Foreground Chat UI
+        Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  final msg = _messages[index];
+                  return GestureDetector(
+                    child: ChatBubble(
+                      content: msg['content'],
+                      timestamp: _formatTimestamp(msg['timestamp']),
+                      status: 'sent',
+                      isSender: msg['isSender'],
+                      senderName: msg['isSender'] ? 'You' : 'Calmora',
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onLongPressStart: (_) => _startListening(),
-                    onLongPressEnd: (_) => _stopListeningAndSend(),
-                    child: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
-                      size: 28,
-                      color: _isListening ? Colors.red : Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: _sendMessage,
-                  ),
-                ],
+                  );
+                },
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: "Type a message or use mic...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onLongPressStart: (_) => _startListening(),
+                      onLongPressEnd: (_) => _stopListeningAndSend(),
+                      child: Icon(
+                        _isListening ? Icons.mic : Icons.mic_none,
+                        size: 28,
+                        color: _isListening ? Colors.red : Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: _sendMessage,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 }

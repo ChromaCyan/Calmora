@@ -347,8 +347,6 @@ class _OnboardingItemState extends State<_OnboardingItem>
     );
   }
 }
-
-//✅✅✅<<<---Next Button--->>>✅✅✅
 class _NextButton extends StatelessWidget {
   final bool isLastPage;
   final VoidCallback onPressed;
@@ -377,8 +375,6 @@ class _NextButton extends StatelessWidget {
     );
   }
 }
-
-//✅✅✅<<<---Previous Button--->>>✅✅✅
 class _PreviousButton extends StatelessWidget {
   final VoidCallback onPressed;
 
@@ -410,7 +406,6 @@ class _PreviousButton extends StatelessWidget {
   }
 }
 
-//✅✅✅<<<---Progress Bar/Dots--->>>✅✅✅
 class _Indicator extends StatelessWidget {
   final bool isActive;
 

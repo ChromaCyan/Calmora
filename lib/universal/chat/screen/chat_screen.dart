@@ -9,6 +9,7 @@ import 'package:armstrong/widgets/forms/appointment_booking_form.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:armstrong/universal/chat/screen/text_n_send.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
+import 'dart:ui';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -212,84 +213,107 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: Text("Chat with ${widget.recipientName}")),
-      body: Column(
-        children: <Widget>[
-          // Create Appointment Button
-          if (!_isSpecialist)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () => _bookAppointment(context),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-                  backgroundColor: theme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  shadowColor: Colors.black.withOpacity(0.2),
-                  elevation: 5,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.calendar_today,
-                        color: Colors.white, size: 22),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "Create Appointment Now",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          // Chat Messages
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _messages.isEmpty
-                    ? const Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.chat_bubble_outline,
-                                size: 50, color: Colors.grey),
-                            SizedBox(height: 10),
-                            Text(
-                              "No messages yet",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          final message = _messages[index];
-
-                          return ChatBubble(
-                            content: message['content'] ?? 'No message',
-                            timestamp: _formatTimestamp(message['timestamp']),
-                            status: message['status'] ?? 'sent',
-                            isSender: message['senderId'] == _userId,
-                            senderName: widget.recipientName,
-                          );
-                        },
-                      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// Background image
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
           ),
 
-          TextNSend(controller: _controller, onSend: _sendMessage),
+          /// Frosted glass overlay
+          Container(
+            color: scheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: const SizedBox.expand(),
+            ),
+          ),
+
+          /// Main Chat UI
+          Column(
+            children: <Widget>[
+              if (!_isSpecialist)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () => _bookAppointment(context),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 30),
+                      backgroundColor: scheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      shadowColor: Colors.black.withOpacity(0.2),
+                      elevation: 5,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.calendar_today,
+                            color: Colors.white, size: 22),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Create Appointment Now",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              /// Chat messages
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _messages.isEmpty
+                        ? const Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.chat_bubble_outline,
+                                    size: 50, color: Colors.grey),
+                                SizedBox(height: 10),
+                                Text(
+                                  "No messages yet",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: _scrollController,
+                            itemCount: _messages.length,
+                            itemBuilder: (context, index) {
+                              final message = _messages[index];
+                              return ChatBubble(
+                                content: message['content'] ?? 'No message',
+                                timestamp:
+                                    _formatTimestamp(message['timestamp']),
+                                status: message['status'] ?? 'sent',
+                                isSender: message['senderId'] == _userId,
+                                senderName: widget.recipientName,
+                              );
+                            },
+                          ),
+              ),
+
+              /// Input
+              TextNSend(controller: _controller, onSend: _sendMessage),
+            ],
+          ),
         ],
       ),
     );

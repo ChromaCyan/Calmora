@@ -38,28 +38,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_userId != null) {}
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return SingleChildScrollView(
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800), 
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: theme.cardColor.withOpacity(0.6), 
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.cardColor.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+
+        // 🟢 Scroll only inside this container
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -73,7 +76,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -81,7 +83,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: AppSection(
                       title: "Understanding Mental Health",
                       imageUrl: "images/splash/image6.png",
-                      onTap: () => _navigateWithSlide(context, MentalHealthAwarenessPage()),
+                      onTap: () => _navigateWithSlide(
+                          context, MentalHealthAwarenessPage()),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -89,7 +92,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: AppSection(
                       title: "Emergency Services",
                       imageUrl: "images/splash/image7.png",
-                      onTap: () => _navigateWithSlide(context, EmergencyServicePage()),
+                      onTap: () =>
+                          _navigateWithSlide(context, EmergencyServicePage()),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -102,7 +106,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
               Center(
                 child: Text(
@@ -114,7 +117,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -122,7 +124,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: GuideCard(
                       title: "Meditation Exercise Guide",
                       imageUrl: "images/meditation.jpg",
-                      onTap: () => _navigateWithSlide(context, MindfulMeditation()),
+                      onTap: () =>
+                          _navigateWithSlide(context, MindfulMeditation()),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -130,12 +133,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: GuideCard(
                       title: "Breathing Exercise Guide",
                       imageUrl: "images/breath.jpg",
-                      onTap: () => _navigateWithSlide(context, BreathingGuideScreen()),
+                      onTap: () =>
+                          _navigateWithSlide(context, BreathingGuideScreen()),
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
               Center(
                 child: Text(
@@ -163,7 +166,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           var slideAnimation = Tween<Offset>(
             begin: const Offset(1.0, 0.0),
             end: Offset.zero,
-          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+          ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeInOut));
           return SlideTransition(position: slideAnimation, child: child);
         },
       ),

@@ -2,7 +2,7 @@ import 'package:armstrong/widgets/cards/notification_card.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'dart:ui';
 
 class NotificationsScreen extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool isLoading = true;
   bool hasError = false;
   String? _userId;
-  String selectedCategory = 'unread'; // Default to unread
+  String selectedCategory = 'unread';
 
   @override
   void initState() {
@@ -79,41 +79,68 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         selectedCategory == 'unread' ? unreadNotifications : readNotifications;
 
     return Scaffold(
-      appBar: UniversalAppBar(
-        title: "Notifications",
-        onBackPressed:
-            _markAllAsReadAndExit, 
+      appBar: AppBar(
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.6),
+        elevation: 0,
+        title: const Text("Notifications"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _markAllAsReadAndExit,
+        ),
       ),
-      body: Column(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          const SizedBox(height: 10),
-          _buildCategorySelector(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : hasError
-                    ? Center(
-                        child: Text(
-                          "Failed to load notifications",
-                          style: theme.textTheme.bodyMedium
-                              ?.copyWith(color: theme.colorScheme.error),
-                        ),
-                      )
-                    : displayedNotifications.isEmpty
+          // Background image
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
+
+          // Frosted glass blur
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: const SizedBox.expand(),
+            ),
+          ),
+
+          // Main content
+          Column(
+            children: [
+              const SizedBox(height: 10),
+              _buildCategorySelector(theme),
+              const SizedBox(height: 10),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : hasError
                         ? Center(
                             child: Text(
-                              "No ${selectedCategory == 'unread' ? 'unread' : 'read'} notifications",
-                              style: theme.textTheme.bodyMedium,
+                              "Failed to load notifications",
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.error,
+                              ),
                             ),
                           )
-                        : ListView.builder(
-                            itemCount: displayedNotifications.length,
-                            itemBuilder: (context, index) {
-                              return NotificationCard(
-                                  notification: displayedNotifications[index]);
-                            },
-                          ),
+                        : displayedNotifications.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "No ${selectedCategory == 'unread' ? 'unread' : 'read'} notifications",
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: displayedNotifications.length,
+                                itemBuilder: (context, index) {
+                                  return NotificationCard(
+                                    notification: displayedNotifications[index],
+                                  );
+                                },
+                              ),
+              ),
+            ],
           ),
         ],
       ),
@@ -121,39 +148,45 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   /// Category Selector for Unread/Read Notifications
-  Widget _buildCategorySelector() {
-    return Row(
-      children: [
-        _buildCategoryButton('unread', 'Unread'),
-        _buildCategoryButton('read', 'Read'),
-      ],
+  Widget _buildCategorySelector(ThemeData theme) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _buildCategoryButton('unread', 'Unread', theme),
+          _buildCategoryButton('read', 'Read', theme),
+        ],
+      ),
     );
   }
 
   /// Single category button with full-width style
-  Widget _buildCategoryButton(String category, String label) {
+  Widget _buildCategoryButton(String category, String label, ThemeData theme) {
     final isSelected = selectedCategory == category;
+
     return Expanded(
       child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedCategory = category;
-          });
-        },
-        child: Container(
+        onTap: () => setState(() => selectedCategory = category),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 12),
           alignment: Alignment.center,
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceVariant,
+          decoration: BoxDecoration(
+            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Text(
             label,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
