@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'package:armstrong/widgets/forms/edit_article_contentfield.dart';
 
 class EditArticleForm extends StatefulWidget {
   final Article article;
@@ -132,24 +133,38 @@ class _EditArticleFormState extends State<EditArticleForm> {
     Navigator.pop(context, true);
   }
 
+//<<<=== New Build Method ===>>>
+Future<void> _openContentEditor() async {
+  final updatedContent = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditArticleContentFieldPage(
+        initialContent: _contentController.text,
+      ),
+    ),
+  );
+
+  if (updatedContent != null && updatedContent is String) {
+    setState(() {
+      _contentController.text = updatedContent;
+    });
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: UniversalAppBar(title: ""),
+      appBar: AppBar(
+        title: Text(""),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const Text(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
                   'Edit Article',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
@@ -215,19 +230,59 @@ class _EditArticleFormState extends State<EditArticleForm> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
-                  controller: _contentController,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    labelText: 'Content',
-                    prefixIcon: const Icon(Icons.description),
-                    filled: true,
-                    fillColor: theme.colorScheme.surface,
-                    border: OutlineInputBorder(
+                // TextFormField(
+                //   controller: _contentController,
+                //   maxLines: 5,
+                //   decoration: InputDecoration(
+                //     labelText: 'Content',
+                //     prefixIcon: const Icon(Icons.description),
+                //     filled: true,
+                //     fillColor: theme.colorScheme.surface,
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //     ),
+                //   ),
+                // ),
+                GestureDetector(
+                  onTap: _openContentEditor,
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: Text(
+                              _contentController.text.isEmpty
+                                  ? 'Write your article content here...'
+                                  : _contentController.text,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: _contentController.text.isEmpty
+                                    ? theme.hintColor
+                                    : theme.textTheme.bodyLarge?.color,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.chevron_right,
+                          color: theme.iconTheme.color?.withOpacity(0.6),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 16),
                 const Text(
                   'Categories',
@@ -295,10 +350,8 @@ class _EditArticleFormState extends State<EditArticleForm> {
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+          ],
+        )
       ),
     );
   }

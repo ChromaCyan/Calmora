@@ -232,11 +232,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   endIndent: 40,
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
 
                 // == Content Section ==
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(0),
                   child: selectedCategory == 'Specialist'
                       ? _buildSpecialistList(
                           searchQuery, selectedSpecialistType)
