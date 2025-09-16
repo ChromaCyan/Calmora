@@ -101,7 +101,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
 
 
       if (response.isNotEmpty) {
-        _showSnackbar('Article added successfully!');
+        _showSnackbar('Article would be reviewed by the Admin Team!');
         Navigator.pop(context);
       } else {
         _showSnackbar('Failed to add article', isError: true);

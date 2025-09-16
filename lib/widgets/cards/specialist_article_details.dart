@@ -19,10 +19,20 @@ class SpecialistArticleDetailPage extends StatefulWidget {
 
 class _SpecialistArticleDetailPageState
     extends State<SpecialistArticleDetailPage> {
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  String? _specialistId;
+
   @override
   void initState() {
     super.initState();
     context.read<ArticleBloc>().add(FetchArticleById(widget.articleId));
+  }
+
+   Future<void> _loadSpecialistId() async {
+    final id = await _storage.read(key: 'userId');
+    setState(() {
+      _specialistId = id;
+    });
   }
 
   @override
@@ -32,7 +42,6 @@ class _SpecialistArticleDetailPageState
         final isUpdated = ModalRoute.of(context)!.settings.arguments as bool?;
 
         if (isUpdated == true) {
-          // ✅ Skip refetch if the article was updated
           return true;
         }
 
@@ -234,7 +243,6 @@ class _SpecialistArticleDetailPageState
   }
 
   void _deleteArticle(BuildContext context, String articleId) {
-    context.read<ArticleBloc>().add(DeleteArticle(articleId));
-    Navigator.pop(context, true);
+    context.read<ArticleBloc>().add(DeleteArticle(articleId, _specialistId!));
   }
 }

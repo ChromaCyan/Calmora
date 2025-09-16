@@ -53,7 +53,9 @@ class UpdateArticle extends ArticleEvent {
 
 class DeleteArticle extends ArticleEvent {
   final String articleId;
-  DeleteArticle(this.articleId);
+  final String specialistId;
+
+  DeleteArticle(this.articleId, this.specialistId);
 }
 //=================================================================================================
 // STATE BLOC LINE HERE
@@ -80,8 +82,7 @@ class ArticleError extends ArticleState {
   final String message;
   ArticleError(this.message);
 }
-//=================================================================================================
-// BLOC LINE HERE
+
 class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   final ApiRepository _apiRepository;
   
@@ -191,7 +192,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
       DeleteArticle event, Emitter<ArticleState> emit) async {
     try {
       await _apiRepository.deleteArticle(event.articleId);
-      add(FetchAllArticles()); 
+      add(FetchArticlesBySpecialist(event.specialistId));
     } catch (e) {
       emit(ArticleError(e.toString()));
     }

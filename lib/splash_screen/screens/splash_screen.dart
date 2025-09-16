@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:armstrong/config/colors.dart';
 import 'package:armstrong/splash_screen/models/splash_message.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:armstrong/authentication/screens/login_screen.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:armstrong/services/socket_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'package:armstrong/authentication/screens/usertype_select_screen.dart';
@@ -22,8 +17,6 @@ class _SplashScreenState extends State<SplashScreen> {
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   bool onboardingCompleted = false;
-  final socketService = SocketService();
-
   @override
   void initState() {
     super.initState();
@@ -40,36 +33,28 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  // void _navigateToUserTypeSelectScreen() {
-  //   Navigator.pushAndRemoveUntil(
-  //     context,
-  //     MaterialPageRoute(builder: (_) => const RegistrationScreen()),
-  //     (route) => false,
-  //   );
-  // }
-
   void _navigateToUserTypeSelectScreen() {
-  Navigator.pushAndRemoveUntil(
-    context,
-    PageRouteBuilder(
-      pageBuilder: (_, __, ___) => const RegistrationScreen(),
-      transitionsBuilder: (_, animation, __, child) {
-        const begin = Offset(1.0, 0.0); // Slide from right to left
-        const end = Offset.zero;
-        const curve = Curves.ease;
+    Navigator.pushAndRemoveUntil(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const RegistrationScreen(),
+        transitionsBuilder: (_, animation, __, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
 
-        final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          final tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    ),
-    (route) => false,
-  );
-}
-
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      ),
+      (route) => false,
+    );
+  }
 
   void _onNextPressed() async {
     if (_currentPage.value == onBoardData.length - 1) {
@@ -103,102 +88,127 @@ class _SplashScreenState extends State<SplashScreen> {
 
     return Scaffold(
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Positioned.fill(child: Container(color: theme.colorScheme.background)),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start, 
-            children: [
-              SizedBox(height: height * 0.1),
-              Text(
-                "CALMORA",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: size.height * 0.055,
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 4,
-                ),
-              ),
-              Divider(
-                thickness: 3,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
-                indent: 140,
-                endIndent: 140,
-              ),
-              Text(
-                "Mental Health App",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: size.height * 0.025,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              Expanded(
-                child: PageView.builder(
-                  itemCount: onBoardData.length,
-                  controller: _pageController,
-                  onPageChanged: (value) => _currentPage.value = value,
-                  itemBuilder: (context, index) => _OnboardingItem(size: size, index: index),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 120),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25.0),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                    child: Container(
-                      padding: EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(30.0),
-                        border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.light
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.white.withOpacity(0.6),
-                        ),
+          /// Background Image
+          Image.asset(
+            "images/login_bg_image.png", // same as UserType background
+            fit: BoxFit.cover,
+          ),
+
+          /// Full-screen blur + semi-transparent overlay
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: height * 0.06),
+
+                    /// Title + Subtitle (kept from your original onboarding)
+                    Text(
+                      "CALMORA",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(
+                        fontSize: size.height * 0.055,
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 4,
                       ),
-                      child: ValueListenableBuilder<int>(
-                        valueListenable: _currentPage,
-                        builder: (_, value, __) => Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            onBoardData.length,
-                            (index) => _Indicator(isActive: value == index),
+                    ),
+                    Divider(
+                      thickness: 3,
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
+                      indent: 140,
+                      endIndent: 140,
+                    ),
+                    Text(
+                      "Mental Health App",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(
+                        fontSize: size.height * 0.025,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+
+                    /// PageView with your onboarding items
+                    Expanded(
+                      child: PageView.builder(
+                        itemCount: onBoardData.length,
+                        controller: _pageController,
+                        onPageChanged: (value) => _currentPage.value = value,
+                        itemBuilder: (context, index) =>
+                            _OnboardingItem(size: size, index: index),
+                      ),
+                    ),
+
+                    /// Progress indicators (glass morph container)
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 120),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.white.withOpacity(0.1)
+                                  : Colors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(30.0),
+                              border: Border.all(
+                                color: theme.brightness == Brightness.light
+                                    ? Colors.black.withOpacity(0.3)
+                                    : Colors.white.withOpacity(0.6),
+                              ),
+                            ),
+                            child: ValueListenableBuilder<int>(
+                              valueListenable: _currentPage,
+                              builder: (_, value, __) => Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  onBoardData.length,
+                                  (index) =>
+                                      _Indicator(isActive: value == index),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
-              ValueListenableBuilder<int>(
-                valueListenable: _currentPage,
-                builder: (_, value, __) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 35),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (value > 0)
-                      _PreviousButton(onPressed: _onPreviousPressed)
-                      else
-                      SizedBox(width: 50),
-                      _NextButton(
-                        isLastPage: value == onBoardData.length - 1,
-                        onPressed: _onNextPressed,
+
+                    /// Navigation buttons
+                    const SizedBox(height: 15),
+                    ValueListenableBuilder<int>(
+                      valueListenable: _currentPage,
+                      builder: (_, value, __) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            if (value > 0)
+                              _PreviousButton(onPressed: _onPreviousPressed)
+                            else
+                              const SizedBox(width: 50),
+                            _NextButton(
+                              isLastPage: value == onBoardData.length - 1,
+                              onPressed: _onNextPressed,
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: height * 0.05),
+                  ],
                 ),
               ),
-              SizedBox(height: height * 0.05),
-            ],
+            ),
           ),
         ],
       ),
@@ -210,13 +220,14 @@ class _OnboardingItem extends StatefulWidget {
   final Size size;
   final int index;
 
-  const _OnboardingItem({required this.size, required this.index, Key ? key}) : super(key: key);
+  const _OnboardingItem({required this.size, required this.index, Key? key})
+      : super(key: key);
 
   @override
   State<_OnboardingItem> createState() => _OnboardingItemState();
 }
 
-class _OnboardingItemState extends State<_OnboardingItem> 
+class _OnboardingItemState extends State<_OnboardingItem>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
@@ -245,7 +256,7 @@ class _OnboardingItemState extends State<_OnboardingItem>
 
     _controller.forward();
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
@@ -283,7 +294,8 @@ class _OnboardingItemState extends State<_OnboardingItem>
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 20),
                     decoration: BoxDecoration(
                       color: theme.brightness == Brightness.dark
                           ? Colors.white.withOpacity(0.1)
@@ -313,7 +325,8 @@ class _OnboardingItemState extends State<_OnboardingItem>
             Container(
               height: size.height * 0.3,
               width: size.width * 0.7,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(30)),
               child: Image.asset(onBoardData[index].image, fit: BoxFit.contain),
             ),
             const SizedBox(height: 10),
@@ -333,21 +346,7 @@ class _OnboardingItemState extends State<_OnboardingItem>
       ),
     );
   }
-
-  // String _getTitle(int index) {
-  //   const titles = [
-  //     "Welcome",
-  //     // "It's Okay\nto Not be Okay",
-  //     // "Sorting through\nthe Noise",
-  //     "Browse Resources!",
-  //     "AI Assistance",
-  //     "Find a Specialist",
-  //     "Find Peace",
-  //   ];
-  //   return titles[index];
-  // }
 }
-
 
 //✅✅✅<<<---Next Button--->>>✅✅✅
 class _NextButton extends StatelessWidget {
@@ -359,31 +358,25 @@ class _NextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Color textColor = isLastPage
-    //     ? Colors.white
-    //     : (theme.brightness == Brightness.dark ? Colors.black : Colors.white);
-    final Color iconColor = isLastPage ? Colors.green : Colors.grey;
 
-    return Material(
-      color: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(15),
-        onTap: onPressed,
-        child: Container(
-          height: 50,
-          width: 50,
-          child: Icon(
-            Icons.arrow_forward_ios_rounded,
-            color: iconColor,
-            size: 28,
-          ),
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+      ),
+      onPressed: onPressed,
+      child: Text(
+        isLastPage ? "Get Started" : "Next",
+        style: GoogleFonts.montserrat(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
       ),
     );
   }
 }
-
 
 //✅✅✅<<<---Previous Button--->>>✅✅✅
 class _PreviousButton extends StatelessWidget {
@@ -394,7 +387,7 @@ class _PreviousButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Color splashColor = Colors.grey.withOpacity(0.3);   
+    final Color splashColor = Colors.grey.withOpacity(0.3);
 
     return Material(
       color: Colors.transparent,
@@ -417,7 +410,6 @@ class _PreviousButton extends StatelessWidget {
   }
 }
 
-
 //✅✅✅<<<---Progress Bar/Dots--->>>✅✅✅
 class _Indicator extends StatelessWidget {
   final bool isActive;
@@ -435,7 +427,9 @@ class _Indicator extends StatelessWidget {
       margin: const EdgeInsets.only(right: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: isActive ? theme.colorScheme.primary : theme.colorScheme.onBackground.withOpacity(0.2),
+        color: isActive
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onBackground.withOpacity(0.2),
       ),
     );
   }

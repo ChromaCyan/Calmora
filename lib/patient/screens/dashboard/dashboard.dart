@@ -38,14 +38,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_userId != null) {}
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800), 
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: theme.cardColor.withOpacity(0.6), 
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -57,8 +71,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: theme.colorScheme.onBackground,
                   ),
                 ),
-
               ),
+              const SizedBox(height: 10),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -66,77 +81,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: AppSection(
                       title: "Understanding Mental Health",
                       imageUrl: "images/splash/image6.png",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) {
-                              return MentalHealthAwarenessPage();  // Destination page
-                            },
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              // Fade transition
-                              var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), // Slide from the right
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
-                              return SlideTransition(position: slideAnimation, child: child);
-                            },
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateWithSlide(context, MentalHealthAwarenessPage()),
                     ),
                   ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: AppSection(
                       title: "Emergency Services",
                       imageUrl: "images/splash/image7.png",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) {
-                              return EmergencyServicePage();  
-                            },
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), 
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
-                              return SlideTransition(position: slideAnimation, child: child);
-                            },
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateWithSlide(context, EmergencyServicePage()),
                     ),
                   ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: AppSection(
                       title: "What is Calmora?",
                       imageUrl: "images/Calmora.png",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) {
-                              return AboutUsPage(); 
-                            },
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
-                              return SlideTransition(position: slideAnimation, child: child);
-                            },
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateWithSlide(context, AboutUsPage()),
                     ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 30),
-
               Center(
                 child: Text(
                   'Mind & Body Wellness',
@@ -146,6 +113,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -153,24 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: GuideCard(
                       title: "Meditation Exercise Guide",
                       imageUrl: "images/meditation.jpg",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) {
-                              return MindfulMeditation();  // Destination page
-                            },
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              // Fade transition
-                              var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), // Slide from the right
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
-                              return SlideTransition(position: slideAnimation, child: child);
-                            },
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateWithSlide(context, MindfulMeditation()),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -178,52 +130,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: GuideCard(
                       title: "Breathing Exercise Guide",
                       imageUrl: "images/breath.jpg",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) {
-                              return BreathingGuideScreen();  
-                            },
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              // Fade transition
-                              var slideAnimation = Tween<Offset>(
-                                begin: Offset(1.0, 0.0), 
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
-                              return SlideTransition(position: slideAnimation, child: child);
-                            },
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateWithSlide(context, BreathingGuideScreen()),
                     ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 30),
-
-              // // Pie chart for survey result
-              // Center(
-              //   child: _userId != null
-              //       ? SurveyScoreChart(patientId: _userId!)
-              //       : Center(child: CircularProgressIndicator()),
-              // ),
-
-              const SizedBox(height: 20),
-
-              // Removed Journal Section
-              // Center(
-              //   child: Text(
-              //     'What is on your mind?',
-              //     style: theme.textTheme.titleLarge?.copyWith(
-              //       fontWeight: FontWeight.bold,
-              //       color: theme.colorScheme.onBackground,
-              //     ),
-              //   ),
-              // ),       
-              // const JournalSection(),
-
               Center(
                 child: Text(
                   'Recommended Articles',
@@ -233,31 +146,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-
-              // Article List
               const ArticleList(),
-
-              const SizedBox(height: 30),
-
-              // Removed Daily Mood Chart
-              // Center(
-              //   child: Text(
-              //     'Weekly Mood Chart',
-              //     style: theme.textTheme.headlineSmall?.copyWith(
-              //       fontWeight: FontWeight.bold,
-              //       color: theme.colorScheme.onBackground,
-              //     ),
-              //   ),
-              // ),
-
-              // Center(
-              //   child: _userId != null
-              //       ? MoodCalendarScreen(userId: _userId!)
-              //       : const Center(child: CircularProgressIndicator()),
-              // ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _navigateWithSlide(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var slideAnimation = Tween<Offset>(
+            begin: const Offset(1.0, 0.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+          return SlideTransition(position: slideAnimation, child: child);
+        },
       ),
     );
   }

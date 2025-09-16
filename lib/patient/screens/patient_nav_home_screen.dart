@@ -8,6 +8,7 @@ import 'package:armstrong/widgets/navigation/nav_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'dart:ui';
 import 'package:armstrong/services/socket_service.dart';
 
 class PatientHomeScreen extends StatefulWidget {
@@ -143,13 +144,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     return BlocProvider(
       create: (context) => BottomNavCubit(),
       child: Scaffold(
+        extendBodyBehindAppBar: true,
+        extendBody: true,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80),
           child: Padding(
             padding: const EdgeInsets.only(top: 20.0, left: 5, right: 5),
             child: Container(
               decoration: BoxDecoration(
-                color: theme.cardColor,
+                color: theme.cardColor.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -244,23 +247,43 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
           ),
         ),
-        body: SafeArea(
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            children: [
-              DashboardScreen(),
-              DiscoverScreen(),
-              ChatListScreen(),
-              _userId != null
-                  ? AppointmentListScreen(patientId: _userId!)
-                  : Center(child: CircularProgressIndicator()),
-            ],
-          ),
+        body: Stack(
+          children: [
+            // --- 1) Background Image ---
+            Positioned.fill(
+              child: Image.asset(
+                "images/login_bg_image.png", 
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            // --- 2) Blur Layer ---
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(
+                  color: Colors.black.withOpacity(0.2), 
+                ),
+              ),
+            ),
+
+            SafeArea(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => _selectedIndex = index);
+                },
+                children: [
+                  DashboardScreen(),
+                  DiscoverScreen(),
+                  ChatListScreen(),
+                  _userId != null
+                      ? AppointmentListScreen(patientId: _userId!)
+                      : const Center(child: CircularProgressIndicator()),
+                ],
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: CustomBottomNavBar(
           selectedIndex: _selectedIndex,

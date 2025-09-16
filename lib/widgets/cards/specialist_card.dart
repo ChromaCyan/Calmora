@@ -15,6 +15,7 @@ class SpecialistCard extends StatelessWidget {
     List<String> words = name.split(" ");
     String firstWord = words.isNotEmpty ? words[0] : "";
     return firstWord.length > 7 ? "${firstWord.substring(0, 7)}..." : firstWord;
+  
   }
 
   @override
