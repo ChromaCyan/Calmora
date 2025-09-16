@@ -6,6 +6,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'package:armstrong/widgets/forms/add_article_contentfield.dart';
 
 class AddArticleScreen extends StatefulWidget {
   @override
@@ -101,7 +102,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
 
 
       if (response.isNotEmpty) {
-        _showSnackbar('Article would be reviewed by the Admin Team!');
+        _showSnackbar('Article added successfully!');
         Navigator.pop(context);
       } else {
         _showSnackbar('Failed to add article', isError: true);
@@ -123,26 +124,47 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
       ),
     );
   }
+  
+void _openContentEditor() async {
+final updatedContent = await Navigator.of(context).push<String>(
+  PageRouteBuilder(
+    pageBuilder: (_, __, ___) => AddArticleContentFieldPage(initialContent: _contentController.text),
+    transitionsBuilder: (_, animation, __, child) {
+      const begin = Offset(1.0, 0.0); // Slide in from right
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      final offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  ),
+);
+  if (updatedContent != null) {
+    setState(() {
+      _contentController.text = updatedContent;
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Publish Article"),
+        title: Text("Publish your own Article"),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Text(
-                  'Create an Article',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                'Create an Article',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16),
@@ -256,42 +278,83 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                 SizedBox(height: 12),
 
                 // Content TextField
-                TextFormField(
-                  controller: _contentController,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyLarge?.color),
-                  decoration: InputDecoration(
-                    labelText: 'Content',
-                    labelStyle: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 14),
-                    hintText: 'Write your article content here...',
-                    hintStyle: TextStyle(
-                        color: Theme.of(context).hintColor, fontSize: 14),
-                    prefixIcon: Icon(Icons.description,
-                        color: Theme.of(context).iconTheme.color),
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.surface,
-                    border: OutlineInputBorder(
+                // TextFormField(
+                //   controller: _contentController,
+                //   style: TextStyle(
+                //       fontSize: 16,
+                //       color: Theme.of(context).textTheme.bodyLarge?.color),
+                //   decoration: InputDecoration(
+                //     labelText: 'Content',
+                //     labelStyle: TextStyle(
+                //         color: Theme.of(context).hintColor, fontSize: 14),
+                //     hintText: 'Write your article content here...',
+                //     hintStyle: TextStyle(
+                //         color: Theme.of(context).hintColor, fontSize: 14),
+                //     prefixIcon: Icon(Icons.description,
+                //         color: Theme.of(context).iconTheme.color),
+                //     filled: true,
+                //     fillColor: Theme.of(context).colorScheme.surface,
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: BorderSide.none,
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: BorderSide(
+                //           color: Theme.of(context).colorScheme.primary,
+                //           width: 2),
+                //     ),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: BorderSide(
+                //           color: Theme.of(context).dividerColor, width: 1),
+                //     ),
+                //     contentPadding:
+                //         EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                //   ),
+                //   maxLines: 5,
+                // ),
+                GestureDetector(
+                  onTap: _openContentEditor,
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      border: Border.all(color: theme.dividerColor),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            physics: NeverScrollableScrollPhysics(),
+                            child: Text(
+                              _contentController.text.isEmpty
+                                  ? 'Write your article content here...'
+                                  : _contentController.text,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: _contentController.text.isEmpty
+                                    ? theme.hintColor
+                                    : theme.textTheme.bodyLarge?.color,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.chevron_right,
+                          color: theme.iconTheme.color?.withOpacity(0.6),
+                        ),
+                      ],
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                          color: Theme.of(context).dividerColor, width: 1),
-                    ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+
                   ),
-                  maxLines: 5,
                 ),
+
                 SizedBox(height: 20),
 
                 Center(
@@ -374,10 +437,21 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+          ],
         ),
+        // child: Card(
+        //   elevation: 4,
+        //   shape:
+        //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        //   child: Padding(
+        //     padding: EdgeInsets.all(16.0),
+        //     child: Column(
+        //       children: [
+                
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ),
     );
   }
