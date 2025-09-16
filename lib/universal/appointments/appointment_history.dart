@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,6 +16,8 @@ class CompletedAppointmentsScreen extends StatefulWidget {
 class _CompletedAppointmentsScreenState
     extends State<CompletedAppointmentsScreen> {
   final ApiRepository _apiRepository = ApiRepository();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
   List<dynamic> completedAppointments = [];
   bool isLoading = true;
   bool hasError = false;
@@ -27,26 +30,20 @@ class _CompletedAppointmentsScreenState
   }
 
   Future<void> _loadUserId() async {
-    final FlutterSecureStorage storage = FlutterSecureStorage();
-    final userId = await storage.read(key: 'userId');
-
-    if (userId != null) {
-      setState(() {
-        _userId = userId;
-      });
-      _fetchCompletedAppointments();
+    _userId = await _storage.read(key: 'userId');
+    if (_userId != null) {
+      await _fetchCompletedAppointments();
     } else {
       setState(() {
-        isLoading = false;
         hasError = true;
+        isLoading = false;
       });
     }
   }
 
   Future<void> _fetchCompletedAppointments() async {
-    if (_userId == null) return;
-
     try {
+      if (_userId == null) return;
       final response = await _apiRepository.getCompletedAppointments(_userId!);
       setState(() {
         completedAppointments = response;
@@ -65,12 +62,10 @@ class _CompletedAppointmentsScreenState
         appointment["timeSlot"] == null) {
       return "N/A";
     }
-
     final appointmentDate = DateTime.parse(appointment["appointmentDate"]);
     final startTime = appointment["timeSlot"]["startTime"];
     final endTime = appointment["timeSlot"]["endTime"];
 
-    // Format the date and time range
     final formattedDate = DateFormat("MMM dd, yyyy").format(appointmentDate);
     return "$formattedDate - $startTime to $endTime";
   }
@@ -86,132 +81,146 @@ class _CompletedAppointmentsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Completed Appointments",
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-          ),
+        backgroundColor: theme.colorScheme.surface.withOpacity(0.6),
+        elevation: 0,
+        title: const Text("Completed Appointments"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        elevation: isDark ? 0 : 1,
-        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
       ),
-      backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[100],
-      body: completedAppointments.isEmpty
-          ? Center(
-              child: Text(
-                "No completed appointments",
-                style:
-                    TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: completedAppointments.length,
-              itemBuilder: (context, index) {
-                final appointment = completedAppointments[index];
-                final Color stripColor = Colors.green; // dynamic if needed
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// Background image
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
 
-                return GestureDetector(
-                  onTap: () => _showAppointmentDetails(context, appointment),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // thin colored strip on the left
-                          Container(
-                            width: 10, // slightly thinner
-                            decoration: BoxDecoration(
-                              color: stripColor,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(12),
-                                bottomLeft: Radius.circular(12),
-                              ),
-                            ),
-                          ),
-
-                          // content
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 14),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      'With: ${appointment["specialist"]?["firstName"] ?? "Unknown"}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.calendar_today,
-                                          size: 16,
-                                          color: isDark
-                                              ? Colors.white70
-                                              : Colors.black54),
-                                      const SizedBox(width: 6),
-                                      Flexible(
-                                        child: Text(
-                                          _formatAppointmentTime(appointment),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: isDark
-                                                ? Colors.white70
-                                                : Colors.black54,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          // trailing chevron
-                          Padding(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 18,
-                              color: isDark ? Colors.white70 : Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+          /// Frosted blur overlay
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: const SizedBox.expand(),
             ),
+          ),
+
+          /// Main content
+          Column(
+            children: [
+              const SizedBox(height: 10),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : hasError
+                        ? Center(
+                            child: Text(
+                              "Failed to load completed appointments",
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.error,
+                              ),
+                            ),
+                          )
+                        : completedAppointments.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "No completed appointments",
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: completedAppointments.length,
+                                itemBuilder: (context, index) {
+                                  final appointment =
+                                      completedAppointments[index];
+
+                                  return GestureDetector(
+                                    onTap: () => _showAppointmentDetails(
+                                        context, appointment),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: theme.brightness ==
+                                                Brightness.light
+                                            ? Colors
+                                                .white // solid white in light mode
+                                            : theme.colorScheme
+                                                .surfaceVariant, // dark bg in dark mode
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          if (theme.brightness ==
+                                              Brightness.light)
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'With: ${appointment["specialist"]?["firstName"] ?? "Unknown"}',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: theme.brightness ==
+                                                      Brightness.light
+                                                  ? Colors.black
+                                                  : Colors.white, // text adapts
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.calendar_today,
+                                                size: 16,
+                                                color: theme.brightness ==
+                                                        Brightness.light
+                                                    ? Colors.black54
+                                                    : Colors.white70,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  _formatAppointmentTime(
+                                                      appointment),
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: theme.brightness ==
+                                                            Brightness.light
+                                                        ? Colors.black87
+                                                        : Colors.white70,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
