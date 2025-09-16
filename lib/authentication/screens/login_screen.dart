@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => SurveyScreen()),
-                                //builder: (context) => PatientHomeScreen()),
+                            //builder: (context) => PatientHomeScreen()),
                           );
                         }
                       } else if (userType == 'Specialist') {
@@ -280,12 +280,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
                                     onPressed: () {
-                                      _showForgotPasswordDialog(context);
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation,
+                                                  secondaryAnimation) =>
+                                              const ForgotPasswordScreen(),
+                                          transitionsBuilder: (context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child) {
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                      );
                                     },
                                     child: Text(
                                       "Forgot Password?",
@@ -378,14 +393,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _showForgotPasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ForgotPasswordDialog();
-      },
-    );
-  }
+  // void _showForgotPasswordDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return ForgotPasswordDialog();
+  //     },
+  //   );
+  // }
 
   @override
   void dispose() {
