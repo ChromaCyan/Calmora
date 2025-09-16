@@ -1,6 +1,6 @@
+import 'dart:ui';
 import 'package:armstrong/specialist/screens/dashboard/chart/WeeklyAppointment.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:armstrong/widgets/cards/specialist_appointment_card.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:intl/intl.dart';
@@ -34,7 +34,6 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
           await _apiRepository.getSpecialistAppointments(widget.specialistId);
       var now = DateTime.now();
 
-      // Filter and map the appointments based on status and time
       var closestAccepted = fetchedAppointments
           .where((appointment) => appointment['status'] == 'accepted')
           .map((appointment) {
@@ -42,7 +41,6 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
         var startTime =
             DateFormat('hh:mm a').parse(appointment['timeSlot']['startTime']);
 
-        // Combine the date and time into a full DateTime
         var fullAppointmentTime = DateTime(
           appointmentDate.year,
           appointmentDate.month,
@@ -51,10 +49,10 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
           startTime.minute,
         );
 
-        // Calculate the difference from now to the appointment time
         var difference = fullAppointmentTime.isBefore(now)
             ? Duration.zero
             : fullAppointmentTime.difference(now);
+
         return {
           'appointment': appointment,
           'fullAppointmentTime': fullAppointmentTime,
@@ -62,9 +60,7 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
         };
       }).toList();
 
-      // Sort by the closest appointment (time difference)
-      closestAccepted
-          .sort((a, b) => a['difference'].compareTo(b['difference']));
+      closestAccepted.sort((a, b) => a['difference'].compareTo(b['difference']));
 
       setState(() {
         upcomingAppointments =
@@ -81,35 +77,61 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.cardColor.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.center,
-                child: const Text(
+              // 📅 Upcoming Appointments
+              Center(
+                child: Text(
                   'Your Upcoming Appointments',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               _buildUpcomingAppointments(),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.center,
-                child: const Text(
-                  'Appointment Chart (Weekly)',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+
+              const SizedBox(height: 30),
+
+              // 📊 Weekly Chart
+              Center(
+                child: Text(
+                  'Weekly Appointment Chart',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               WeeklyAppointmentChart(specialistId: widget.specialistId),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 30),
+
+              // ✨ (Optional) You could add a "Recommended Resources" or "Your Stats" section here later
             ],
           ),
         ),
@@ -128,6 +150,7 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
 
     return ListView.builder(
       shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: upcomingAppointments.length,
       itemBuilder: (context, index) {
         final appointment = upcomingAppointments[index];

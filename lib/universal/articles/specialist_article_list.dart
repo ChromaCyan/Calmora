@@ -39,101 +39,134 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
     }
   }
 
+  void _navigateToAddArticle() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddArticleScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          CustomSearchBar(
-            hintText: 'Search from your articles...',
-            searchController: _searchController,
-            onChanged: (query) {
-              setState(() {
-                searchQuery = query.toLowerCase();
-              });
-            },
-            onClear: () {
-              setState(() {
-                searchQuery = '';
-                _searchController.clear();
-              });
-            },
-          ),
-          Expanded(
-            child: BlocBuilder<ArticleBloc, ArticleState>(
-              builder: (context, state) {
-                if (state is ArticleLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is ArticleError) {
-                  String errorMessage = _getFriendlyErrorMessage(state.message);
-                  final theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.question_mark,
-                          size: 50,
-                          color: theme
-                              .colorScheme.tertiary, 
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          errorMessage,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme
-                                .colorScheme.tertiary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  );
-                }
-
-                if (state is ArticleLoaded) {
-                  final filteredArticles = state.articles.where((article) {
-                    return article.title.toLowerCase().contains(searchQuery);
-                  }).toList();
-
-                  if (filteredArticles.isEmpty) {
-                    return const Center(
-                        child: Text("No matching articles found."));
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: filteredArticles.length,
-                    itemBuilder: (context, index) {
-                      final article = filteredArticles[index];
-                      return SpecialistArticleCard(
-                        articleId: article.id,
-                        imageUrl: article.heroImage,
-                        title: article.title,
-                      );
-                    },
-                  );
-                }
-                return const Center(child: Text("No articles found."));
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.cardColor.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            CustomSearchBar(
+              hintText: 'Search from your articles...',
+              searchController: _searchController,
+              onChanged: (query) {
+                setState(() {
+                  searchQuery = query.toLowerCase();
+                });
+              },
+              onClear: () {
+                setState(() {
+                  searchQuery = '';
+                  _searchController.clear();
+                });
               },
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddArticleScreen()),
-          );
-        },
-        child: const Icon(Icons.add, size: 35),
+            const SizedBox(height: 10),
+            Expanded(
+              child: BlocBuilder<ArticleBloc, ArticleState>(
+                builder: (context, state) {
+                  if (state is ArticleLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state is ArticleError) {
+                    String errorMessage = _getFriendlyErrorMessage(state.message);
+
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.question_mark,
+                            size: 50,
+                            color: theme.colorScheme.tertiary,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            errorMessage,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.tertiary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (state is ArticleLoaded) {
+                    final filteredArticles = state.articles.where((article) {
+                      return article.title.toLowerCase().contains(searchQuery);
+                    }).toList();
+
+                    if (filteredArticles.isEmpty) {
+                      return const Center(
+                          child: Text("No matching articles found."));
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: filteredArticles.length,
+                      itemBuilder: (context, index) {
+                        final article = filteredArticles[index];
+                        return SpecialistArticleCard(
+                          articleId: article.id,
+                          imageUrl: article.heroImage,
+                          title: article.title,
+                        );
+                      },
+                    );
+                  }
+                  return const Center(child: Text("No articles found."));
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                onPressed: _navigateToAddArticle,
+                label: const Text("Add Article"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
