@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:armstrong/splash_screen/models/survey_message.dart';
 import 'package:armstrong/patient/screens/survey/questions_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
+import 'dart:ui';
+import 'package:google_fonts/google_fonts.dart';
 
 class SurveyScreen extends StatefulWidget {
   const SurveyScreen({super.key});
@@ -15,7 +14,9 @@ class SurveyScreen extends StatefulWidget {
 
 class _SurveyScreenState extends State<SurveyScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
+
   bool _surveyOnboardingCompleted = false;
   String? _userId;
 
@@ -26,18 +27,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 
   Future<void> _loadUserId() async {
-    final storage = FlutterSecureStorage();
-    _userId = await storage.read(key: 'userId');
+    _userId = await _storage.read(key: 'userId');
     _checkSurveyOnboardingStatus();
   }
 
   Future<void> _checkSurveyOnboardingStatus() async {
     if (_userId == null) return;
-    
-    final storage = FlutterSecureStorage();
     String? completed =
-        await storage.read(key: 'survey_onboarding_completed_$_userId');
-    
+        await _storage.read(key: 'survey_onboarding_completed_$_userId');
     if (completed == 'true') {
       setState(() => _surveyOnboardingCompleted = true);
       _navigateToSurvey();
@@ -52,83 +49,155 @@ class _SurveyScreenState extends State<SurveyScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => _surveyOnboardingCompleted,
-      child: Scaffold(
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Column(
-                children: [
-                  // Onboarding Content
-                  Expanded(
-                    flex: 7,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: onBoardData.length,
-                      onPageChanged: (index) => setState(() => _currentPage = index),
-                      itemBuilder: (context, index) => _buildOnboardingItem(index, constraints.maxWidth, constraints.maxHeight),
-                    ),
-                  ),
-
-                  // Navigation Button
-                  _buildNavigationButton(constraints.maxWidth),
-
-                  // Page Indicators
-                  _buildPageIndicators(),
-                  const SizedBox(height: 10),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
+  void _onNextPressed() async {
+    if (_currentPage.value == onBoardData.length - 1) {
+      // ✅ FIX: use user-specific key
+      await _storage.write(
+        key: 'survey_onboarding_completed_$_userId',
+        value: 'true',
+      );
+      _navigateToSurvey();
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+    }
   }
 
-  /// Builds onboarding content for each page
-  Widget _buildOnboardingItem(int index, double maxWidth, double maxHeight) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  void _onPreviousPressed() {
+    if (_currentPage.value > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_surveyOnboardingCompleted) return Container();
+
+    final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          // Image Container
-          SizedBox(
-            height: maxHeight * 0.4,
-            width: maxWidth * 0.8,
-            child: Image.asset(
-              onBoardData[index].image,
-              fit: BoxFit.contain,
-            ),
+          /// Background Image (same style as Splash)
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
           ),
 
-          const SizedBox(height: 20),
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    SizedBox(height: size.height * 0.06),
 
-          // Title Text
-          Text(
-            _getOnboardingTitle(index),
-            style: TextStyle(
-              fontSize: maxWidth * 0.08, // Responsive font size
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
+                    Text(
+                      "SURVEY",
+                      style: GoogleFonts.montserrat(
+                        fontSize: size.height * 0.045,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 3,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    Divider(
+                      thickness: 3,
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
+                      indent: 140,
+                      endIndent: 140,
+                    ),
+                    Text(
+                      "Personalize Your Dashboard",
+                      style: GoogleFonts.montserrat(
+                        fontSize: size.height * 0.022,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
 
-          const SizedBox(height: 10),
+                    Expanded(
+                      child: PageView.builder(
+                        itemCount: onBoardData.length,
+                        controller: _pageController,
+                        onPageChanged: (value) => _currentPage.value = value,
+                        itemBuilder: (context, index) => _OnboardingItem(
+                          size: size,
+                          index: index,
+                        ),
+                      ),
+                    ),
 
-          // Description Text
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: maxWidth * 0.1),
-            child: Text(
-              onBoardData[index].text,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: maxWidth * 0.045,
-                color: Theme.of(context).colorScheme.onBackground,
+                    /// Progress Indicator
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 120),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.white.withOpacity(0.1)
+                                  : Colors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: theme.brightness == Brightness.light
+                                    ? Colors.black.withOpacity(0.3)
+                                    : Colors.white.withOpacity(0.6),
+                              ),
+                            ),
+                            child: ValueListenableBuilder<int>(
+                              valueListenable: _currentPage,
+                              builder: (_, value, __) => Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  onBoardData.length,
+                                  (index) =>
+                                      _Indicator(isActive: value == index),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// Buttons
+                    const SizedBox(height: 15),
+                    ValueListenableBuilder<int>(
+                      valueListenable: _currentPage,
+                      builder: (_, value, __) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            if (value > 0)
+                              _PreviousButton(onPressed: _onPreviousPressed)
+                            else
+                              const SizedBox(width: 50),
+                            _NextButton(
+                              isLastPage: value == onBoardData.length - 1,
+                              onPressed: _onNextPressed,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.05),
+                  ],
+                ),
               ),
             ),
           ),
@@ -136,89 +205,160 @@ class _SurveyScreenState extends State<SurveyScreen> {
       ),
     );
   }
-
-  /// Builds navigation button (Continue/Start Survey)
-Widget _buildNavigationButton(double maxWidth) {
-  return GestureDetector(
-    onTap: () async {
-      if (_currentPage == onBoardData.length - 1) {
-        final storage = FlutterSecureStorage();
-        await storage.write(key: 'survey_onboarding_completed', value: 'true');
-        _navigateToSurvey();
-      } else {
-        _pageController.nextPage(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-        );
-      }
-    },
-    child: Container(
-      margin: const EdgeInsets.symmetric(vertical: 15),
-      height: 60,
-      width: maxWidth * 0.6,
-      decoration: BoxDecoration(
-        color: _currentPage == onBoardData.length - 1
-            ? Colors.green
-            : Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey.withOpacity(0.5) // Grey shadow for dark mode
-                : Colors.black.withOpacity(0.2), // Black shadow for light mode
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          _currentPage == onBoardData.length - 1 ? "Start Survey!" : "Continue",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: _currentPage == onBoardData.length - 1
-                ? Colors.white
-                : Theme.of(context).brightness == Brightness.dark
-                    ? Colors.black
-                    : Colors.white,
-          ),
-        ),
-      ),
-    ),
-  );
 }
 
-  /// Builds page indicators (dots)
-  Widget _buildPageIndicators() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        onBoardData.length,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          width: _currentPage == index ? 20 : 10,
-          height: 10,
-          margin: const EdgeInsets.only(right: 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: _currentPage == index
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onBackground.withOpacity(0.2),
+class _OnboardingItem extends StatelessWidget {
+  final Size size;
+  final int index;
+
+  const _OnboardingItem({required this.size, required this.index});
+
+  String _getTitle(int index) {
+    const titles = [
+      "Why Survey?",
+      "Personalize Your Dashboard",
+      "We Care About You",
+    ];
+    return titles[index];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        SizedBox(height: size.height * 0.05),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: theme.brightness == Brightness.light
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.6),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  _getTitle(index),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: size.height * 0.027,
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          height: size.height * 0.3,
+          width: size.width * 0.7,
+          child: Image.asset(onBoardData[index].image, fit: BoxFit.contain),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            onBoardData[index].text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: size.height * 0.020,
+              color: theme.colorScheme.onBackground,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NextButton extends StatelessWidget {
+  final bool isLastPage;
+  final VoidCallback onPressed;
+
+  const _NextButton({required this.isLastPage, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+      ),
+      onPressed: onPressed,
+      child: Text(
+        isLastPage ? "Start Survey" : "Next",
+        style: GoogleFonts.montserrat(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
       ),
     );
   }
+}
 
-  /// Gets onboarding title
-  String _getOnboardingTitle(int index) {
-    const titles = [
-      "Why Survey?",
-      "To personalize your dashboard..",
-      "We care about you!",
-    ];
-    return titles[index];
+class _PreviousButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _PreviousButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color splashColor = Colors.grey.withOpacity(0.3);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        splashColor: splashColor,
+        onTap: onPressed,
+        child: const SizedBox(
+          height: 50,
+          width: 50,
+          child: Icon(Icons.arrow_back_ios_outlined, color: Colors.grey, size: 28),
+        ),
+      ),
+    );
+  }
+}
+
+class _Indicator extends StatelessWidget {
+  final bool isActive;
+
+  const _Indicator({required this.isActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      width: isActive ? 20 : 10,
+      height: 10,
+      margin: const EdgeInsets.only(right: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: isActive
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onBackground.withOpacity(0.2),
+      ),
+    );
   }
 }

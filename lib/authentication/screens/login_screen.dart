@@ -171,8 +171,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                //builder: (context) => SurveyScreen()),
-                                builder: (context) => PatientHomeScreen()),
+                                builder: (context) => SurveyScreen()),
+                                //builder: (context) => PatientHomeScreen()),
                           );
                         }
                       } else if (userType == 'Specialist') {

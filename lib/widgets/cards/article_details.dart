@@ -18,7 +18,6 @@ class ArticleDetailPage extends StatelessWidget {
     context.read<ArticleBloc>().add(FetchArticleById(articleId));
 
     return WillPopScope(
-      // This listens for back button presses
       onWillPop: () async {
         final storage = FlutterSecureStorage();
         final userId = await storage.read(key: 'userId');
@@ -30,7 +29,9 @@ class ArticleDetailPage extends StatelessWidget {
       },
 
       child: Scaffold(
-        appBar: UniversalAppBar(title: ""),
+        appBar: AppBar(
+          title: const Text('Article Details'),
+        ),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {

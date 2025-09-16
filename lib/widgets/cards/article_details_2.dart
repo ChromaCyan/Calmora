@@ -28,7 +28,9 @@ class ArticleDetailPage2 extends StatelessWidget {
       },
 
       child: Scaffold(
-        appBar: UniversalAppBar(title: ""),
+        appBar: AppBar(
+          title: const Text('Article Details'),
+        ),
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {
