@@ -15,6 +15,8 @@ import 'package:armstrong/models/user/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:armstrong/universal/profile/setting_screen.dart';
 import 'package:armstrong/services/socket_service.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -67,6 +69,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController emergencyContactRelationController =
       TextEditingController();
 
+  // Clinic Location Fields (GOOGLE MAPS)
+  LatLng? _clinicLatLng;
+  String? _readableClinicAddress;
+
   File? _selectedImage;
   String? _imageUrl;
   String? _userType;
@@ -111,6 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           locationController.text = user.location ?? "";
           clinicController.text = user.clinic ?? "";
           availabilityController.text = user.availability ?? "";
+          _updateClinicLocationPreview();
 
           // Patient Fields
           if (_userType == "Patient") {
@@ -243,6 +250,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         isLoading = false;
         hasError = true;
+      });
+    }
+  }
+
+  Future<void> _updateClinicLocationPreview() async {
+    try {
+      final parts = clinicController.text.split(',');
+      if (parts.length < 2) return;
+
+      final lat = double.parse(parts[0]);
+      final lng = double.parse(parts[1]);
+      final newLatLng = LatLng(lat, lng);
+
+      final placemarks = await placemarkFromCoordinates(lat, lng);
+      String readable = '';
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        readable = [
+          place.street,
+          place.subLocality,
+          place.locality,
+          place.administrativeArea,
+          place.postalCode,
+        ].where((part) => part != null && part.trim().isNotEmpty).join(', ');
+      }
+
+      setState(() {
+        _clinicLatLng = newLatLng;
+        _readableClinicAddress = readable.isEmpty ? null : readable;
+      });
+    } catch (e) {
+      debugPrint('Error updating clinic location preview: $e');
+      setState(() {
+        _clinicLatLng = null;
+        _readableClinicAddress = null;
       });
     }
   }
@@ -404,8 +446,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     emergencyContactRelationController,
                                 specializationController:
                                     specializationController,
-                                licenseNumberController:
-                                    licenseNumberController,
                                 bioController: bioController,
                                 yearsOfExperienceController:
                                     yearsOfExperienceController,
@@ -418,6 +458,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 onPickDateOfBirth: _pickDateOfBirth,
                                 userType: _userType!,
                               ),
+
+                              if (_userType == "Specialist" &&
+                                  _clinicLatLng != null) ...[
+                                Text(
+                                  'Clinic Location Preview',
+                                  style: theme.textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                SizedBox(
+                                  height: 200,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: GoogleMap(
+                                      initialCameraPosition: CameraPosition(
+                                        target: _clinicLatLng!,
+                                        zoom: 14,
+                                      ),
+                                      markers: {
+                                        Marker(
+                                          markerId:
+                                              const MarkerId('clinic_marker'),
+                                          position: _clinicLatLng!,
+                                        ),
+                                      },
+                                      zoomControlsEnabled: false,
+                                      liteModeEnabled: true,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+
+                                /// 🆕 ADD THIS BLOCK HERE
+                                if (licenseNumberController.text.isNotEmpty)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'License Certificate Provided',
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(
+                                          licenseNumberController.text,
+                                          height: 200,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Container(
+                                            height: 200,
+                                            color: Colors.grey[300],
+                                            child: const Center(
+                                              child: Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 40,
+                                                  color: Colors.grey),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
+                                  ),
+                              ],
 
                               const SizedBox(height: 20),
 

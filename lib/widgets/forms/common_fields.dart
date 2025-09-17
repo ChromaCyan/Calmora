@@ -1,6 +1,9 @@
 // import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:armstrong/widgets/cards/map_picker.dart';
+import 'package:geocoding/geocoding.dart';
 
 class CombinedForm extends StatelessWidget {
   final TextEditingController firstNameController;
@@ -19,7 +22,6 @@ class CombinedForm extends StatelessWidget {
 
   // Specialist-specific fields
   final TextEditingController specializationController;
-  final TextEditingController licenseNumberController;
   final TextEditingController bioController;
   final TextEditingController yearsOfExperienceController;
   final TextEditingController languagesSpokenController;
@@ -45,7 +47,6 @@ class CombinedForm extends StatelessWidget {
     required this.emergencyContactPhoneController,
     required this.emergencyContactRelationController,
     required this.specializationController,
-    required this.licenseNumberController,
     required this.bioController,
     required this.yearsOfExperienceController,
     required this.languagesSpokenController,
@@ -56,6 +57,28 @@ class CombinedForm extends StatelessWidget {
     required this.onPickDateOfBirth,
     required this.userType,
   }) : super(key: key);
+
+  String _getReadableClinicText(BuildContext context, String clinic) {
+    if (clinic.isEmpty) return "Pick Clinic Location";
+    final parts = clinic.split(',');
+    if (parts.length != 2) return "Invalid Clinic Coordinates";
+
+    try {
+      final lat = double.parse(parts[0]);
+      final lng = double.parse(parts[1]);
+      return "Location: ($lat, $lng)";
+    } catch (_) {
+      return "Invalid Clinic Coordinates";
+    }
+  }
+
+  String _formatPlacemark(Placemark place) {
+    return [
+      place.name,
+      place.locality,
+      place.administrativeArea,
+    ].where((e) => e != null && e.isNotEmpty).join(", ");
+  }
 
   InputDecoration customInputDecoration(String label, BuildContext context,
       {bool readOnly = false, bool hideStandbyBorder = false}) {
@@ -76,8 +99,7 @@ class CombinedForm extends StatelessWidget {
               ? Colors.transparent
               : (isEditing
                   ? colorScheme.onSurface.withOpacity(0.5)
-                  : colorScheme.onSurface.withOpacity(0.1)
-              ),
+                  : colorScheme.onSurface.withOpacity(0.1)),
           width: 1.5,
         ),
       ),
@@ -108,9 +130,12 @@ class CombinedForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 Text(
+                Text(
                   "Personal Information",
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -138,13 +163,18 @@ class CombinedForm extends StatelessWidget {
                   decoration: customInputDecoration("Phone Number", context),
                   enabled: isEditing,
                   keyboardType: TextInputType.phone,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(11),
+                  ],
                 ),
+
                 DropdownButtonFormField<String>(
                   value: genderController.text.isNotEmpty
                       ? genderController.text
                       : null,
-                  decoration: customInputDecoration("Gender", context, hideStandbyBorder: true),
+                  decoration: customInputDecoration("Gender", context,
+                      hideStandbyBorder: true),
                   items: [
                     {"label": "Male", "value": "male"},
                     {"label": "Female", "value": "female"}
@@ -159,7 +189,9 @@ class CombinedForm extends StatelessWidget {
                           genderController.text = newValue!;
                         }
                       : null,
-                  icon: isEditing ? const Icon(Icons.arrow_drop_down) : const SizedBox.shrink(),
+                  icon: isEditing
+                      ? const Icon(Icons.arrow_drop_down)
+                      : const SizedBox.shrink(),
                 ),
 
                 // Only show the date picker for patients
@@ -174,7 +206,9 @@ class CombinedForm extends StatelessWidget {
                                 "Date of Birth", context,
                                 hideStandbyBorder: true)
                             .copyWith(
-                          suffixIcon: isEditing ? const Icon(Icons.calendar_today) : null,
+                          suffixIcon: isEditing
+                              ? const Icon(Icons.calendar_today)
+                              : null,
                         ),
                       ),
                     ),
@@ -182,58 +216,13 @@ class CombinedForm extends StatelessWidget {
                 ],
                 const SizedBox(height: 20),
 
-                if (userType.toLowerCase() == "patient") ...[
-                    Text (
-                    "Medical Information",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  // TextField(
-                  //   controller: addressController,
-                  //   decoration: customInputDecoration("Address", context),
-                  //   enabled: isEditing,
-                  // ),
-                  TextField(
-                    controller: medicalHistoryController,
-                    decoration:
-                        customInputDecoration("Medical History", context),
-                    enabled: isEditing,
-                  ),
-                  TextField(
-                    controller: therapyGoalsController,
-                    decoration: customInputDecoration("Therapy Goals", context),
-                    enabled: isEditing,
-                  ),
-                  const SizedBox(height: 20),
-                  //   Text(
-                  //   "Emergency Contact Information",
-                  //   style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                  // ),
-                  // const SizedBox(height: 8),
-                  // TextField(
-                  //   controller: emergencyContactNameController,
-                  //   decoration: customInputDecoration(
-                  //       "Emergency Contact Name", context),
-                  //   enabled: isEditing,
-                  // ),
-                  // TextField(
-                  //   controller: emergencyContactPhoneController,
-                  //   decoration: customInputDecoration(
-                  //       "Emergency Contact Phone", context),
-                  //   enabled: isEditing,
-                  // ),
-                  // TextField(
-                  //   controller: emergencyContactRelationController,
-                  //   decoration: customInputDecoration(
-                  //       "Emergency Contact Relation", context),
-                  //   enabled: isEditing,
-                  // ),
-                ],
-
                 if (userType.toLowerCase() == "specialist") ...[
-                    Text(
+                  Text(
                     "Professional Information",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
@@ -269,27 +258,101 @@ class CombinedForm extends StatelessWidget {
                     ),
                   ),
                   TextField(
-                    controller: licenseNumberController,
-                    decoration: customInputDecoration("License No.", context),
-                    enabled: isEditing,
-                  ),
-                  TextField(
                     controller: yearsOfExperienceController,
                     decoration:
                         customInputDecoration("Years of Experience", context),
                     enabled: isEditing,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ],
                   ),
-                  TextField(
-                    controller: languagesSpokenController,
-                    decoration:
-                        customInputDecoration("Languages Spoken", context),
-                    enabled: isEditing,
+                  Builder(
+                    builder: (context) {
+                      List<String> availableLanguages = [
+                        'English',
+                        'Tagalog',
+                        'Pangasinan'
+                      ];
+                      List<String> selectedLanguages = languagesSpokenController
+                          .text
+                          .split(',')
+                          .map((e) => e.trim())
+                          .where((e) => e.isNotEmpty)
+                          .toList();
+
+                      return StatefulBuilder(
+                        builder: (context, setModalState) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Languages Spoken",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8.0,
+                                runSpacing: 4.0,
+                                children: availableLanguages.map((language) {
+                                  final isSelected =
+                                      selectedLanguages.contains(language);
+                                  return FilterChip(
+                                    label: Text(language),
+                                    selected: isSelected,
+                                    onSelected: isEditing
+                                        ? (bool selected) {
+                                            setModalState(() {
+                                              if (selected) {
+                                                selectedLanguages.add(language);
+                                              } else {
+                                                selectedLanguages
+                                                    .remove(language);
+                                              }
+                                              languagesSpokenController.text =
+                                                  selectedLanguages.join(', ');
+                                            });
+                                          }
+                                        : null,
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   ),
-                  // TextField(
-                  //   controller: locationController,
-                  //   decoration: customInputDecoration("Location", context),
-                  //   enabled: isEditing,
-                  // ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Work Information",
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: availabilityController.text.isNotEmpty
+                        ? availabilityController.text
+                        : null,
+                    decoration: customInputDecoration("Availability", context),
+                    items: ["Available", "Not Available"].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: isEditing
+                        ? (newValue) => availabilityController.text = newValue!
+                        : null,
+                  ),
                   DropdownButtonFormField<String>(
                     value: locationController.text.isNotEmpty
                         ? locationController.text
@@ -307,31 +370,74 @@ class CombinedForm extends StatelessWidget {
                           }
                         : null,
                   ),
-                  TextField(
-                    controller: clinicController,
-                    decoration: customInputDecoration("Clinic", context),
-                    enabled: isEditing,
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Clinic Location",
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.location_pin),
+                        label: Text(
+                          _getReadableClinicText(
+                              context, clinicController.text),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                        ),
+                        onPressed: isEditing
+                            ? () async {
+                                final picked = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MapPickerScreen(),
+                                  ),
+                                );
 
-                    Text(
-                    "Work Information",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: availabilityController.text.isNotEmpty
-                        ? availabilityController.text
-                        : null,
-                    decoration: customInputDecoration("Availability", context),
-                    items: ["Available", "Not Available"].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: isEditing
-                        ? (newValue) => availabilityController.text = newValue!
-                        : null,
+                                if (picked != null) {
+                                  try {
+                                    final placemarks =
+                                        await placemarkFromCoordinates(
+                                      picked.latitude,
+                                      picked.longitude,
+                                    );
+                                    String readable =
+                                        _formatPlacemark(placemarks.first);
+                                    clinicController.text =
+                                        "${picked.latitude},${picked.longitude}";
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Clinic updated to: $readable")),
+                                    );
+                                  } catch (e) {
+                                    debugPrint("Reverse geocoding failed: $e");
+                                  }
+                                }
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],

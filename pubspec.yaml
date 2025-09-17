@@ -76,10 +76,16 @@ dependencies:
 
   #Ai Dependency for AI Chatbot
   flutter_tts: ^4.2.3
+
   #speech_to_text: ^6.6.0 in case i need to rollback
   speech_to_text: ^7.0.0
   audioplayers: ^6.5.0
   path_provider: ^2.1.5
+
+  #Location Dependency
+  google_maps_flutter: ^2.13.1
+  flutter_polyline_points: ^3.0.1
+  geocoding: ^4.0.0
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

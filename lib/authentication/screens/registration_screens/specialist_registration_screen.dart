@@ -1,6 +1,4 @@
-// import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 import 'dart:ui';
-
 import 'package:armstrong/authentication/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +10,9 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'dart:io';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:armstrong/widgets/cards/map_picker.dart';
+import 'package:geocoding/geocoding.dart';
 
 class SpecialistRegistrationScreen extends StatefulWidget {
   const SpecialistRegistrationScreen({super.key});
@@ -38,6 +39,8 @@ class _SpecialistRegistrationScreenState
   final _specializationController = TextEditingController();
   final _locationController = TextEditingController();
   final _clinicController = TextEditingController();
+  LatLng? _clinicLocation;
+  String? _clinicLocationString;
 
   // Focus nodes
   final FocusNode _firstNameFocus = FocusNode();
@@ -93,7 +96,7 @@ class _SpecialistRegistrationScreenState
     final isSpecialistFieldsFilled =
         _specializationController.text.isNotEmpty &&
             _locationController.text.isNotEmpty &&
-            _clinicController.text.isNotEmpty &&
+            _clinicLocation != null &&
             _licenseImage != null;
 
     isRegisterButtonEnabled.value =
@@ -290,7 +293,7 @@ class _SpecialistRegistrationScreenState
       otherDetails: {
         "specialization": _specializationController.text,
         "location": _locationController.text,
-        "clinic": _clinicController.text,
+        "clinic": _clinicLocationString ?? "",
         "licenseNumber": _uploadedLicenseUrl!,
       },
       profileImage: '',
@@ -507,6 +510,7 @@ class _SpecialistRegistrationScreenState
   }
 
   Widget _buildStep(int step) {
+    final colorScheme = Theme.of(context).colorScheme;
     switch (step) {
       case 0:
         return Column(
@@ -619,11 +623,64 @@ class _SpecialistRegistrationScreenState
               },
             ),
             const SizedBox(height: 20),
-            CustomTextField(
-              label: "Clinic Name",
-              controller: _clinicController,
-              onChanged: (_) => _checkFields(),
-            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.location_pin),
+              label: Text(
+                _clinicLocationString != null
+                    ? "Location Picked: $_clinicLocationString"
+                    : "Pick Clinic Location on Map",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              onPressed: () async {
+                final LatLng? pickedLocation = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MapPickerScreen(),
+                  ),
+                );
+
+                if (pickedLocation != null) {
+                  String readableAddress =
+                      "${pickedLocation.latitude},${pickedLocation.longitude}";
+
+                  try {
+                    List<Placemark> placemarks = await placemarkFromCoordinates(
+                      pickedLocation.latitude,
+                      pickedLocation.longitude,
+                    );
+
+                    if (placemarks.isNotEmpty) {
+                      final Placemark place = placemarks.first;
+                      readableAddress =
+                          "${place.name ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
+                    }
+                  } catch (e) {
+                    debugPrint("Error in reverse geocoding: $e");
+                  }
+
+                  setState(() {
+                    _clinicLocation = pickedLocation;
+                    _clinicLocationString = readableAddress;
+                  });
+
+                  _checkFields();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.onPrimaryContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              ),
+            )
           ],
         );
 
