@@ -123,7 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: GuideCard(
                       title: "Meditation Exercise Guide",
-                      imageUrl: "images/meditation.jpg",
+                      imageUrl: "images/meditation2.jpeg",
                       onTap: () =>
                           _navigateWithSlide(context, MindfulMeditation()),
                     ),

@@ -142,7 +142,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
                                 patient['profileImage'].isNotEmpty
                             ? NetworkImage(patient['profileImage'])
                             : const AssetImage(
-                                    "images/no_profile.png")
+                                    "images/no_profile3.png")
                                 as ImageProvider,
                         fit: BoxFit.cover,
                       ),
