@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -11,16 +11,17 @@ class AboutUsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.6),
-        elevation: 0,
-        title: Text(
-          "About Us",
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // backgroundColor: theme.colorScheme.surface.withOpacity(0.6),
+        // elevation: 0,
+        // title: Text(
+        //   "About Us",
+        //   style: GoogleFonts.lato(fontWeight: FontWeight.bold),
+        // ),
+        // centerTitle: true,
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -28,9 +29,10 @@ class AboutUsPage extends StatelessWidget {
           /// Background image
           Image.asset(
             "images/login_bg_image.png",
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
 
+          /// Blur + overlay
           /// Blur + overlay
           Container(
             color: theme.colorScheme.surface
@@ -50,16 +52,15 @@ class AboutUsPage extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface
-                          .withOpacity(0.8), // match transparency
+                      color: Colors.transparent, // match transparency
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
-                        BoxShadow(
-                          color: Colors.black
-                              .withOpacity(0.15), // softer like other page
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
+                        // BoxShadow(
+                        //   color: Colors.black
+                        //       .withOpacity(0.15), // softer like other page
+                        //   blurRadius: 8,
+                        //   offset: const Offset(0, 4),
+                        // ),
                       ],
                     ),
                     child: Column(
@@ -155,19 +156,19 @@ class AboutUsPage extends StatelessWidget {
                         ),
                         _buildTeamMember(
                           "Genghis, Bautista",
-                          "Frontend Developer",
-                          "The past is history, the future is a mystery...",
+                          "System Analyst and Frontend Developer",
+                          "Healing comes in steps, and with time, it grows.",
                           "images/members_pfp/genghis.jpg",
                         ),
                         _buildTeamMember(
                           "Josh Brian, Bugarin",
                           "System Integrator and Fullstack Developer",
-                          "Kung kaya nila, edi sila na..",
+                          "Always stand back up whenever you fall, no matter what.",
                           "images/members_pfp/josh.jpg",
                         ),
                         _buildTeamMember(
                           "Raven, Caguioa",
-                          "Frontend Developer",
+                          "System Integrator and Frontend Developer",
                           "Never be easily affected by other's criticism, for they are just words.",
                           "images/members_pfp/raven.jpg",
                         ),
@@ -177,6 +178,7 @@ class AboutUsPage extends StatelessWidget {
                           "If an opportunity opens, do not hesitate to grab it.",
                           "images/members_pfp/marion.jpg",
                         ),
+                        const SizedBox(height: 30),
                       ],
                     ),
                   ),
@@ -184,25 +186,25 @@ class AboutUsPage extends StatelessWidget {
               ),
 
               /// Footer
-              Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.07,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withOpacity(0.9),
-                ),
-                child: Center(
-                  child: Text(
-                    "© 2025 Calmora, All Rights Reserved.",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
+              // Container(
+              //   width: double.infinity,
+              //   height: MediaQuery.of(context).size.height * 0.07,
+              //   padding: const EdgeInsets.all(10),
+              //   decoration: BoxDecoration(
+              //     color: theme.colorScheme.surface.withOpacity(0.9),
+              //   ),
+              //   child: Center(
+              //     child: Text(
+              //       "© 2025 Calmora, All Rights Reserved.",
+              //       style: GoogleFonts.lato(
+              //         fontSize: 14,
+              //         color: theme.brightness == Brightness.dark
+              //             ? Colors.white
+              //             : Colors.black,
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ],
@@ -211,53 +213,118 @@ class AboutUsPage extends StatelessWidget {
   }
 
   /// Helper: Team member card
-  Widget _buildTeamMember(
-      String name, String role, String quote, String imagePath) {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.85), // ✅ theme-aware
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: AssetImage(imagePath),
+  // Widget _buildTeamMember(
+  //     String name, String role, String quote, String imagePath) {
+  //   return Builder(
+  //     builder: (context) {
+  //       final theme = Theme.of(context);
+  //       return Container(
+  //         margin: const EdgeInsets.only(bottom: 16),
+  //         padding: const EdgeInsets.all(19),
+  //         decoration: BoxDecoration(
+  //           color: theme.colorScheme.surface.withOpacity(0.5), // ✅ theme-aware
+  //           borderRadius: BorderRadius.circular(20),
+  //           // border: Border.all(
+  //           //   color: Colors.white.withOpacity(0.9)
+  //           // ),
+  //         ),
+  //         child: Row(
+  //           children: [
+  //             CircleAvatar(
+  //               radius: 40,
+  //               backgroundImage: AssetImage(imagePath),
+  //             ),
+  //             const SizedBox(width: 12),
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     name,
+  //                     style: GoogleFonts.lato(
+  //                       fontSize: 18,
+  //                       fontWeight: FontWeight.bold,
+  //                     ),
+  //                   ),
+  //                   const Divider(color: Colors.grey),
+  //                   Text(
+  //                     "Role: $role",
+  //                     style: GoogleFonts.lato(fontSize: 14),
+  //                   ),
+  //                   const Divider(color: Colors.grey),
+  //                   Text(
+  //                     "Quote: $quote",
+  //                     style: GoogleFonts.lato(fontSize: 14),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+Widget _buildTeamMember(
+  String name,
+  String role,
+  String quote,
+  String imagePath,
+) {
+  return Builder(
+    builder: (context) {
+      final theme = Theme.of(context);
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(19),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start, // ✅ so it grows tall
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: AssetImage(imagePath),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    // softWrap: true,              // ✅ allows wrapping
+                    // overflow: TextOverflow.visible, // ✅ no ellipsis
+                  ),
+                  const Divider(color: Colors.grey),
+                  Text(
+                    "Role: $role",
+                    style: TextStyle(fontSize: 14),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                  const Divider(color: Colors.grey),
+                  Text(
+                    "Quote: $quote",
+                    style: TextStyle(fontSize: 14),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Divider(color: Colors.grey),
-                    Text(
-                      "Role: $role",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const Divider(color: Colors.grey),
-                    Text(
-                      "Quote: $quote",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 }

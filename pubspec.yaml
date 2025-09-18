@@ -199,6 +199,7 @@ flutter:
     - images/error.json
     - images/loading2.json
     - images/error2.json
+    - images/breathing_exercise_dp.jpg
 
     # Fonts Assets
   fonts:
