@@ -15,7 +15,6 @@ class AboutUsPage extends StatelessWidget {
         elevation: 0,
         title: Text(
           "About Us",
-          style: GoogleFonts.lato(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -32,7 +31,6 @@ class AboutUsPage extends StatelessWidget {
             fit: BoxFit.cover,
           ),
 
-          /// Blur + overlay
           /// Blur + overlay
           Container(
             color: theme.colorScheme.surface
@@ -70,7 +68,7 @@ class AboutUsPage extends StatelessWidget {
                         /// About Section
                         Text(
                           "What is Calmora?",
-                          style: GoogleFonts.lato(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -91,7 +89,7 @@ class AboutUsPage extends StatelessWidget {
                           "From the phrase 'a Helping Hand' combined with the resilience of Filipinos, our team came up with the name 'Calmora' "
                           "to symbolize using our collective strength by offering a hand to fellow Filipinos in need.",
                           textAlign: TextAlign.justify,
-                          style: GoogleFonts.lato(fontSize: 16),
+                          style: TextStyle(fontSize: 16),
                         ),
 
                         const SizedBox(height: 20),
@@ -101,7 +99,7 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Text(
                           "Our Mission",
-                          style: GoogleFonts.lato(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -112,7 +110,7 @@ class AboutUsPage extends StatelessWidget {
                           "Provide them with the resources they need to improve their mental health and guide them toward a healthier lifestyle. "
                           "And reach out to licensed mental health professionals for further support.",
                           textAlign: TextAlign.justify,
-                          style: GoogleFonts.lato(fontSize: 16),
+                          style: TextStyle(fontSize: 16),
                         ),
 
                         const SizedBox(height: 20),
@@ -122,7 +120,7 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Text(
                           "Our Vision",
-                          style: GoogleFonts.lato(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -132,7 +130,7 @@ class AboutUsPage extends StatelessWidget {
                           "Calmora aims to reduce and contribute in fully eliminating the effects of stigma revolving around Filipinos’ mental health. "
                           "Reminding the world that Filipinos can express their emotions and vulnerabilities, and we must not shame them when they show their true feelings just because of cultural expectations.",
                           textAlign: TextAlign.justify,
-                          style: GoogleFonts.lato(fontSize: 16),
+                          style: TextStyle(fontSize: 16),
                         ),
 
                         const SizedBox(height: 20),
@@ -142,7 +140,7 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Text(
                           "Our Team",
-                          style: GoogleFonts.lato(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -157,19 +155,19 @@ class AboutUsPage extends StatelessWidget {
                         ),
                         _buildTeamMember(
                           "Genghis, Bautista",
-                          "System Analyst and Frontend Developer",
+                          "Frontend Developer",
                           "The past is history, the future is a mystery...",
                           "images/members_pfp/genghis.jpg",
                         ),
                         _buildTeamMember(
                           "Josh Brian, Bugarin",
                           "System Integrator and Fullstack Developer",
-                          "Always stand back up whenever you fall, no matter what.",
+                          "Kung kaya nila, edi sila na..",
                           "images/members_pfp/josh.jpg",
                         ),
                         _buildTeamMember(
                           "Raven, Caguioa",
-                          "System Integrator and Frontend Developer",
+                          "Frontend Developer",
                           "Never be easily affected by other's criticism, for they are just words.",
                           "images/members_pfp/raven.jpg",
                         ),
@@ -196,7 +194,7 @@ class AboutUsPage extends StatelessWidget {
                 child: Center(
                   child: Text(
                     "© 2025 Calmora, All Rights Reserved.",
-                    style: GoogleFonts.lato(
+                    style: TextStyle(
                       fontSize: 14,
                       color: theme.brightness == Brightness.dark
                           ? Colors.white
@@ -238,7 +236,7 @@ class AboutUsPage extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: GoogleFonts.lato(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -246,12 +244,12 @@ class AboutUsPage extends StatelessWidget {
                     const Divider(color: Colors.grey),
                     Text(
                       "Role: $role",
-                      style: GoogleFonts.lato(fontSize: 14),
+                      style: TextStyle(fontSize: 14),
                     ),
                     const Divider(color: Colors.grey),
                     Text(
                       "Quote: $quote",
-                      style: GoogleFonts.lato(fontSize: 14),
+                      style: TextStyle(fontSize: 14),
                     ),
                   ],
                 ),

@@ -16,7 +16,6 @@ class EmergencyServicePage extends StatelessWidget {
         elevation: 0,
         title: Text(
           "Emergency Services",
-          style: GoogleFonts.lato(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -69,7 +68,7 @@ class EmergencyServicePage extends StatelessWidget {
                   // Title
                   Text(
                     "You Are Not Alone",
-                    style: GoogleFonts.lato(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onBackground,
@@ -80,7 +79,7 @@ class EmergencyServicePage extends StatelessWidget {
                   // Subtitle
                   Text(
                     "If you or someone you know is struggling, these hotlines are available to provide help and support.",
-                    style: GoogleFonts.lato(
+                    style: TextStyle(
                       fontSize: 16,
                       color: theme.colorScheme.onBackground.withOpacity(0.75),
                       height: 1.4,
@@ -94,7 +93,7 @@ class EmergencyServicePage extends StatelessWidget {
                   // Section title
                   Text(
                     "Mental Health Hotlines (PH)",
-                    style: GoogleFonts.lato(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onBackground,
@@ -153,7 +152,7 @@ class EmergencyServicePage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.lato(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onBackground,
@@ -162,7 +161,7 @@ class EmergencyServicePage extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   number,
-                  style: GoogleFonts.lato(
+                  style: TextStyle(
                     fontSize: 14,
                     color: Theme.of(context)
                         .colorScheme

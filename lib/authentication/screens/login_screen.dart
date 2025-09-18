@@ -111,6 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       final userId = userData['userId'];
                       final approvalStatus = userData['approvalStatus'];
                       final token = userData['token'];
+                      final surveyCompleted = userData['surveyCompleted'] ?? false;
 
                       if (userType == 'Specialist') {
                         if (approvalStatus == 'rejected') {
@@ -153,15 +154,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       await StorageHelper.saveUserType(userType);
 
                       if (userType == 'Patient') {
-                        final FlutterSecureStorage storage =
-                            FlutterSecureStorage();
-                        final hasCompletedSurvey = await storage.read(
-                            key: 'hasCompletedSurvey_$userId');
-                        final surveyOnboardingCompleted = await storage.read(
-                            key: 'survey_onboarding_completed_$userId');
+                        await StorageHelper.saveSurveyCompleted(
+                            userId, surveyCompleted);
 
-                        if (hasCompletedSurvey == 'true' &&
-                            surveyOnboardingCompleted == 'true') {
+                        await StorageHelper.saveSurveyOnboarding(userId, false);
+
+                        if (surveyCompleted) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -172,7 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => SurveyScreen()),
-                            //builder: (context) => PatientHomeScreen()),
                           );
                         }
                       } else if (userType == 'Specialist') {

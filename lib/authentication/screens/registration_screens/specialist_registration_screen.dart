@@ -293,7 +293,7 @@ class _SpecialistRegistrationScreenState
       otherDetails: {
         "specialization": _specializationController.text,
         "location": _locationController.text,
-        "clinic": _clinicLocationString ?? "",
+        "clinic": "${_clinicLocation!.latitude},${_clinicLocation!.longitude}",
         "licenseNumber": _uploadedLicenseUrl!,
       },
       profileImage: '',
@@ -638,8 +638,7 @@ class _SpecialistRegistrationScreenState
                 final LatLng? pickedLocation = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MapPickerScreen(),
-                  ),
+                      builder: (context) => const MapPickerScreen()),
                 );
 
                 if (pickedLocation != null) {
@@ -647,13 +646,12 @@ class _SpecialistRegistrationScreenState
                       "${pickedLocation.latitude},${pickedLocation.longitude}";
 
                   try {
-                    List<Placemark> placemarks = await placemarkFromCoordinates(
+                    final placemarks = await placemarkFromCoordinates(
                       pickedLocation.latitude,
                       pickedLocation.longitude,
                     );
-
                     if (placemarks.isNotEmpty) {
-                      final Placemark place = placemarks.first;
+                      final place = placemarks.first;
                       readableAddress =
                           "${place.name ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
                     }
@@ -662,8 +660,10 @@ class _SpecialistRegistrationScreenState
                   }
 
                   setState(() {
-                    _clinicLocation = pickedLocation;
-                    _clinicLocationString = readableAddress;
+                    _clinicLocation =
+                        pickedLocation;
+                    _clinicLocationString =
+                        readableAddress; 
                   });
 
                   _checkFields();
@@ -680,7 +680,7 @@ class _SpecialistRegistrationScreenState
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
-            )
+            ),
           ],
         );
 

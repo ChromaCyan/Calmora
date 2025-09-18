@@ -67,4 +67,30 @@ class StorageHelper {
   static Future<void> clearRole() async {
     await _storage.delete(key: 'userType');
   }
+
+  static Future<void> saveSurveyCompleted(String userId, bool completed) async {
+    await _storage.write(
+      key: 'hasCompletedSurvey_$userId',
+      value: completed.toString(),
+    );
+  }
+
+  static Future<bool> getSurveyCompleted(String userId) async {
+    final value = await _storage.read(key: 'hasCompletedSurvey_$userId');
+    return value == 'true';
+  }
+
+  static Future<void> saveSurveyOnboarding(
+      String userId, bool completed) async {
+    await _storage.write(
+      key: 'survey_onboarding_completed_$userId',
+      value: completed.toString(),
+    );
+  }
+
+  static Future<bool> getSurveyOnboarding(String userId) async {
+    final value =
+        await _storage.read(key: 'survey_onboarding_completed_$userId');
+    return value == 'true';
+  }
 }

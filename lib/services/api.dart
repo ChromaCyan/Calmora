@@ -69,7 +69,19 @@ class ApiRepository {
     final data = json.decode(response.body);
 
     if (response.statusCode == 200) {
-      await _storage.write(key: 'token', value: data['token']);
+      final token = data['token'];
+      final userId = data['userId'];
+      final surveyCompleted = data['surveyCompleted'] ?? false;
+
+      // Save token
+      await _storage.write(key: 'token', value: token);
+
+      // Save userId
+      await _storage.write(key: 'userId', value: userId);
+
+      // Save survey completion flag (scoped to userId)
+      await StorageHelper.saveSurveyCompleted(userId, surveyCompleted);
+
       return data;
     } else {
       final errorMessage = data['message'] ?? 'Failed to login';

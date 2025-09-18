@@ -17,6 +17,7 @@ import 'package:armstrong/universal/profile/setting_screen.dart';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'dart:ui';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -302,6 +303,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent, 
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+            child: Container(
+              color: Theme.of(context)
+                  .colorScheme
+                  .surface
+                  .withOpacity(0.6), 
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -318,7 +332,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         centerTitle: true,
-        elevation: 2,
         actions: [
           IconButton(
             icon: Icon(
@@ -490,7 +503,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 const SizedBox(height: 20),
 
-                                /// 🆕 ADD THIS BLOCK HERE
                                 if (licenseNumberController.text.isNotEmpty)
                                   Column(
                                     crossAxisAlignment:
@@ -542,7 +554,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     elevation: 0,
                                     shadowColor: Colors.transparent,
                                     minimumSize: Size(screenWidth * 0.4,
-                                        40), // Responsive size
+                                        40), 
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -554,7 +566,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Text("Logout",
                                       style: TextStyle(
                                           fontSize:
-                                              buttonFontSize)), // Dynamic font size
+                                              buttonFontSize)), 
                                 ),
                               ),
                             ],

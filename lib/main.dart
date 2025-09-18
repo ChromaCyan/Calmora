@@ -12,8 +12,6 @@ import 'package:armstrong/providers/font_provider.dart';
 import 'package:armstrong/providers/theme_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:armstrong/services/socket_service.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
@@ -29,7 +27,6 @@ void main() async {
   // Initialize Local Notifications
   await NotificationService.initNotifications();
 
-
   String? token = await storage.read(key: 'jwt');
   String? role;
   bool onboardingCompleted = await _checkOnboardingStatus();
@@ -43,10 +40,10 @@ void main() async {
       final jwt = JWT.verify(token, SecretKey('your_jwt_secret_key'));
       role = jwt.payload['userType'];
       final userId = jwt.payload['userId'];
+      final hasCompletedSurveyFromJWT = jwt.payload['surveyCompleted'] ?? false;
 
       if (token != null && role == 'Patient') {
-        hasCompletedSurvey =
-            await storage.read(key: 'hasCompletedSurvey_$userId') == 'true';
+        hasCompletedSurvey = hasCompletedSurveyFromJWT;
         surveyOnboardingCompleted =
             await storage.read(key: 'survey_onboarding_completed_$userId') ==
                 'true';
@@ -135,18 +132,12 @@ class MyApp extends StatelessWidget {
 
   Widget _getHomeScreen(String? role) {
     if (role == 'Patient') {
-      // Check if the patient has completed the survey and onboarding before navigating to home screen
-      if (hasCompletedSurvey && surveyOnboardingCompleted) {
-        return const PatientHomeScreen();
-      } else {
-        // Navigate to Survey if the user hasn't completed it
-        return const SurveyScreen();
-      }
+      return hasCompletedSurvey
+          ? const PatientHomeScreen()
+          : const SurveyScreen();
     } else if (role == 'Specialist') {
-      // Navigate to Specialist home screen
       return const SpecialistHomeScreen();
     } else {
-      // Default case, navigate to Login screen if no valid role
       return const LoginScreen();
     }
   }

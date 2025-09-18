@@ -14,7 +14,6 @@ class MentalHealthAwarenessPage extends StatelessWidget {
         elevation: 0,
         title: Text(
           "Mental Health Awareness",
-          style: GoogleFonts.lato(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -46,14 +45,15 @@ class MentalHealthAwarenessPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 25),
                 Center(
                   child: Text(
                     "Filipinos’s Mental Health Matters",
-                    style: GoogleFonts.lato(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color:
-                          theme.colorScheme.onBackground, // ✅ adapts to theme
+                          theme.colorScheme.onBackground, 
                     ),
                   ),
                 ),
@@ -82,7 +82,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
                         title: "It's okay to seek help.",
                         message:
                             "Recognizing when you need support is a sign of strength. Don't hesitate to reach out to a friend or a professional.",
-                        iconColor: Colors.amber, // ⚠️ warning color
+                        iconColor: Colors.amber,
                       ),
                       Divider(color: Colors.grey.shade600),
                       _buildTip(
@@ -91,7 +91,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
                         title: "You are part of a community.",
                         message:
                             "Many Filipinos face similar challenges. Sharing your experiences can foster connection and understanding.",
-                        iconColor: Colors.green, // 👥 community color
+                        iconColor: Colors.green,
                       ),
                       Divider(color: Colors.grey.shade600),
                       _buildTip(
@@ -100,7 +100,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
                         title: "Communication is key.",
                         message:
                             "Talking about your feelings can help you process them. Consider journaling or discussing with someone you trust.",
-                        iconColor: Colors.teal, // 💬 chat color
+                        iconColor: Colors.teal,
                       ),
                       Divider(color: Colors.grey.shade600),
                       _buildTip(
@@ -149,7 +149,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.lato(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
@@ -158,7 +158,7 @@ class MentalHealthAwarenessPage extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   message,
-                  style: GoogleFonts.lato(
+                  style: TextStyle(
                     fontSize: 16,
                     color: theme.colorScheme.onBackground.withOpacity(0.75),
                   ),

@@ -18,12 +18,16 @@ class AppointmentListScreen extends StatefulWidget {
 class _AppointmentListScreenState extends State<AppointmentListScreen> {
   String selectedCategory = 'pending';
 
+  Future<void> _refreshAppointments() async {
+    context
+        .read<AppointmentBloc>()
+        .add(FetchPatientAppointmentsEvent(patientId: widget.patientId));
+  }
+
   @override
   void initState() {
     super.initState();
-    context.read<AppointmentBloc>().add(
-          FetchPatientAppointmentsEvent(patientId: widget.patientId),
-        );
+    _refreshAppointments();
   }
 
   @override
@@ -52,15 +56,19 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
             if (state is AppointmentLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is AppointmentError) {
-              return Center(child: Text('Error: ${state.message}'));
+              return Column(
+                children: [
+                  _buildCategorySelector(theme),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: Center(child: Text('Error: ${state.message}')),
+                  ),
+                ],
+              );
             } else if (state is PatientAppointmentsLoaded) {
               final allAppointments = state.appointments
                   .where((appointment) => appointment['status'] != 'declined')
                   .toList();
-
-              if (allAppointments.isEmpty) {
-                return const Center(child: Text('No appointments found.'));
-              }
 
               // Sort by appointment date
               allAppointments.sort((a, b) {
@@ -69,7 +77,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                 return aTime.compareTo(bTime);
               });
 
-              // Filter
               final pendingAppointments = allAppointments
                   .where((a) => a['status'] == 'pending')
                   .toList();
@@ -86,27 +93,47 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                   _buildCategorySelector(theme),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: filteredAppointments.isEmpty
-                        ? const Center(
-                            child: Text('No appointments available.'))
-                        : ListView.builder(
-                            itemCount: filteredAppointments.length,
-                            itemBuilder: (context, index) {
-                              final appointment = filteredAppointments[index];
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child:
-                                    AppointmentCard(appointment: appointment),
-                              );
-                            },
-                          ),
+                    child: RefreshIndicator(
+                      onRefresh: _refreshAppointments,
+                      child: filteredAppointments.isEmpty
+                          ? ListView(
+                              physics:
+                                  const AlwaysScrollableScrollPhysics(), // ensures pull works
+                              children: const [
+                                SizedBox(height: 200),
+                                Center(child: Text('No appointments available.')),
+                              ],
+                            )
+                          : ListView.builder(
+                              physics:
+                                  const AlwaysScrollableScrollPhysics(),
+                              itemCount: filteredAppointments.length,
+                              itemBuilder: (context, index) {
+                                final appointment =
+                                    filteredAppointments[index];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0),
+                                  child: AppointmentCard(
+                                      appointment: appointment),
+                                );
+                              },
+                            ),
+                    ),
                   ),
                 ],
               );
             }
 
-            return const Center(child: Text('Unexpected state.'));
+            return Column(
+              children: [
+                _buildCategorySelector(theme),
+                const SizedBox(height: 10),
+                const Expanded(
+                  child: Center(child: Text('Unexpected state.')),
+                ),
+              ],
+            );
           },
         ),
       ),
