@@ -100,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: AppSection(
                       title: "What is Calmora?",
-                      imageUrl: "images/Calmora.png",
+                      imageUrl: "images/calmora_circle_crop.png",
                       onTap: () => _navigateWithSlide(context, AboutUsPage()),
                     ),
                   ),
@@ -132,7 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: GuideCard(
                       title: "Breathing Exercise Guide",
-                      imageUrl: "images/breath.jpg",
+                      imageUrl: "images/breathing_exercise_dp.jpg",
                       onTap: () =>
                           _navigateWithSlide(context, BreathingGuideScreen()),
                     ),
