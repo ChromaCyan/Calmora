@@ -131,15 +131,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   style: theme.textTheme.bodyMedium,
                                 ),
                               )
-                            : ListView.builder(
-                                itemCount: displayedNotifications.length,
-                                itemBuilder: (context, index) {
-                                  return NotificationCard(
-                                    notification: displayedNotifications[index],
-                                  );
+                            : RefreshIndicator(
+                                onRefresh: () async {
+                                  await fetchNotifications();
                                 },
+                                child: ListView.builder(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  itemCount: displayedNotifications.length,
+                                  itemBuilder: (context, index) {
+                                    return NotificationCard(
+                                      notification:
+                                          displayedNotifications[index],
+                                    );
+                                  },
+                                ),
                               ),
-              ),
+              )
             ],
           ),
         ],

@@ -51,7 +51,27 @@ class _ArticleListState extends State<ArticleList> {
           if (state is ArticleLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ArticleError) {
-            return Center(child: Text('Error: ${state.message}'));
+            return RefreshIndicator(
+              onRefresh: () async {
+                if (_patientId != null) {
+                  context
+                      .read<ArticleBloc>()
+                      .add(FetchRecommendedArticles(_patientId!));
+                }
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: 230,
+                  child: Center(
+                    child: Text(
+                      "Something went wrong. Pull down to retry.",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+              ),
+            );
           } else if (state is ArticleLoaded) {
             final filteredArticles = state.articles.where((article) {
               return article.title

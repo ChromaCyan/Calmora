@@ -67,15 +67,29 @@ class _SpecialistAppointmentListScreenState
         ),
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
-            : errorMessage.isNotEmpty
-                ? Center(child: Text('Error: $errorMessage'))
-                : Column(
-                    children: [
-                      _buildCategorySelector(theme),
-                      const SizedBox(height: 10),
-                      Expanded(child: _buildAppointmentList()),
-                    ],
-                  ),
+            : RefreshIndicator(
+                onRefresh: _fetchAppointments,
+                child: errorMessage.isNotEmpty
+                    ? SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          height: 300,
+                          child: Center(
+                            child: Text(
+                              'Something went wrong. Pull down to retry.',
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          _buildCategorySelector(theme),
+                          const SizedBox(height: 10),
+                          Expanded(child: _buildAppointmentList()),
+                        ],
+                      ),
+              ),
       ),
     );
   }
@@ -130,13 +144,12 @@ class _SpecialistAppointmentListScreenState
 
     if (selectedCategory == 'upcoming') {
       var now = DateTime.now();
-
       var upcomingAppointments = appointments
           .where((appointment) => appointment['status'] == 'accepted')
           .map((appointment) {
         var appointmentDate = DateTime.parse(appointment['appointmentDate']);
-        var startTime = DateFormat('hh:mm a')
-            .parse(appointment['timeSlot']['startTime']);
+        var startTime =
+            DateFormat('hh:mm a').parse(appointment['timeSlot']['startTime']);
         var fullAppointmentTime = DateTime(
           appointmentDate.year,
           appointmentDate.month,
@@ -174,6 +187,7 @@ class _SpecialistAppointmentListScreenState
     }
 
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       itemCount: filteredAppointments.length,
       itemBuilder: (context, index) {
         final appointment = filteredAppointments[index];
