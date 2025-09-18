@@ -90,18 +90,18 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                             : LinearGradient(
                                 colors: isHovered
                                     ? [
-                                        colorScheme.secondary.withOpacity(0.3),
-                                        colorScheme.secondary.withOpacity(0.15),
+                                        colorScheme.secondary.withOpacity(0.25),
+                                        colorScheme.secondary.withOpacity(0.1),
                                       ]
                                     : [
-                                        Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.grey[900]!
+                                        theme.brightness == Brightness.dark
+                                            ? Colors.grey[
+                                                850]! // 🔹 darker for dark mode
+                                            : Colors.grey[
+                                                300]!, // 🔹 softer gray for light mode
+                                        theme.brightness == Brightness.dark
+                                            ? Colors.grey[800]!
                                             : Colors.grey[200]!,
-                                        Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.grey[850]!
-                                            : Colors.grey[100]!,
                                       ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -110,7 +110,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                         border: Border.all(
                           color: isSelected
                               ? colorScheme.primary
-                              : (Theme.of(context).brightness == Brightness.dark
+                              : (theme.brightness == Brightness.dark
                                   ? Colors.grey[600]!
                                   : Colors.grey[400]!),
                           width: isSelected ? 2 : 1.2,
