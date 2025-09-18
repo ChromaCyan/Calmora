@@ -10,6 +10,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'dart:ui';
 import 'package:armstrong/services/socket_service.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -180,7 +181,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   icon: Icon(
                     Icons.person_2,
                     size: 28,
-                    color: theme.iconTheme.color ?? theme.colorScheme.onSurfaceVariant,
+                    color: theme.iconTheme.color ??
+                        theme.colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -207,7 +209,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   IconButton(
                     icon: Stack(
                       children: [
-                        Icon(Icons.notifications, size: 28, color: theme.iconTheme.color ?? theme.colorScheme.onSurfaceVariant,),
+                        Icon(
+                          Icons.notifications,
+                          size: 28,
+                          color: theme.iconTheme.color ??
+                              theme.colorScheme.onSurfaceVariant,
+                        ),
                         if (_unreadCount > 0)
                           Positioned(
                             right: 0,
@@ -281,7 +288,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   ChatListScreen(),
                   _userId != null
                       ? AppointmentListScreen(patientId: _userId!)
-                      : const Center(child: CircularProgressIndicator()),
+                      : Center(
+                          child: GlobalLoader.loader,
+                        ),
                 ],
               ),
             ),

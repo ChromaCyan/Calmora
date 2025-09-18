@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/specialist_appointment_card.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:intl/intl.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistAppointmentListScreen extends StatefulWidget {
   final String specialistId;
@@ -66,7 +67,9 @@ class _SpecialistAppointmentListScreenState
           ],
         ),
         child: isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(
+                child: GlobalLoader.loader,
+              )
             : RefreshIndicator(
                 onRefresh: _fetchAppointments,
                 child: errorMessage.isNotEmpty

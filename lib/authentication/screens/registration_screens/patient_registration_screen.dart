@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/authentication/screens/login_screen.dart';
-import 'package:armstrong/splash_screen/screens/survey_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
@@ -12,9 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:armstrong/services/supabase.dart';
-import 'dart:io';
+import 'package:armstrong/config/global_loader.dart';
 
 class PatientRegistrationScreen extends StatefulWidget {
   const PatientRegistrationScreen({super.key});
@@ -72,11 +69,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       filled: false,
       fillColor: Colors.transparent,
       enabledBorder: UnderlineInputBorder(
-        // borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
       ),
       focusedBorder: UnderlineInputBorder(
-        // borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -347,7 +342,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                 },
                 builder: (context, state) {
                   if (state is AuthLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return GlobalLoader.loader;
                   }
 
                   return SingleChildScrollView(

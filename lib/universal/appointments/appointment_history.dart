@@ -4,6 +4,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/cards/appointment_complete_pop_card.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class CompletedAppointmentsScreen extends StatefulWidget {
   const CompletedAppointmentsScreen({super.key});
@@ -117,7 +118,9 @@ class _CompletedAppointmentsScreenState
               const SizedBox(height: 10),
               Expanded(
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: GlobalLoader.loader,
+                      )
                     : hasError
                         ? Center(
                             child: Text(

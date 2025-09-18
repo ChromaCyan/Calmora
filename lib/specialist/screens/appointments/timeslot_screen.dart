@@ -5,6 +5,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart'
 import 'package:armstrong/widgets/forms/timeslot_form.dart';
 import 'package:intl/intl.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class TimeSlotListScreen extends StatefulWidget {
   final String specialistId;
@@ -173,8 +174,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                     child: BlocBuilder<TimeSlotBloc, TimeSlotState>(
                       builder: (context, state) {
                         if (state is TimeSlotLoading) {
-                          return const Center(
-                              child: CircularProgressIndicator());
+                          return GlobalLoader.loader;
                         } else if (state is TimeSlotSuccess) {
                           final slots = state.data as List<TimeSlotModel>;
 

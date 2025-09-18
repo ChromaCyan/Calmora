@@ -16,13 +16,13 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:armstrong/services/notification_service.dart';
 import 'dart:async';
 import 'services/supabase.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = FlutterSecureStorage();
   await SupabaseService.initialize();
-
-  print("🚀 Starting app...");
 
   // Initialize Local Notifications
   await NotificationService.initNotifications();
@@ -31,7 +31,6 @@ void main() async {
   String? role;
   bool onboardingCompleted = await _checkOnboardingStatus();
 
-  // Check if survey is completed for patient
   bool hasCompletedSurvey = false;
   bool surveyOnboardingCompleted = false;
 
@@ -45,8 +44,7 @@ void main() async {
       if (token != null && role == 'Patient') {
         hasCompletedSurvey = hasCompletedSurveyFromJWT;
         surveyOnboardingCompleted =
-            await storage.read(key: 'survey_onboarding_completed_$userId') ==
-                'true';
+            await storage.read(key: 'survey_onboarding_completed_$userId') == 'true';
       }
     } catch (e) {
       print('Invalid token: $e');
@@ -56,6 +54,9 @@ void main() async {
     }
   }
 
+  // Setup EasyLoading globally
+  _setupEasyLoading();
+
   runApp(MyApp(
     isLoggedIn: token != null,
     role: role,
@@ -63,6 +64,15 @@ void main() async {
     hasCompletedSurvey: hasCompletedSurvey,
     surveyOnboardingCompleted: surveyOnboardingCompleted,
   ));
+}
+
+// Setup EasyLoading globally
+void _setupEasyLoading() {
+  EasyLoading.instance
+    ..indicatorWidget = GlobalLoader.loader // your custom loader
+    ..maskType = EasyLoadingMaskType.black
+    ..userInteractions = false
+    ..dismissOnTap = false;
 }
 
 Future<bool> _checkOnboardingStatus() async {
@@ -113,6 +123,7 @@ class MyApp extends StatelessWidget {
             ),
             themeMode: context.watch<ThemeProvider>().themeMode,
             debugShowCheckedModeBanner: false,
+            builder: EasyLoading.init(), // attach EasyLoading globally
             home: onboardingCompleted
                 ? _getInitialScreen()
                 : const SplashScreen(),

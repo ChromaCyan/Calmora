@@ -5,6 +5,7 @@ import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistArticleDetailPage extends StatefulWidget {
   final String articleId;
@@ -59,7 +60,7 @@ class _SpecialistArticleDetailPageState
         body: BlocBuilder<ArticleBloc, ArticleState>(
           builder: (context, state) {
             if (state is ArticleLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return GlobalLoader.loader;
             } else if (state is ArticleError) {
               return Center(
                 child: Text(

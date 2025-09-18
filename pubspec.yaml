@@ -69,6 +69,8 @@ dependencies:
   flutter_local_notifications: ^19.4.0
   flutter_keyboard_visibility: ^6.0.0
   table_calendar: ^3.1.3
+  flutter_easyloading: ^3.0.5
+  lottie: ^3.3.2
   
   #Launcher Dependencies
   flutter_launcher_icons: ^0.14.3
@@ -191,6 +193,12 @@ flutter:
     - images/no_profile.png
     - images/no_profile2.png
     - images/no_profile3.png
+    - images/loading.gif
+    - images/mental.json
+    - images/loading.json
+    - images/error.json
+    - images/loading2.json
+    - images/error2.json
 
     # Fonts Assets
   fonts:

@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:armstrong/config/global_loader.dart';
+
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -354,7 +356,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         },
         builder: (context, state) {
           if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return GlobalLoader.loader;
           }
 
           return Stack(

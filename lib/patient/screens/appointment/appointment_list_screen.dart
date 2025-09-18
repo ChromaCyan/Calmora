@@ -4,6 +4,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/widgets/cards/appointment_card.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class AppointmentListScreen extends StatefulWidget {
   final String patientId;
@@ -54,7 +55,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         child: BlocBuilder<AppointmentBloc, AppointmentState>(
           builder: (context, state) {
             if (state is AppointmentLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return GlobalLoader.loader;
             } else if (state is AppointmentError) {
               return Column(
                 children: [

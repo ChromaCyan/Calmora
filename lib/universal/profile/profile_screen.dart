@@ -18,6 +18,7 @@ import 'package:armstrong/services/socket_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:ui';
+import 'package:armstrong/config/global_loader.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -345,7 +346,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+                        child: GlobalLoader.loader,
+                      )
           : hasError
               ? const Center(child: Text("Failed to load profile"))
               : SingleChildScrollView(

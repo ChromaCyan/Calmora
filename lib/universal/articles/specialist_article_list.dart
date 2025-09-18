@@ -4,6 +4,7 @@ import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/widgets/cards/specialist_article_card.dart';
 import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/universal/articles/add_articles.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistArticleScreen extends StatefulWidget {
   final String specialistId;
@@ -98,7 +99,7 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
                   child: BlocBuilder<ArticleBloc, ArticleState>(
                     builder: (context, state) {
                       if (state is ArticleLoading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return GlobalLoader.loader;
                       }
                       if (state is ArticleError) {
                         String errorMessage =

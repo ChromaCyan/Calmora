@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/models/article/article.dart';
-
+import 'package:armstrong/config/global_loader.dart';
 class ArticleList extends StatelessWidget {
   final String searchQuery;
 
@@ -16,7 +16,7 @@ class ArticleList extends StatelessWidget {
         future: ApiRepository().getAllArticles(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return GlobalLoader.loader;
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

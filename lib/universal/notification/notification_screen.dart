@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:ui';
+import 'package:armstrong/config/global_loader.dart';
+import 'package:armstrong/config/global_error.dart';
 
 class NotificationsScreen extends StatefulWidget {
   @override
@@ -114,15 +116,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               const SizedBox(height: 10),
               Expanded(
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: GlobalLoader.loader,
+                      )
                     : hasError
-                        ? Center(
-                            child: Text(
-                              "Failed to load notifications",
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.error,
-                              ),
-                            ),
+                        ? GlobalErrorWidget(
+                            onRetry: () async {
+                              await fetchNotifications(); 
+                            },
+                            message: "Failed to load notifications",
                           )
                         : displayedNotifications.isEmpty
                             ? Center(

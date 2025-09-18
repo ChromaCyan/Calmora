@@ -6,6 +6,7 @@ import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/universal/chat/screen/chat_card.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
@@ -121,7 +122,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const AIChatScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const AIChatScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -153,7 +155,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
             /// Chat List
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: GlobalLoader.loader,
+                    )
                   : _errorMessage.isNotEmpty
                       ? Center(
                           child: Text(
@@ -171,7 +175,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   child: Text(
                                     'No chats found.',
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                      color: theme.colorScheme.onBackground.withOpacity(0.6),
+                                      color: theme.colorScheme.onBackground
+                                          .withOpacity(0.6),
                                     ),
                                   ),
                                 )
@@ -179,14 +184,21 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                   itemCount: _filteredChats.length,
                                   itemBuilder: (context, index) {
                                     final chat = _filteredChats[index];
-                                    final participants = chat['participants'] ?? [];
+                                    final participants =
+                                        chat['participants'] ?? [];
                                     final chatId = chat['chatId'] ?? '';
-                                    final recipient = participants.isNotEmpty ? participants[0] : {};
+                                    final recipient = participants.isNotEmpty
+                                        ? participants[0]
+                                        : {};
                                     final recipientId = recipient['_id'] ?? '';
-                                    final recipientName = recipient['firstName'] ?? 'No Name';
-                                    final recipientImage = recipient['profileImage'] ?? '';
-                                    final lastMessage = chat['lastMessage'] ?? {};
-                                    final messageContent = lastMessage['content'] ?? 'No message';
+                                    final recipientName =
+                                        recipient['firstName'] ?? 'No Name';
+                                    final recipientImage =
+                                        recipient['profileImage'] ?? '';
+                                    final lastMessage =
+                                        chat['lastMessage'] ?? {};
+                                    final messageContent =
+                                        lastMessage['content'] ?? 'No message';
 
                                     return ChatCard(
                                       chatId: chatId,

@@ -10,6 +10,7 @@ import 'package:armstrong/widgets/navigation/search.dart';
 import 'package:armstrong/widgets/cards/daily_advice_card.dart';
 import 'package:armstrong/patient/screens/discover/specialist_detail_screen.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({Key? key}) : super(key: key);
@@ -467,7 +468,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return BlocBuilder<SpecialistBloc, SpecialistState>(
       builder: (context, state) {
         if (state is SpecialistLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return GlobalLoader.loader;
         } else if (state is SpecialistError) {
           return Center(child: Text('Error: ${state.message}'));
         } else if (state is SpecialistLoaded) {
@@ -537,7 +538,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return BlocBuilder<ArticleBloc, ArticleState>(
       builder: (context, state) {
         if (state is ArticleLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return GlobalLoader.loader;
         } else if (state is ArticleError) {
           return Center(child: Text('Error: ${state.message}'));
         } else if (state is ArticleLoaded) {

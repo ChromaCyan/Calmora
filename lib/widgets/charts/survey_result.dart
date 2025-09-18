@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:armstrong/models/survey/survey_result.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class SurveyScoreChart extends StatefulWidget {
   final String patientId;
@@ -69,7 +70,7 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
       future: surveyData,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return GlobalLoader.loader;
         } else if (snapshot.hasError || !snapshot.hasData) {
           return Center(
             child: Text(

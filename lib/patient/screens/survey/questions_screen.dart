@@ -6,6 +6,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'dart:ui';
+import 'package:armstrong/config/global_loader.dart';
 
 class QuestionScreen extends StatefulWidget {
   @override
@@ -152,9 +153,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = isDark
-        ? Colors.black.withOpacity(0.4)
-        : Colors.white.withOpacity(0.4);
+    final glassColor =
+        isDark ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.4);
 
     return Scaffold(
       body: Stack(
@@ -170,13 +170,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
               child: Container(color: glassColor),
             ),
           ),
-
           _isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? Center(
+                  child: GlobalLoader.loader,
+                )
               : Column(
                   children: [
                     const SizedBox(height: 30),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 20),
@@ -210,7 +210,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         ],
                       ),
                     ),
-
                     Expanded(
                       child: Column(
                         children: [
@@ -249,15 +248,16 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         ],
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: TextButton(
                           style: TextButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.surface.withOpacity(0.25),
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withOpacity(0.25),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -275,9 +275,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                 .textTheme
                                 .labelLarge
                                 ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                         ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/specialist_appointment_card.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:intl/intl.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistDashboardScreen extends StatefulWidget {
   final String specialistId;
@@ -141,7 +142,7 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
 
   Widget _buildUpcomingAppointments() {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return GlobalLoader.loader;
     } else if (errorMessage.isNotEmpty) {
       return Center(child: Text('Error: $errorMessage'));
     } else if (upcomingAppointments.isEmpty) {

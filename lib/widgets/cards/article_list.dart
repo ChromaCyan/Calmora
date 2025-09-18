@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/widgets/cards/article_card.dart';
 import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:armstrong/models/article/article.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class ArticleList extends StatefulWidget {
   final String searchQuery;
@@ -41,7 +42,7 @@ class _ArticleListState extends State<ArticleList> {
   @override
   Widget build(BuildContext context) {
     if (_patientId == null) {
-      return const Center(child: CircularProgressIndicator());
+      return GlobalLoader.loader;
     }
 
     return SizedBox(
@@ -49,7 +50,7 @@ class _ArticleListState extends State<ArticleList> {
       child: BlocBuilder<ArticleBloc, ArticleState>(
         builder: (context, state) {
           if (state is ArticleLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return GlobalLoader.loader;
           } else if (state is ArticleError) {
             return RefreshIndicator(
               onRefresh: () async {

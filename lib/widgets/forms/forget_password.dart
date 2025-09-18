@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/text/register_built_text_field.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -89,7 +90,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         await _apiRepository.requestPasswordReset(_emailController.text.trim());
         setState(() => step = "enter_code");
         FocusScope.of(context).requestFocus(_otpFocus);
-
       } else if (step == "enter_code") {
         if (_otpController.text.isEmpty) {
           throw Exception("Please enter the OTP code.");
@@ -107,7 +107,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         } else {
           throw Exception(response["message"] ?? "OTP verification failed.");
         }
-
       } else if (step == "reset_password") {
         final password = _newPasswordController.text;
         final confirmPassword = _confirmPasswordController.text;
@@ -134,7 +133,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         } else {
           throw Exception(response["message"] ?? "Failed to reset password.");
         }
-
       } else {
         Navigator.pop(context); // after success
       }
@@ -171,7 +169,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 100),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 100),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -186,12 +185,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 40),
-
                         if (isLoading)
-                          const Center(child: CircularProgressIndicator())
+                          Center(
+                            child: GlobalLoader.loader,
+                          )
                         else if (step == "verify") ...[
                           Text("Step 1 of 3: Email",
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.w500,
                                     color: colorScheme.primary,
                                   )),
@@ -204,7 +207,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         ] else if (step == "enter_code") ...[
                           Text("Step 2 of 3: OTP Code",
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.w500,
                                     color: colorScheme.primary,
                                   )),
@@ -217,7 +223,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         ] else if (step == "reset_password") ...[
                           Text("Step 3 of 3: New & Confirm Password",
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.w500,
                                     color: colorScheme.primary,
                                   )),
@@ -234,7 +243,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() => _obscurePassword = !_obscurePassword);
+                                setState(
+                                    () => _obscurePassword = !_obscurePassword);
                               },
                             ),
                             onChanged: (val) {
@@ -281,13 +291,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               style: Theme.of(context).textTheme.titleLarge,
                               textAlign: TextAlign.center),
                         ],
-
                         if (errorMessage != null) ...[
                           const SizedBox(height: 10),
                           Text(errorMessage!,
                               style: TextStyle(color: colorScheme.error)),
                         ],
-
                         const SizedBox(height: 40),
                         Center(
                           child: ElevatedButton(

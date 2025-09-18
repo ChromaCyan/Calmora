@@ -13,6 +13,7 @@ import 'dart:io';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:armstrong/widgets/cards/map_picker.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistRegistrationScreen extends StatefulWidget {
   const SpecialistRegistrationScreen({super.key});
@@ -372,7 +373,7 @@ class _SpecialistRegistrationScreenState
                   },
                   builder: (context, state) {
                     if (state is AuthLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                      return GlobalLoader.loader;
                     }
 
                     return SingleChildScrollView(

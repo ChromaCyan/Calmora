@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:intl/intl.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class AppointmentBookingForm extends StatefulWidget {
   final String specialistId;
@@ -207,7 +208,7 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
     return BlocBuilder<TimeSlotBloc, TimeSlotState>(
       builder: (context, state) {
         if (state is TimeSlotLoading) {
-          return Center(child: CircularProgressIndicator());
+          return GlobalLoader.loader;
         } else if (state is TimeSlotSuccess &&
             state.data is List<TimeSlotModel>) {
           final List<TimeSlotModel> availableSlots = state.data;

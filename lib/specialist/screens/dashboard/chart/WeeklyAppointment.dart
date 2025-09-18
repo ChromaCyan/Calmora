@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/config/global_loader.dart';
 
 class WeeklyAppointmentChart extends StatefulWidget {
   final String specialistId;
@@ -95,7 +96,7 @@ class _WeeklyAppointmentChartState extends State<WeeklyAppointmentChart> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return GlobalLoader.loader;
     } else if (errorMessage.isNotEmpty) {
       return Center(child: Text('Error: $errorMessage'));
     }

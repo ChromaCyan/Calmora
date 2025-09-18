@@ -17,7 +17,7 @@ import 'package:armstrong/widgets/cards/profession_card.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'dart:ui';
-
+import 'package:armstrong/config/global_loader.dart';
 class SpecialistDetailScreen extends StatefulWidget {
   final String specialistId;
 
@@ -123,7 +123,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
             BlocBuilder<SpecialistBloc, SpecialistState>(
               builder: (context, state) {
                 if (state is SpecialistLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return GlobalLoader.loader;
                 } else if (state is SpecialistDetailLoaded) {
                   final specialist = state.specialist;
 

@@ -10,6 +10,7 @@ import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
 import 'package:armstrong/universal/chat/screen/text_n_send.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'dart:ui';
+import 'package:armstrong/config/global_loader.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -276,7 +277,9 @@ class _ChatScreenState extends State<ChatScreen> {
               /// Chat messages
               Expanded(
                 child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: GlobalLoader.loader,
+                      )
                     : _messages.isEmpty
                         ? const Center(
                             child: Column(
