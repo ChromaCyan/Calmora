@@ -490,42 +490,37 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             return const Center(child: Text('No matching specialists found.'));
           }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              _fetchSpecialists();
-            },
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.65,
-              ),
-              itemCount: filteredSpecialists.length,
-              itemBuilder: (context, index) {
-                final specialist = filteredSpecialists[index];
-
-                return SpecialistCard(
-                  specialist: specialist,
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SpecialistDetailScreen(
-                          specialistId: specialist.id,
-                        ),
-                      ),
-                    );
-                    if (result != null && result == 'refresh') {
-                      _fetchSpecialists();
-                    }
-                  },
-                );
-              },
+          return GridView.builder(
+            padding: const EdgeInsets.all(8),
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.65,
             ),
+            itemCount: filteredSpecialists.length,
+            itemBuilder: (context, index) {
+              final specialist = filteredSpecialists[index];
+
+              return SpecialistCard(
+                specialist: specialist,
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SpecialistDetailScreen(
+                        specialistId: specialist.id,
+                      ),
+                    ),
+                  );
+                  if (result != null && result == 'refresh') {
+                    _fetchSpecialists();
+                  }
+                },
+              );
+            },
           );
         }
 
@@ -559,25 +554,20 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             return const Center(child: Text('No matching articles found.'));
           }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              _fetchArticles();
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            itemCount: filteredArticles.length,
+            itemBuilder: (context, index) {
+              final article = filteredArticles[index];
+              return ArticleCard2(
+                articleId: article.id,
+                imageUrl: article.heroImage,
+                title: article.title,
+                publisher: 'By ${article.specialistName}',
+              );
             },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: filteredArticles.length,
-              itemBuilder: (context, index) {
-                final article = filteredArticles[index];
-                return ArticleCard2(
-                  articleId: article.id,
-                  imageUrl: article.heroImage,
-                  title: article.title,
-                  publisher: 'By ${article.specialistName}',
-                );
-              },
-            ),
           );
         } else {
           return const Center(child: Text('No articles found.'));
