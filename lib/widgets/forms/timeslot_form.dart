@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_new_bloc.dart';
@@ -127,16 +129,32 @@ class _TimeSlotPageState extends State<TimeSlotForm> {
     context.read<TimeSlotBloc>().add(ResetTimeSlotEvent());
   }
 
+  void _clearForm() {
+  setState(() {
+    _selectedDay = null;
+    _startTime = null;
+    _endTime = null;
+  });
+
+  _formKey.currentState?.reset();
+}
+
+
   Widget _buildDropdown(String label, List<String> items, String? value,
       Function(String?) onChanged) {
+    final theme = Theme.of(context);
     return DropdownButtonFormField<String>(
       value: value,
       decoration: InputDecoration(
         labelText: label,
+        filled: true,
+        fillColor: theme.colorScheme.surface.withOpacity(0.8),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide.none,
         ),
       ),
+      dropdownColor: theme.colorScheme.surface.withOpacity(0.9), 
       items: items.map((String item) {
         return DropdownMenuItem<String>(
           value: item,
@@ -150,14 +168,18 @@ class _TimeSlotPageState extends State<TimeSlotForm> {
 
   Widget _buildTimeField(String label, String? value, Function(String) onSaved,
       {bool isStartTime = true}) {
+    final theme = Theme.of(context);
     return TextFormField(
       readOnly: true,
       controller: TextEditingController(text: value),
       decoration: InputDecoration(
         labelText: label,
         suffixIcon: const Icon(Icons.access_time),
+        filled: true,
+        fillColor: theme.colorScheme.surface.withOpacity(0.8),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide.none,
         ),
       ),
       onTap: () async {
@@ -177,10 +199,15 @@ class _TimeSlotPageState extends State<TimeSlotForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: UniversalAppBar(
-        title: widget.slotId == null ? 'Add Time Slot' : 'Edit Time Slot',
-        onBackPressed: () => _navigateBack(context),
+      // appBar: UniversalAppBar(
+      //   title: widget.slotId == null ? 'Add Time Slot' : 'Edit Time Slot',
+      //   onBackPressed: () => _navigateBack(context),
+      // ),
+      appBar: AppBar(
+        title: Text(widget.slotId == null ? "Add Time Slot" : "Edit Time Slot",
+        ),
       ),
       body: BlocListener<TimeSlotBloc, TimeSlotState>(
         listener: (context, state) {
@@ -203,63 +230,152 @@ class _TimeSlotPageState extends State<TimeSlotForm> {
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Day of the week dropdown
-                  _buildDropdown(
-                    'Select Day',
-                    _daysOfWeek,
-                    _selectedDay,
-                    (value) => setState(() => _selectedDay = value),
-                  ),
-                  const SizedBox(height: 16),
 
-                  // Start time
-                  _buildTimeField(
-                    'Start Time',
-                    _startTime,
-                    (value) => setState(() => _startTime = value),
-                  ),
-                  const SizedBox(height: 16),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              "images/login_bg_image.png",
+              fit: BoxFit.fill,
+            ),
+            Container(
+              color: theme.colorScheme.surface.withOpacity(0.6),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: const SizedBox.expand(),
+              ),
+            ),
+            Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Day of the week dropdown
+                            _buildDropdown(
+                              'Select Day',
+                              _daysOfWeek,
+                              _selectedDay,
+                              (value) => setState(() => _selectedDay = value),
+                            ),
+                            const SizedBox(height: 16),
 
-                  // End time
-                  _buildTimeField(
-                    'End Time',
-                    _endTime,
-                    (value) => setState(() => _endTime = value),
-                  ),
-                  const SizedBox(height: 24),
+                            // Start time
+                            _buildTimeField(
+                              'Start Time',
+                              _startTime,
+                              (value) => setState(() => _startTime = value),
+                            ),
+                            const SizedBox(height: 16),
 
-                  // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                            // End time
+                            _buildTimeField(
+                              'End Time',
+                              _endTime,
+                              (value) => setState(() => _endTime = value),
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Submit Button
+                            // SizedBox(
+                            //   width: double.infinity,
+                            //   child: ElevatedButton(
+                            //     onPressed: _submitForm,
+                            //     style: ElevatedButton.styleFrom(
+                            //       padding: const EdgeInsets.symmetric(vertical: 16),
+                            //       shape: RoundedRectangleBorder(
+                            //         borderRadius: BorderRadius.circular(8),
+                            //       ),
+                            //     ),
+                            //     child: Text(
+                            //       widget.slotId == null
+                            //           ? 'Add Time Slot'
+                            //           : 'Update Time Slot',
+                            //       style: const TextStyle(
+                            //           fontSize: 16, fontWeight: FontWeight.bold),
+                            //     ),
+                            //   ),
+                            // ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: _clearForm,
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    backgroundColor: Colors.transparent,
+                                    foregroundColor: theme.colorScheme.onPrimaryContainer,
+                                    padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12),
+                                        bottomLeft: Radius.circular(12),
+                                      ),
+                                      side: BorderSide(
+                                        color: Colors.grey.shade500,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Clear',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+
+                                // const SizedBox(width: 16), // space between buttons
+
+                                ElevatedButton(
+                                  onPressed: _submitForm,
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    backgroundColor: Colors.transparent,
+                                    foregroundColor: theme.colorScheme.onPrimaryContainer,
+                                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(12), 
+                                        bottomRight: Radius.circular(12),
+                                      ),
+                                      side: BorderSide(
+                                        color: Colors.grey.shade500,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    widget.slotId == null ? 'Add Time Slot' : 'Update Time Slot',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+
+                          ],
                         ),
-                      ),
-                      child: Text(
-                        widget.slotId == null
-                            ? 'Add Time Slot'
-                            : 'Update Time Slot',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
-          ),
+          ],
         ),
       ),
     );

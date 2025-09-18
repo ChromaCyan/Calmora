@@ -40,12 +40,31 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
     }
   }
 
-  void _navigateToAddArticle() {
+  // void _navigateToAddArticle() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => AddArticleScreen()),
+  //   );
+  // }
+    void _navigateToAddArticle() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddArticleScreen()),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            AddArticleScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var slideAnimation = Tween<Offset>(
+            begin: const Offset(1.0, 0.0), // slide from right
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+          );
+          return SlideTransition(position: slideAnimation, child: child);
+        },
+      ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -169,20 +188,19 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
             ),
             Positioned(
               bottom: 0,
+              left: 0,
               right: 0,
-              child: ElevatedButton.icon(
-                onPressed: _navigateToAddArticle,
-                label: const Text("Add Article", textAlign: TextAlign.center),
-                // icon: const Icon(Icons.add),
-                style: ElevatedButton.styleFrom(
+              child: Center(
+                child: FloatingActionButton(
+                  onPressed: _navigateToAddArticle,
+                  elevation: 0,
                   backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  mini: true,
+                  child: Icon(
+                    Icons.add,
+                    size: 30,
+                    color: theme.colorScheme.surface,
                   ),
-                  // elevation: 6,
                 ),
               ),
             ),

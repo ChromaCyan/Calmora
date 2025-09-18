@@ -36,18 +36,41 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
         );
   }
 
-  void _navigateToAddSlot() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TimeSlotForm(specialistId: widget.specialistId),
-      ),
-    );
+  // void _navigateToAddSlot() async {
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => TimeSlotForm(specialistId: widget.specialistId),
+  //     ),
+  //   );
 
-    if (result == true) {
-      _fetchTimeSlots();
-    }
+  //   if (result == true) {
+  //     _fetchTimeSlots();
+  //   }
+  // }
+  void _navigateToAddSlot() async {
+  final result = await Navigator.push(
+    context,
+    PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          TimeSlotForm(specialistId: widget.specialistId),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final slideAnimation = Tween<Offset>(
+          begin: const Offset(1.0, 0.0), // from right
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+        );
+        return SlideTransition(position: slideAnimation, child: child);
+      },
+    ),
+  );
+
+  if (result == true) {
+    _fetchTimeSlots();
   }
+}
+
 
   void _showSnackBar(String title, String message, ContentType type) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -273,20 +296,18 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
             // Floating Add Slot Button
             Positioned(
               bottom: 0,
+              left: 0,
               right: 0,
-              child: ElevatedButton.icon(
-                onPressed: _navigateToAddSlot,
-                label: const Text("Add Time", textAlign: TextAlign.center),
-                // icon: const Icon(Icons.add),
-                style: ElevatedButton.styleFrom(
+              child: Center(
+                child: FloatingActionButton(
+                  elevation: 0,
+                  onPressed: _navigateToAddSlot,
                   backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  // elevation: 6,
+                  mini: true,
+                  child: Icon(
+                    Icons.add, 
+                    size: 30,
+                    color: theme.colorScheme.surface,),
                 ),
               ),
             ),
