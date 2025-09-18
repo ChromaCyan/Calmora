@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:armstrong/models/article/article.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -195,248 +197,299 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Publish your own Article"),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Create an Article',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      appBar: AppBar(),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.fill,
+          ),
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: const SizedBox.expand(),
             ),
-            SizedBox(height: 16),
+          ),
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Create an Article',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 16),
 
-            // Image Picker with GestureDetector
-            GestureDetector(
-              onTap: _pickImage,
-              child: Stack(
-                children: [
-                  Container(
-                    height: 250,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context).colorScheme.surfaceVariant,
-                      image: _image != null
-                          ? DecorationImage(
-                              image: FileImage(_image!), fit: BoxFit.cover)
-                          : null,
-                    ),
-                    child: _image == null
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.image,
-                                  size: 50,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant),
-                              SizedBox(height: 8),
-                              Text('Add image cover',
-                                  style: TextStyle(
+                      // Image Picker with GestureDetector
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: 250,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.6),
+                                image: _image != null
+                                    ? DecorationImage(
+                                        image: FileImage(_image!), fit: BoxFit.cover)
+                                    : null,
+                              ),
+                              child: _image == null
+                                  ? Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.image,
+                                            size: 50,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant),
+                                        SizedBox(height: 8),
+                                        Text('Add you display image here',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant)),
+                                      ],
+                                    )
+                                  : null,
+                            ),
+
+                            // Remove Button (only shown when an image is selected)
+                            if (_image != null)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _image = null;
+                                    });
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onSurfaceVariant)),
-                            ],
-                          )
-                        : null,
-                  ),
-
-                  // Remove Button (only shown when an image is selected)
-                  if (_image != null)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _image = null;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .background
-                                .withOpacity(0.7),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.close,
-                              color: Theme.of(context).colorScheme.onBackground,
-                              size: 20),
+                                          .background
+                                          .withOpacity(0.7),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.close,
+                                        color: Theme.of(context).colorScheme.onBackground,
+                                        size: 20),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                    ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
+                      SizedBox(height: 16),
 
-            // Title TextField
-            TextFormField(
-              controller: _titleController,
-              style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).textTheme.bodyLarge?.color),
-              decoration: InputDecoration(
-                labelText: 'Title',
-                labelStyle:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
-                hintText: 'Enter article title',
-                hintStyle:
-                    TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
-                prefixIcon:
-                    Icon(Icons.title, color: Theme.of(context).iconTheme.color),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surface,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary, width: 2),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                      color: Theme.of(context).dividerColor, width: 1),
-                ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              ),
-            ),
-            SizedBox(height: 12),
-            GestureDetector(
-              onTap: _openContentEditor,
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: theme.dividerColor),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: NeverScrollableScrollPhysics(),
-                        child: Text(
-                          _contentController.text.isEmpty
-                              ? 'Write your article content here...'
-                              : _contentController.text,
-                          style: TextStyle(
+                      // Title TextField
+                      TextFormField(
+                        controller: _titleController,
+                        style: TextStyle(
                             fontSize: 16,
-                            color: _contentController.text.isEmpty
-                                ? theme.hintColor
-                                : theme.textTheme.bodyLarge?.color,
+                            color: Theme.of(context).textTheme.bodyLarge?.color),
+                        decoration: InputDecoration(
+                          labelText: 'Title',
+                          labelStyle:
+                              TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
+                          hintText: 'Enter article title',
+                          hintStyle:
+                              TextStyle(color: Theme.of(context).hintColor, fontSize: 14),
+                          prefixIcon:
+                              Icon(Icons.title, color: Theme.of(context).iconTheme.color),
+                          filled: true,
+                          fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary, width: 2),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).dividerColor, width: 1),
+                          ),
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: _openContentEditor,
+                        child: Container(
+                          height: 150,
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(color: theme.dividerColor),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  child: Text(
+                                    _contentController.text.isEmpty
+                                        ? 'Add your contents here...'
+                                        : _contentController.text,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: _contentController.text.isEmpty
+                                          ? theme.hintColor
+                                          : theme.textTheme.bodyLarge?.color,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(
+                                Icons.chevron_right,
+                                color: theme.iconTheme.color?.withOpacity(0.6),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(
-                      Icons.chevron_right,
-                      color: theme.iconTheme.color?.withOpacity(0.6),
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
-            SizedBox(height: 20),
-
-            Center(
-              child: Text(
-                'Categories',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
-                ),
-              ),
-            ),
-
-            // Category Dropdown
-            Column(
-              children: _categories.map((category) {
-                return CheckboxListTile(
-                  title: Text(category),
-                  value: _selectedCategories.contains(category),
-                  onChanged: (bool? selected) {
-                    setState(() {
-                      if (selected == true && _selectedCategories.length < 2) {
-                        _selectedCategories.add(category);
-                      } else {
-                        _selectedCategories.remove(category);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-
-            SizedBox(height: 20),
-
-            Center(
-              child: Text(
-                'Target Gender',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
-                ),
-              ),
-            ),
-            Column(
-              children: ['everyone', 'male', 'female'].map((gender) {
-                return RadioListTile<String>(
-                  title: Text(
-                    gender[0].toUpperCase() + gender.substring(1),
-                  ),
-                  value: gender,
-                  groupValue: _selectedGender,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGender = value;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-
-            SizedBox(height: 12),
-
-            //Submit Button
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _submitArticle,
-                    icon: Icon(Icons.send),
-                    label: Text('Submit Article'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      SizedBox(height: 20),
+                      
+                      const Divider(
+                        thickness: 1.5,
+                        color: Colors.grey,
+                        indent: 40,
+                        endIndent: 40,
                       ),
-                    ),
+                      
+                      SizedBox(height: 10),
+
+                      Center(
+                        child: Text(
+                          'Categories',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onBackground,
+                          ),
+                        ),
+                      ),
+
+                      // Category Dropdown
+                      Column(
+                        children: _categories.map((category) {
+                          return CheckboxListTile(
+                            title: Text(category),
+                            value: _selectedCategories.contains(category),
+                            onChanged: (bool? selected) {
+                              setState(() {
+                                if (selected == true && _selectedCategories.length < 2) {
+                                  _selectedCategories.add(category);
+                                } else {
+                                  _selectedCategories.remove(category);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+
+                      SizedBox(height: 20),
+
+                      const Divider(
+                        thickness: 1.5,
+                        color: Colors.grey,
+                        indent: 40,
+                        endIndent: 40,
+                      ),
+                      
+                      SizedBox(height: 10),
+
+                      Center(
+                        child: Text(
+                          'Target Gender',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onBackground,
+                          ),
+                        ),
+                      ),
+                      Column(
+                        children: ['everyone', 'male', 'female'].map((gender) {
+                          return RadioListTile<String>(
+                            title: Text(
+                              gender[0].toUpperCase() + gender.substring(1),
+                            ),
+                            value: gender,
+                            groupValue: _selectedGender,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedGender = value;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+
+                      SizedBox(height: 12),
+
+                      const Divider(
+                        thickness: 1.5,
+                        color: Colors.grey,
+                        indent: 40,
+                        endIndent: 40,
+                      ),
+
+                      //Submit Button
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center, // center it horizontally
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _submitArticle,
+                            icon: Icon(Icons.send, size: 24),
+                            label: Text(
+                              'Submit Article',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(horizontal: 85, vertical: 15), // ⬅️ bigger size
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+                ), 
+              ),
+            ],
+          )
+        ],
+      )
     );
   }
 }
