@@ -18,6 +18,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'dart:ui';
 import 'package:armstrong/config/global_loader.dart';
+
 class SpecialistDetailScreen extends StatefulWidget {
   final String specialistId;
 
@@ -61,7 +62,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
         if (userId != null) {
           context.read<SpecialistBloc>().add(FetchSpecialists());
         }
-        return true; 
+        return true;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -203,7 +204,10 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                   specialization,
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.grey[600],
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.7),
                                   ),
                                 ),
                               ],
@@ -221,6 +225,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                           /// Action buttons
                           Row(
                             children: [
+                              /// Schedule Button
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () => _bookAppointment(
@@ -230,10 +235,19 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                   label: const Text(
                                     "Schedule",
                                     style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    foregroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
                                     shape: RoundedRectangleBorder(
@@ -242,7 +256,10 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                   ),
                                 ),
                               ),
+
                               const SizedBox(width: 12),
+
+                              /// Message Button
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () async {
@@ -277,10 +294,19 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                   label: const Text(
                                     "Message",
                                     style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    foregroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
                                     shape: RoundedRectangleBorder(
@@ -395,25 +421,35 @@ Widget _buildAvailabilityCard(BuildContext context, String availability) {
   final theme = Theme.of(context);
 
   final Color borderColor = isAvailable ? Colors.green : Colors.red;
-
   final Color textColor = isAvailable ? Colors.green : Colors.red;
-
   final IconData icon = isAvailable ? Icons.check_circle : Icons.cancel;
 
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6.0),
+    padding: const EdgeInsets.symmetric(vertical: 6.0), // original padding
     child: Container(
+      margin: const EdgeInsets.all(0), // keep original margin
+      padding: const EdgeInsets.symmetric(
+          vertical: 10.0, horizontal: 14.0), // keep original padding
       decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor.withOpacity(0.7), width: 1.5),
+        color: theme.cardColor.withOpacity(0.6), // match other cards
+        borderRadius: BorderRadius.circular(16), // same radius as _SectionCard
+        border: Border.all(
+          color: borderColor.withOpacity(0.7), // availability-based border
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1), // match shadow
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 14.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: textColor, size: 20),
-          const SizedBox(width: 8),
+          Icon(icon, color: textColor, size: 22),
+          const SizedBox(width: 10),
           Text(
             availability,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -434,24 +470,27 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(0), // original margin
+      padding: const EdgeInsets.all(16), // original padding
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.withOpacity(0.3),
-        //     blurRadius: 10,
-        //     offset: const Offset(0, 4),
-        //   ),
-        //],
+        color: theme.cardColor.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16), // original radius
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white.withOpacity(0.3) // light border in dark mode
-              : Colors.black.withOpacity(0.2), // dark border in light mode
+          color: theme.brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.3)
+              : Colors.black.withOpacity(0.2),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,63 +498,14 @@ class _SectionCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
+              color: theme.colorScheme.primary,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           ...children,
         ],
-      ),
-    );
-  }
-}
-
-/// --- Reusable Info Row ---
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _InfoRow(
-      {required this.icon,
-      required this.label,
-      required this.value,
-      super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            "$label: $value",
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// --- Chip Tag ---
-class _ChipTag extends StatelessWidget {
-  final String label;
-  const _ChipTag({required this.label, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      backgroundColor: Colors.blueAccent.withOpacity(0.15),
-      label: Text(
-        label,
-        style: const TextStyle(color: Colors.white),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
       ),
     );
   }

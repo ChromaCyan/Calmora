@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class NotificationCard extends StatelessWidget {
   final Map<String, dynamic> notification;
 
-  const NotificationCard({Key? key, required this.notification}) : super(key: key);
+  const NotificationCard({Key? key, required this.notification})
+      : super(key: key);
 
   IconData _getIcon(String type) {
     switch (type) {
@@ -29,11 +30,30 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    final theme = Theme.of(context);
+
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+      decoration: BoxDecoration(
+        color: theme.cardColor.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.3)
+              : Colors.black.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
       child: ListTile(
+        contentPadding: EdgeInsets.zero,
         leading: CircleAvatar(
           backgroundColor: _getColor(notification['type']),
           child: Icon(_getIcon(notification['type']), color: Colors.white),
@@ -41,19 +61,23 @@ class NotificationCard extends StatelessWidget {
         title: Text(
           notification['message'],
           style: TextStyle(
-            fontWeight: notification['isRead'] ? FontWeight.normal : FontWeight.bold,
+            fontWeight:
+                notification['isRead'] ? FontWeight.normal : FontWeight.bold,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         subtitle: Text(
           _formatDate(notification['createdAt']),
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
         ),
         trailing: notification['isRead']
             ? null
             : Container(
                 width: 10,
                 height: 10,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
