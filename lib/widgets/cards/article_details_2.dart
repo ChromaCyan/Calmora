@@ -7,6 +7,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'dart:ui';
 
 class ArticleDetailPage2 extends StatelessWidget {
   final String articleId;
@@ -16,6 +17,7 @@ class ArticleDetailPage2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     context.read<ArticleBloc>().add(FetchArticleById(articleId));
 
     return WillPopScope(
@@ -30,24 +32,68 @@ class ArticleDetailPage2 extends StatelessWidget {
 
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Article Details'),
+          elevation: 1,
+          backgroundColor: Colors.transparent,
+          flexibleSpace: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+              child: Container(
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+              ),
+            ),
+          ),
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+            onPressed: () async {
+              final storage = FlutterSecureStorage();
+              final userId = await storage.read(key: 'userId');
+
+              if (userId != null) {
+                context.read<ArticleBloc>().add(FetchAllArticles());
+              }
+
+              Navigator.pop(context);
+            },
+          ),
         ),
-        body: BlocBuilder<ArticleBloc, ArticleState>(
-          builder: (context, state) {
-            if (state is ArticleLoading) {
-              return GlobalLoader.loader;
-            } else if (state is ArticleError) {
-              return Center(
-                child: Text(
-                  'Error: ${state.message}',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              );
-            } else if (state is ArticleDetailLoaded) {
-              return _buildArticleDetail(context, state.article);
-            }
-            return const Center(child: Text('Article not found'));
-          },
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            /// Background image
+            Image.asset(
+              "images/login_bg_image.png",
+              fit: BoxFit.cover,
+            ),
+
+            /// Frosted glass blur
+            Container(
+              color: theme.colorScheme.surface.withOpacity(0.6),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: const SizedBox.expand(),
+              ),
+            ),
+            BlocBuilder<ArticleBloc, ArticleState>(
+              builder: (context, state) {
+                if (state is ArticleLoading) {
+                  return GlobalLoader.loader;
+                } else if (state is ArticleError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${state.message}',
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  );
+                } else if (state is ArticleDetailLoaded) {
+                  return _buildArticleDetail(context, state.article);
+                }
+                return const Center(child: Text('Article not found'));
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -112,87 +158,86 @@ class ArticleDetailPage2 extends StatelessWidget {
             ),
             // Title + specialist + categories row
             Positioned(
-  left: 16,
-  right: 16,
-  bottom: 16,
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      // Title
-      Text(
-        article.title,
-        style: theme.textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: titleFontSize,
-          color: Colors.white,
-          shadows: [
-            Shadow(
-              blurRadius: 4,
-              color: Colors.black.withOpacity(0.7),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 4),
-      
-      // Specialist name + categories row
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Specialist name
-          Expanded(
-            child: Text(
-              'By ${article.specialistName}',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withOpacity(0.85),
-                fontSize: specialistFontSize,
-                shadows: [
-                  Shadow(
-                    blurRadius: 4,
-                    color: Colors.black.withOpacity(0.7),
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title
+                  Text(
+                    article.title,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: titleFontSize,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black.withOpacity(0.7),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  
+                  // Specialist name + categories row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // Specialist name
+                      Expanded(
+                        child: Text(
+                          'By ${article.specialistName}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: specialistFontSize,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 4,
+                                color: Colors.black.withOpacity(0.7),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      // Categories
+                      Wrap(
+                        spacing: 6.0,
+                        runSpacing: 4.0,
+                        children: article.categories.map((category) {
+                          String capitalizedCategory = category
+                              .split(' ')
+                              .map((word) =>
+                                  word[0].toUpperCase() + word.substring(1))
+                              .join(' ');
+
+                          return Chip(
+                            label: Text(
+                              capitalizedCategory,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.white,
+                                fontSize: 12.0,
+                              ),
+                            ),
+                            backgroundColor: Colors.black87,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                              vertical: 4.0,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-
-          const SizedBox(width: 12),
-
-          // Categories
-          Wrap(
-            spacing: 6.0,
-            runSpacing: 4.0,
-            children: article.categories.map((category) {
-              String capitalizedCategory = category
-                  .split(' ')
-                  .map((word) =>
-                      word[0].toUpperCase() + word.substring(1))
-                  .join(' ');
-
-              return Chip(
-                label: Text(
-                  capitalizedCategory,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white,
-                    fontSize: 12.0,
-                  ),
-                ),
-                backgroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 4.0,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    ],
-  ),
-),
-
           ],
         ),
 

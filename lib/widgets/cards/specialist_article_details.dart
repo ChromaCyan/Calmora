@@ -6,6 +6,7 @@ import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'dart:ui';
 
 class SpecialistArticleDetailPage extends StatefulWidget {
   final String articleId;
@@ -38,6 +39,7 @@ class _SpecialistArticleDetailPageState
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return WillPopScope(
       onWillPop: () async {
         final isUpdated = ModalRoute.of(context)!.settings.arguments as bool?;
@@ -55,25 +57,78 @@ class _SpecialistArticleDetailPageState
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Article Details"),
+          elevation: 1,
+          backgroundColor: Colors.transparent,
+          flexibleSpace: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+              child: Container(
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+              ),
+            ),
+          ),
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+            onPressed: () async {
+              final storage = FlutterSecureStorage();
+              final userId = await storage.read(key: 'userId');
+
+              if (userId != null) {
+                context.read<ArticleBloc>().add(FetchAllArticles());
+              }
+
+              Navigator.pop(context);
+            },
+          ),
+          // title: Text(
+          //   "Specialist Details",
+          //   style: TextStyle(
+          //     color: Theme.of(context).colorScheme.onPrimaryContainer,
+          //     fontWeight: FontWeight.w600,
+          //     fontSize: 18,
+          //   ),
+          // ),
+          // centerTitle: true,
         ),
-        body: BlocBuilder<ArticleBloc, ArticleState>(
-          builder: (context, state) {
-            if (state is ArticleLoading) {
-              return GlobalLoader.loader;
-            } else if (state is ArticleError) {
-              return Center(
-                child: Text(
-                  'Error: ${state.message}',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              );
-            } else if (state is ArticleDetailLoaded) {
-              return _buildArticleDetail(context, state.article);
-            }
-            return const Center(child: Text('Article not found'));
-          },
-        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            /// Background image
+            Image.asset(
+              "images/login_bg_image.png",
+              fit: BoxFit.cover,
+            ),
+
+            /// Frosted glass blur
+            Container(
+              color: theme.colorScheme.surface.withOpacity(0.6),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: const SizedBox.expand(),
+              ),
+            ),
+            BlocBuilder<ArticleBloc, ArticleState>(
+              builder: (context, state) {
+                if (state is ArticleLoading) {
+                  return GlobalLoader.loader;
+                } else if (state is ArticleError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${state.message}',
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  );
+                } else if (state is ArticleDetailLoaded) {
+                  return _buildArticleDetail(context, state.article);
+                }
+                return const Center(child: Text('Article not found'));
+              },
+            ),
+          ],
+        )
       ),
     );
   }
