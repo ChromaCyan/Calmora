@@ -82,11 +82,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.6),
-        elevation: 0,
-        title: const Text("Notifications"),
+        backgroundColor: Colors.transparent,
+        elevation: 1,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+            ),
+          ),
+        ),
+        title: Text(
+          "Notifications",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
           onPressed: _markAllAsReadAndExit,
         ),
       ),

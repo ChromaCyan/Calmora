@@ -319,7 +319,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       case 2:
         return 'Chat';
       case 3:
-        return 'Your Appointments';
+        return 'Appointments';
       default:
         return 'Home';
     }

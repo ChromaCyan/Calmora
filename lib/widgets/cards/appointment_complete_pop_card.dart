@@ -38,9 +38,9 @@ class AppointmentDetailsDialog extends StatelessWidget {
               maxHeight: MediaQuery.of(context).size.height * 0.8,
             ),
             child: Material(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16),
-              elevation: 12,
+              color: Theme.of(context).cardColor.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(35),
+              elevation: 0,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SingleChildScrollView(
@@ -52,9 +52,8 @@ class AppointmentDetailsDialog extends StatelessWidget {
                       // Title
                       Text(
                         "Appointment Details",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold,),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
 
@@ -108,7 +107,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
                             appointment["imageUrl"],
-                            height: 180,
+                            height: 280,
                             width: double.infinity,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
@@ -118,7 +117,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                         ),
                       ],
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 5),
 
                       // Close button
                       Align(

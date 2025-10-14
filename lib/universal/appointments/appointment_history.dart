@@ -86,12 +86,29 @@ class _CompletedAppointmentsScreenState
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.6),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("Completed Appointments"),
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+            ),
+          ),
+        ),
+        title: Text(
+          "Completed Appointments",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onPrimaryContainer,
         ),
       ),
       body: Stack(
@@ -147,17 +164,11 @@ class _CompletedAppointmentsScreenState
                                     onTap: () => _showAppointmentDetails(
                                         context, appointment),
                                     child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 8),
+                                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: theme.brightness ==
-                                                Brightness.light
-                                            ? Colors
-                                                .white // solid white in light mode
-                                            : theme.colorScheme
-                                                .surfaceVariant, // dark bg in dark mode
-                                        borderRadius: BorderRadius.circular(12),
+                                        color: Theme.of(context).cardColor.withOpacity(0.6),
+                                        borderRadius: BorderRadius.circular(20),
                                         boxShadow: [
                                           if (theme.brightness ==
                                               Brightness.light)

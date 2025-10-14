@@ -28,7 +28,7 @@ class TextNSend extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send, color: theme.primary),
+            icon: Icon(Icons.send_rounded, color: theme.primary),
             onPressed: onSend,
           ),
         ],
