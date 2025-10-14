@@ -10,7 +10,6 @@ class EmergencyServicePage extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 1,
         backgroundColor: Colors.transparent,
@@ -32,7 +31,7 @@ class EmergencyServicePage extends StatelessWidget {
           },
         ),
         title: Text(
-          "Hotline Services",
+          "Emergency Services",
           style: TextStyle(
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             fontWeight: FontWeight.w600,
@@ -61,96 +60,97 @@ class EmergencyServicePage extends StatelessWidget {
 
           /// Foreground content
           SingleChildScrollView(
-  padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 32, 16, 16),
-  child: ConstrainedBox(
-    constraints: BoxConstraints(
-      minHeight: MediaQuery.of(context).size.height -
-          (kToolbarHeight + 32 + 16), // available height
-    ),
-    child: Center(
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(16),
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.black.withOpacity(0.15),
-          //     blurRadius: 8,
-          //     offset: const Offset(0, 4),
-          //   )
-          // ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min, // keep it compact
-          children: [
-            // Title
-            Text(
-              "You Are Not Alone",
-              style: GoogleFonts.lato(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onBackground,
+            padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 32, 16, 16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    (kToolbarHeight + 32 + 16),
+              ),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(16),
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.black.withOpacity(0.15),
+                    //     blurRadius: 8,
+                    //     offset: const Offset(0, 4),
+                    //   )
+                    // ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Title
+                      Text(
+                        "You Are Not Alone",
+                        style: GoogleFonts.lato(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onBackground,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Subtitle
+                      Text(
+                        "If you or someone you know is struggling, these hotlines are available to provide help and support.",
+                        style: GoogleFonts.lato(
+                          fontSize: 16,
+                          color:
+                              theme.colorScheme.onBackground.withOpacity(0.75),
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      Divider(color: Colors.grey.shade600),
+                      const SizedBox(height: 16),
+
+                      // Section title
+                      Text(
+                        "Mental Health Hotlines (PH)",
+                        style: GoogleFonts.lato(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onBackground,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Hotline list
+                      _buildHotlineTile(
+                        context,
+                        icon: Icons.phone,
+                        title: "Philippines Mental Health Association",
+                        number: "(02) 8821 4958",
+                        color: Colors.green,
+                      ),
+                      Divider(color: Colors.grey.shade600),
+                      _buildHotlineTile(
+                        context,
+                        icon: Icons.support_agent,
+                        title: "DOH Mental Health Crisis Hotline",
+                        number: '0917-899-8727',
+                        color: Colors.blue,
+                      ),
+                      Divider(color: Colors.grey.shade600),
+                      _buildHotlineTile(
+                        context,
+                        icon: Icons.heart_broken,
+                        title: "In Touch Community Services",
+                        number: "(02) 8893-1903",
+                        color: Colors.redAccent,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-
-            // Subtitle
-            Text(
-              "If you or someone you know is struggling, these hotlines are available to provide help and support.",
-              style: GoogleFonts.lato(
-                fontSize: 16,
-                color: theme.colorScheme.onBackground.withOpacity(0.75),
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Divider(color: Colors.grey.shade600),
-            const SizedBox(height: 16),
-
-            // Section title
-            Text(
-              "Mental Health Hotlines (PH)",
-              style: GoogleFonts.lato(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onBackground,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Hotline list
-            _buildHotlineTile(
-              context,
-              icon: Icons.phone,
-              title: "Philippines Mental Health Association",
-              number: "(02) 8821 4958",
-              color: Colors.green,
-            ),
-            Divider(color: Colors.grey.shade600),
-            _buildHotlineTile(
-              context,
-              icon: Icons.support_agent,
-              title: "DOH Mental Health Crisis Hotline",
-              number: '0917-899-8727',
-              color: Colors.blue,
-            ),
-            Divider(color: Colors.grey.shade600),
-            _buildHotlineTile(
-              context,
-              icon: Icons.heart_broken,
-              title: "In Touch Community Services",
-              number: "(02) 8893-1903",
-              color: Colors.redAccent,
-            ),
-          ],
-        ),
-      ),
-    ),
-  ),
-),
+          ),
         ],
       ),
     );

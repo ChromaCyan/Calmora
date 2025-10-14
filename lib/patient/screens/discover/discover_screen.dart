@@ -32,20 +32,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   // Specialist Type
   final List<String> specialistTypes = [
+    'Counselor',
     'Psychologist',
     'Psychiatrist',
-    'Counselor',
   ];
 
   // Article Categories
   final List<String> articleCategories = [
-    'Health',
-    'Social',
-    'Growth',
-    'Relationships',
-    'Coping Strategies',
-    'Self-Care',
+    'health',
+    'social',
+    'growth',
+    'relationships',
+    'coping strategies',
+    'self-care',
   ];
+
+  List<String> get displayArticleCategories => articleCategories
+      .map((category) => category
+          .split(' ')
+          .map((word) => word[0].toUpperCase() + word.substring(1))
+          .join(' '))
+      .toList();
 
   @override
   void initState() {
@@ -135,15 +142,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       selectedValue: selectedSpecialistType,
                       categories: specialistTypes,
                       icons: {
+                        'Counselor': Icons.support_agent,
                         'Psychologist': Icons.psychology,
                         'Psychiatrist': Icons.medical_information,
-                        'Counselor': Icons.support_agent,
                       },
-                      colors: [
-                        Colors.deepPurple,
-                        Colors.redAccent,
-                        Colors.teal
-                      ],
+                      colors: [Colors.teal, Colors.teal, Colors.teal],
                       onSelect: (value) {
                         setState(() {
                           selectedSpecialistType = value;
@@ -168,50 +171,35 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 if (selectedCategory == 'Articles') ...[
                   _buildFilterCard(
                     'Article Category',
-                    DropdownButton<String>(
-                      value: selectedArticleCategory.isEmpty
-                          ? null
-                          : selectedArticleCategory,
-                      icon: Icon(Icons.arrow_drop_down,
-                          color: theme.colorScheme.primary),
-                      isExpanded: true,
-                      elevation: 16,
-                      hint: Text("Select Article Category"),
-                      onChanged: (String? newCategory) {
+                    buildCategorySelector(
+                      selectedValue: selectedArticleCategory,
+                      categories: displayArticleCategories,
+                      icons: {
+                        'Health': Icons.health_and_safety,
+                        'Social': Icons.people,
+                        'Growth': Icons.trending_up,
+                        'Relationships': Icons.favorite,
+                        'Coping strategies': Icons.self_improvement,
+                        'Self-care': Icons.spa,
+                      },
+                      colors: [
+                        Colors.teal,
+                        Colors.teal,
+                        Colors.teal,
+                        Colors.teal,
+                        Colors.teal,
+                        Colors.teal,
+                      ],
+                      onSelect: (value) {
                         setState(() {
                           selectedArticleCategory =
-                              newCategory == "Clear Filter"
+                              selectedArticleCategory == value.toLowerCase()
                                   ? ''
-                                  : newCategory ?? '';
+                                  : value.toLowerCase();
+
+                          _fetchArticles();
                         });
                       },
-                      items: [
-                        DropdownMenuItem<String>(
-                          value: "Clear Filter",
-                          child: Text("Clear Filter",
-                              style: TextStyle(color: Colors.red)),
-                        ),
-                        ...[
-                          'health',
-                          'social',
-                          'growth',
-                          'relationships',
-                          'coping strategies',
-                          'self-care'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          String capitalizedValue = value
-                              .split(' ')
-                              .map((word) =>
-                                  word[0].toUpperCase() + word.substring(1))
-                              .join(' ');
-
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(capitalizedValue,
-                                style: TextStyle(fontSize: 16)),
-                          );
-                        }).toList(),
-                      ],
                     ),
                   ),
                   _buildFilterCard(
@@ -303,7 +291,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
           final category = categories[index];
-          final isSelected = selectedValue == category;
+          final isSelected =
+              (selectedValue ?? '').toLowerCase() == category.toLowerCase();
 
           final baseColor = colors != null && index < colors.length
               ? colors[index]

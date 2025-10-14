@@ -412,7 +412,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     }),
                                   ),
                                   child: Text(
-                                    "Patient",
+                                    "General User",
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium

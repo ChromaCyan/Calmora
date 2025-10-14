@@ -23,52 +23,57 @@ class _FrequentlyAskedQuestionsState extends State<FrequentlyAskedQuestions> {
     {
       'question': 'How do I reset my password?',
       'answer':
-          'To reset your password, you can do so, by logging out first which will navigate you to the login page, on the login page, tap on the "Forgot Password?" button. Enter a valid email address, wait for the OTP that was sent to the email you entered to arrive, once received, enter the valid OTP, and enter your New Password and Confirm it.'
+          'To reset your password, first log out of your account to return to the login page. On the login screen, tap "Forgot Password?" and enter your registered email address. You’ll receive a One-Time Password (OTP) via email. Once you receive it, enter the OTP, then set and confirm your new password.'
     },
     {
       'question': 'Can I use the app offline?',
       'answer':
-          'No, some features are available offline. However, for syncing data and updates, it can lead to failures when offline, therefore an internet connection is required.'
+          'No. Most features require an internet connection. You may still see locally stored data from before you went offline, but syncing, updates, and chat features will not work without an active internet connection.'
     },
     {
-      'question': 'How do I start a convo with a specialist?',
+      'question': 'How do I start a conversation with a specialist?',
       'answer':
-          'To chat a specialist, you can find them by navigating to the "Discovery" page, the page next to Dashboard.\n\nFeel free to categorize them to allign it with what you seek, choose and tap one of them then press the "Message" button, and start chatting with them.'
+          'To start chatting with a specialist, navigate to the "Discovery" page (next to the Dashboard). You can filter or browse specialists based on your needs. Tap on a specialist’s profile, then press the "Message" button to begin your conversation.'
     },
     {
-      'question': 'Where can I see my chats history?',
+      'question': 'Where can I see my chat history?',
       'answer':
-          "To see your chat history, you can simply navigate to the 'Chat' page, the page next to the 'Discovery' page.\n\nAnd there, you will see all the specialists that you've previousely chatted."
+          'You can view your previous conversations by navigating to the "Chat" page, or by tapping the chat icon on the navigation bar. There, you’ll find all the specialists you’ve previously chatted with.'
     },
     {
       'question': 'How do I book an appointment?',
-      'answer':
-          "To book or schedule an appointment with a specialists, you can do it two ways.\n\n1:\n- Navigate to Discovery.\n- Find the specialist you want to book an appointment to.\n- Tap their profile.\n- And press the 'Schedule' button.\n\n2:\n- Navigate to Chat.\n- Open the conversation of the specialist you have chatted whom you want to book an appointment to.\n- And above is the button where you can schedule an appointment.\n\nOnce you have successfully booked your appointment, you view its status if the specialist has accepted or rejected your appointment by navigating to the 'Appointment' page on the very last page next to 'Chat'."
+      'answer': 'You can book or schedule an appointment in two ways:\n\n'
+          '1. From the Discovery page:\n'
+          '- Navigate to "Discovery".\n'
+          '- Find and tap the specialist you wish to book.\n'
+          '- Tap their profile and press the "Schedule" button.\n\n'
+          '2. From the Chat page:\n'
+          '- Open the conversation with the specialist you want to book.\n'
+          '- Tap the "Schedule" button at the top of the chat screen.\n\n'
+          'Once booked, you can check the status of your appointment (accepted or rejected) on the "Appointments" page, located next to the chat icon on the navigation bar.'
     },
     {
-      'question': 'Can I see the history of the successful appointments that I have made?',
+      'question':
+          'Can I see the history of the successful appointments I have made?',
       'answer':
-          "Yes, you can see it, simply go to your profile on the upper-left corner of your screen, and you will see an clock icon on the left side, tap it and you will see your Completed Appointments."
+          'Yes. You can view your completed appointments by going to your Profile (upper-left corner of the screen). Tap the clock icon on the left side to open your "Completed Appointments" list.'
     },
     {
       'question': 'How does the AI chatbot work?',
-      'answer':
-          "Our AI chatbot works as a basic assitance that can help guide you through your needs and convenience on certain topics, such as:\n\n- You want to know the features that you can find on the app.\n- You need quick a response on a serious topic that's not yet severe.\n- And in case you are not yet sure which specialist to reach out, our chatbot can help you to address your current state, however, some limitations are applied and it is still advisable to reach out to a specialist.\n\nYou also ask the chatbot itself regarding what it can provide, please feel free to do so."
+      'answer': 'Our AI chatbot serves as a helpful assistant to guide you through various features and provide general emotional support. It can help with:\n\n'
+          '- Getting quick guidance on mild concerns.\n'
+          '- Offers as a conversation companion and providing wellness tips and advice.\n\n'
+          'Please note that while the chatbot can provide helpful insights, it has limitations.\n\n'
+          '- It can only be a conversation AI that can provide wellness tips\n'
+          '- It will not give you diagnosis for your mental health problems.\n\n' 
+          'For more serious or ongoing concerns, You should connect with a qualified specialist in this application.'
     },
     {
-      'question': 'Are my all my chats with the specialist and the AI chatbot secured, safe, and encrypted?',
+      'question':
+          'Are my chats with the specialist and AI chatbot secure and safe',
       'answer':
-          "..."
-    },
-    {
-      'question': 'Can I delete the conversation with the specialist I have previously chatted?',
-      'answer':
-          "..."
-    },
-    {
-      'question': 'How do I delete my account?',
-      'answer':
-          "To delete your account, you will have to send an Account Deletion request letter, and our team will review your request for 7 days before proceeding.\n\nTo do so, simply... ..."
+          'Yes. All your conversations with specialists are only accessible to you and the specialist you are communicating with.\n\n'
+              'As for the AI chatbot, it does not retain or store any conversation history. Once you leave or navigate back from the chat screen, the session is cleared. This ensures your privacy and keeps your data secure.'
     },
   ];
 
@@ -160,10 +165,9 @@ class _FrequentlyAskedQuestionsState extends State<FrequentlyAskedQuestions> {
                       child: Text(
                         "Got Questions? We've got answers",
                         style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface
-                        ),
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface),
                         textAlign: TextAlign.center,
                       ),
                     ),
