@@ -128,8 +128,8 @@ class _EditArticleFormState extends State<EditArticleForm> {
         );
     _showSnackBar(
       "Success",
-      "Article updated successfully!",
-      ContentType.success,
+      "Article has been updated and will be reviewed by admin team.",
+      ContentType.help,
     );
     Navigator.pop(context, true);
   }
