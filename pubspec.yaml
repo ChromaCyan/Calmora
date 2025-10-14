@@ -200,6 +200,20 @@ flutter:
     - images/loading2.json
     - images/error2.json
     - images/breathing_exercise_dp.jpg
+    - images/about_mental_health/counselor.jpg
+    - images/about_mental_health/couple_arguing.jpg
+    - images/about_mental_health/couple.jpg
+    - images/about_mental_health/depress.jpg
+    - images/about_mental_health/lonely_guy.jpg
+    - images/about_mental_health/mental_disorder.jpg
+    - images/about_mental_health/mental_health.jpg
+    - images/about_mental_health/psychiatrist.jpg
+    - images/about_mental_health/psychologist.jpg
+    - images/about_mental_health/r_u_ok.jpg
+    - images/about_mental_health/suffering_inside.jpg
+    - images/about_mental_health/types_of_disorders.jpg
+    - images/about_mental_health/types_of_specialists.jpg
+    - images/help_center.png
 
     # Fonts Assets
   fonts:

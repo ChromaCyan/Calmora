@@ -1,16 +1,22 @@
-import 'package:armstrong/patient/screens/dashboard/men_health.dart';
+import 'package:armstrong/patient/screens/dashboard/about_app_pages/awareness.dart';
 import 'package:armstrong/widgets/cards/welcome_card.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/cards/mood_graph.dart';
 import 'package:armstrong/widgets/cards/journal_card.dart';
 import 'package:armstrong/widgets/cards/article_list.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:armstrong/widgets/cards/meditation_card.dart';
+import 'package:armstrong/widgets/cards/guide_card.dart';
 import 'package:armstrong/widgets/cards/app_section.dart';
-import 'package:armstrong/patient/screens/dashboard/meditation_details.dart';
-import 'package:armstrong/patient/screens/dashboard/breathing_details.dart';
-import 'package:armstrong/patient/screens/dashboard/emergency_services.dart';
-import 'package:armstrong/patient/screens/dashboard/about_us.dart';
+
+import 'package:armstrong/patient/screens/dashboard/mind_body_pages/meditation_details.dart';
+import 'package:armstrong/patient/screens/dashboard/mind_body_pages/breathing_details.dart';
+import 'package:armstrong/patient/screens/dashboard/about_app_pages/emergency_services.dart';
+import 'package:armstrong/patient/screens/dashboard/about_app_pages/about_us.dart';
+import 'package:armstrong/patient/screens/dashboard/about_app_pages/faq.dart';
+import 'package:armstrong/patient/screens/dashboard/about_mental_health_pages/mental_disorder.dart';
+import 'package:armstrong/patient/screens/dashboard/about_mental_health_pages/mental_health.dart';
+import 'package:armstrong/patient/screens/dashboard/about_mental_health_pages/specialist_types.dart';
+import 'package:armstrong/patient/screens/dashboard/about_mental_health_pages/types_of_mental_disorder.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -66,9 +72,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              
+              // const SizedBox(height: 30),
               Center(
                 child: Text(
-                  'What is this app about?',
+                  'About Mental Health',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
@@ -76,36 +84,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 10),
+              //cards part
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
-                    child: AppSection(
-                      title: "Understanding Mental Health",
-                      imageUrl: "images/splash/image6.png",
-                      onTap: () => _navigateWithSlide(
-                          context, MentalHealthAwarenessPage()),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: AppSection(
-                      title: "Emergency Services",
-                      imageUrl: "images/splash/image7.png",
+                    child: GuideCard(
+                      title: "What is Mental Health?",
+                      imageUrl: "images/about_mental_health/mental_health.jpg",
                       onTap: () =>
-                          _navigateWithSlide(context, EmergencyServicePage()),
+                          _navigateWithSlide(context, MentalHealth()),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: AppSection(
-                      title: "What is Calmora?",
-                      imageUrl: "images/calmora_circle_crop.png",
-                      onTap: () => _navigateWithSlide(context, AboutUsPage()),
+                    child: GuideCard(
+                      title: "What is a Mental Disorder?",
+                      imageUrl: "images/about_mental_health/mental_disorder.jpg",
+                      onTap: () =>
+                          _navigateWithSlide(context, MentalDisorder()),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: GuideCard(
+                      title: "Common types of mental disorder",
+                      imageUrl: "images/about_mental_health/depress.jpg",
+                      onTap: () =>
+                          _navigateWithSlide(context, DisorderTypes()),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GuideCard(
+                      title: "Calmora Specialists and who should you seek",
+                      imageUrl: "images/about_mental_health/types_of_specialists.jpg",
+                      onTap: () =>
+                          _navigateWithSlide(context, SpecialistTypes()),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 30),
+              Center(
+                child: Text(
+                  'Recommended Articles',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
+                ),
+              ),
+              const ArticleList(),
+
               const SizedBox(height: 30),
               Center(
                 child: Text(
@@ -140,16 +177,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
               const SizedBox(height: 30),
+              const Divider(
+                thickness: 1.5,
+                color: Colors.grey,
+                indent: 40,
+                endIndent: 40,
+              ),
+              const SizedBox(height: 30),
               Center(
                 child: Text(
-                  'Recommended Articles',
+                  'What is this app about?',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
                   ),
                 ),
               ),
-              const ArticleList(),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: AppSection(
+                      title: "For Awareness",
+                      imageUrl: "images/splash/image6.png",
+                      onTap: () => _navigateWithSlide(
+                          context, MentalHealthAwarenessPage()),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AppSection(
+                      title: "Hotline Services",
+                      imageUrl: "images/splash/image7.png",
+                      onTap: () =>
+                          _navigateWithSlide(context, EmergencyServicePage()),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AppSection(
+                      title: "Help\nCenter",
+                      imageUrl: "images/splash/image2.png",
+                      onTap: () => _navigateWithSlide(context, FrequentlyAskedQuestions()),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AppSection(
+                      title: "About Calmora",
+                      imageUrl: "images/calmora_circle_crop.png",
+                      onTap: () => _navigateWithSlide(context, AboutUsPage()),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
