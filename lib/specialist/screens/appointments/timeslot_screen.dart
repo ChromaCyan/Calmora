@@ -56,7 +56,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
           TimeSlotForm(specialistId: widget.specialistId),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final slideAnimation = Tween<Offset>(
-          begin: const Offset(1.0, 0.0), // from right
+          begin: const Offset(1.0, 0.0), 
           end: Offset.zero,
         ).animate(
           CurvedAnimation(parent: animation, curve: Curves.easeInOut),

@@ -53,7 +53,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to register user: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -85,7 +86,8 @@ class ApiRepository {
       return data;
     } else {
       final errorMessage = data['message'] ?? 'Failed to login';
-      throw Exception(errorMessage);
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -104,7 +106,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to verify OTP: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -122,7 +125,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return responseBody;
     } else {
-      throw Exception(responseBody['message'] ?? 'Failed to send OTP');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -140,12 +144,14 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return responseBody;
     } else if (responseBody['message'] == "OTP has expired") {
-      throw Exception("Your OTP has expired. Please request a new one.");
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     } else if (responseBody['message'] ==
         "OTP expired after 3 failed attempts. Request a new one.") {
       throw Exception("Too many failed attempts. Request a new OTP.");
     } else {
-      throw Exception(responseBody['message'] ?? 'OTP verification failed');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -188,7 +194,8 @@ class ApiRepository {
       final data = json.decode(response.body)["data"];
       return Profile.fromJson(data);
     } else {
-      throw Exception('Failed to fetch profile: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -209,7 +216,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to edit profile: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -226,7 +234,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return Specialist.fromJson(json.decode(response.body)['data']);
     } else {
-      throw Exception('Failed to fetch specialist details: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -244,7 +253,8 @@ class ApiRepository {
       final List<dynamic> data = json.decode(response.body)['data'];
       return data.map((json) => Specialist.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to fetch specialists: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -260,7 +270,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body)['data'];
     } else {
-      throw Exception('Failed to fetch patient data: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
   /////////////////////////////////////////////////////////////////////////////////
@@ -295,7 +306,8 @@ class ApiRepository {
       final responseData = json.decode(response.body);
       return responseData['chatId']; // Return the chatId for the new chat
     } else {
-      throw Exception('Failed to create a new chat: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -317,7 +329,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       print('Message sent successfully');
     } else {
-      throw Exception('Failed to send message: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -335,7 +348,8 @@ class ApiRepository {
       List<dynamic> chatList = json.decode(response.body);
       return chatList.map((chat) => Map<String, dynamic>.from(chat)).toList();
     } else {
-      throw Exception('Failed to fetch chat list: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -356,7 +370,8 @@ class ApiRepository {
           .map((message) => Map<String, dynamic>.from(message))
           .toList();
     } else {
-      throw Exception('Failed to fetch chat history: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
   /////////////////////////////////////////////////////////////////////////////////
@@ -388,10 +403,12 @@ class ApiRepository {
               date.year, date.month, date.day, timeParts[0], timeParts[1]);
         }).toList();
       } else {
-        throw Exception("Invalid data format: Expected list of slots.");
+        final errorData = jsonDecode(response.body);
+        throw errorData['message'] ?? 'Unknown error occurred';
       }
     } else {
-      throw Exception('Failed to fetch available slots: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -432,7 +449,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to create appointment: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -448,7 +466,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to fetch patient appointments: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -464,8 +483,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception(
-          'Failed to fetch specialist appointments: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -484,7 +503,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to accept appointment: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -503,7 +523,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to decline appointment: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -530,7 +551,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to complete appointment: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -547,8 +569,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception(
-          'Failed to fetch completed appointments: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -574,9 +596,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception(
-        'Failed to fetch weekly completed appointments: ${response.body}',
-      );
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -603,7 +624,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to create mood entry: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -621,7 +643,8 @@ class ApiRepository {
       List<dynamic> data = json.decode(response.body);
       return data.map((item) => MoodEntry.fromJson(item)).toList();
     } else {
-      throw Exception('Failed to fetch mood entries: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -641,7 +664,8 @@ class ApiRepository {
       final List<dynamic> data = json.decode(response.body)['data'];
       return data.map((survey) => Map<String, dynamic>.from(survey)).toList();
     } else {
-      throw Exception('Failed to fetch surveys: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -681,7 +705,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body)['data'];
     } else {
-      throw Exception('Failed to submit survey response: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -699,7 +724,8 @@ class ApiRepository {
       final Map<String, dynamic> data = json.decode(response.body)['data'];
       return SurveyResult.fromJson(data);
     } else {
-      throw Exception('Failed to fetch survey results: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -718,7 +744,8 @@ class ApiRepository {
       // Convert each item to an Article object
       return data.map((articleData) => Article.fromMap(articleData)).toList();
     } else {
-      throw Exception('Failed to fetch recommended articles: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -739,7 +766,8 @@ class ApiRepository {
       final List<dynamic> data = json.decode(response.body);
       return data.map((article) => Article.fromMap(article)).toList();
     } else {
-      throw Exception('Failed to fetch articles: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -757,7 +785,8 @@ class ApiRepository {
       final List<dynamic> data = json.decode(response.body);
       return data.map((article) => Article.fromMap(article)).toList();
     } else {
-      throw Exception('Failed to fetch specialist articles: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -775,7 +804,8 @@ class ApiRepository {
       final Map<String, dynamic> data = json.decode(response.body);
       return Article.fromMap(data);
     } else {
-      throw Exception('Failed to fetch article: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -812,7 +842,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to create article: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -850,7 +881,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to update article: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -865,7 +897,8 @@ class ApiRepository {
     );
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw Exception('Failed to delete article: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -887,7 +920,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(json.decode(response.body));
     } else {
-      throw Exception('Failed to load notifications: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -905,7 +939,8 @@ class ApiRepository {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to mark notification as read: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -922,8 +957,8 @@ class ApiRepository {
     );
 
     if (response.statusCode != 200) {
-      throw Exception(
-          'Failed to mark all notifications as read: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -956,7 +991,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to add time slot: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -986,7 +1022,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to update time slot: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -1006,7 +1043,8 @@ class ApiRepository {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to delete time slot: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -1037,10 +1075,12 @@ class ApiRepository {
           return TimeSlotModel.fromJson(slot);
         }).toList();
       } else {
-        throw Exception("Invalid data format: Expected list of slots.");
+        final errorData = jsonDecode(response.body);
+        throw errorData['message'] ?? 'Unknown error occurred';
       }
     } else {
-      throw Exception('Failed to fetch available slots: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -1060,14 +1100,15 @@ class ApiRepository {
       print("API Response: ${response.body}");
       final data = json.decode(response.body);
 
-      // ✅ Fix: Return only the 'slots' list
       if (data["slots"] is List) {
         return data["slots"] as List<dynamic>;
       } else {
-        throw Exception("Invalid data format: Expected list of slots.");
+        final errorData = jsonDecode(response.body);
+        throw errorData['message'] ?? 'Unknown error occurred';
       }
     } else {
-      throw Exception('Failed to fetch all time slots: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -1107,7 +1148,8 @@ class ApiRepository {
     if (response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to book appointment: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -1125,7 +1167,8 @@ class ApiRepository {
       final data = json.decode(response.body);
       return data;
     } else {
-      throw Exception('Gemini error: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 
@@ -1139,9 +1182,10 @@ class ApiRepository {
       final data = json.decode(response.body);
       return data['audioBase64'];
     } else if (response.statusCode == 404) {
-      return null; // audio not ready yet
+      return null;
     } else {
-      throw Exception('Fetch audio error: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
     }
   }
 }
