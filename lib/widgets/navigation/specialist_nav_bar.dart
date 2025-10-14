@@ -130,6 +130,7 @@ class SpecialistBottomNavBar extends StatelessWidget {
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
+                    fontSize: 13
                   ),
                 ),
               ),

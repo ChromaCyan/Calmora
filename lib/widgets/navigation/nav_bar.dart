@@ -245,6 +245,7 @@ class CustomBottomNavBar extends StatelessWidget {
                     style: TextStyle(
                       color: primaryColor,
                       fontWeight: FontWeight.bold,
+                      fontSize: 13,
                     ),
                   ),
                 ),

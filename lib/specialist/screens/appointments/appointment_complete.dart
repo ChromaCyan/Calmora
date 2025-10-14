@@ -5,6 +5,7 @@ import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'dart:ui';
 // import 'package:armstrong/widgets/navigation/appbar.dart';
 
 class AppointmentCompleteScreen extends StatefulWidget {
@@ -133,129 +134,188 @@ class _AppointmentCompleteScreenState extends State<AppointmentCompleteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      // appBar: UniversalAppBar(title: "Complete Appointment"),
-      appBar: AppBar(title: Text("Complete Appointmnet"),),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 30,),
-            Text("Your feedback about your appointment",
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)
+      resizeToAvoidBottomInset: true, // <-- allows body to resize for keyboard
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
             ),
-            const SizedBox(height: 10,),
-            TextFormField(
-              controller: _feedbackController,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-              decoration: InputDecoration(
-                labelText: 'Type here',
-                labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                hintText: 'Share your thoughts',
-                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                prefixIcon: Icon(Icons.feedback, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surface,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline, width: 1),
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              ),
-              maxLines: 3,
+          ),
+        ),
+        title: Text(
+          "Appointment Completion",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_rounded),
+          onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onPrimaryContainer,
+        ),
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// Background image
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
+
+          /// Frosted blur overlay
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: const SizedBox.expand(),
             ),
+          ),
 
-            const SizedBox(height: 25),
-            Text("Share your memory with your client (^_^)",
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-            const SizedBox(height: 10),
-
-            // Image Picker
-            GestureDetector(
-              onTap: _pickImage,
-              child: Stack(
+          /// Scrollable content
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    height: 250,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context).colorScheme.surfaceVariant,
-                      image: _image != null
-                          ? DecorationImage(image: FileImage(_image!), fit: BoxFit.cover)
-                          : null,
+                  const SizedBox(height: 30),
+                  Text(
+                    "Your feedback about your appointment",
+                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: _feedbackController,
+                    style: TextStyle(color: theme.colorScheme.onSurface),
+                    decoration: InputDecoration(
+                      labelText: 'Type here',
+                      labelStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                      hintText: 'Share your thoughts',
+                      hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.feedback, color: theme.colorScheme.onSurfaceVariant),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface.withOpacity(0.6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: theme.colorScheme.outline, width: 1),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     ),
-                    child: _image == null
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.image, size: 50, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                              SizedBox(height: 8),
-                              Text('Add image cover',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            ],
-                          )
-                        : null,
+                    maxLines: 3,
                   ),
 
-                  // Remove Button (only shown when an image is selected)
-                  if (_image != null)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _image = null;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: EdgeInsets.all(6),
+                  const SizedBox(height: 25),
+                  Text(
+                    "Share your memory with your client (^_^)",
+                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 10),
+
+                  /// Image Picker
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 250,
+                          width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.background.withOpacity(0.7),
-                            shape: BoxShape.circle,
+                            borderRadius: BorderRadius.circular(20),
+                            color: theme.colorScheme.surfaceVariant.withOpacity(0.6),
+                            image: _image != null
+                                ? DecorationImage(image: FileImage(_image!), fit: BoxFit.cover)
+                                : null,
                           ),
-                          child: Icon(Icons.close, color: Theme.of(context).colorScheme.onBackground, size: 20),
+                          child: _image == null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.image,
+                                        size: 50,
+                                        color: theme.colorScheme.onSurfaceVariant),
+                                    SizedBox(height: 8),
+                                    Text('Add image cover',
+                                        style: TextStyle(
+                                            color: theme.colorScheme.onSurfaceVariant)),
+                                  ],
+                                )
+                              : null,
+                        ),
+                        if (_image != null)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: InkWell(
+                              onTap: () => setState(() => _image = null),
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.background.withOpacity(0.7),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.close,
+                                    color: theme.colorScheme.onBackground, size: 20),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// Complete Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: _submitCompletion, 
+                        icon: Icon(Icons.send_rounded, size: 24),
+                        label: Text(
+                          "Submit",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 85, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // Complete Button
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _submitCompletion,
-                    icon: Icon(Icons.check_circle),
-                    label: Text('Complete Appointment'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

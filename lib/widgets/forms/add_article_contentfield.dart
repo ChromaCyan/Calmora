@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:armstrong/widgets/navigation/appbar.dart';
+import 'dart:ui';
 
 class AddArticleContentFieldPage extends StatefulWidget {
   final String initialContent;
@@ -39,12 +40,30 @@ class _AddArticleContentFieldPageState extends State<AddArticleContentFieldPage>
       child: Scaffold(
         backgroundColor: theme.colorScheme.background,
         appBar: AppBar(
-          title: Text(""),
-          // leading: IconButton(
-          //   icon: Icon(Icons.arrow_back_ios_new_rounded),
-          //   onPressed: _handleDone,
-          //   color: theme.colorScheme.onPrimaryContainer,
-          // ),
+          elevation: 1,
+          backgroundColor: Colors.transparent,
+          flexibleSpace: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+              child: Container(
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+              ),
+            ),
+          ),
+          title: Text(
+            "Your Contents here",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: _handleDone,
+            color: theme.colorScheme.onPrimaryContainer,
+          ),
           // actions: [
           //   TextButton(
           //     onPressed: _handleDone,

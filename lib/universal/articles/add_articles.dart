@@ -197,7 +197,37 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(),
+      // resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        elevation: 1,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+          onPressed: () async {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "Publish your own article here",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -220,11 +250,11 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Create an Article',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 16),
+                      // Text(
+                      //   'Create an Article',
+                      //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      // ),
+                      SizedBox(height: 40),
 
                       // Image Picker with GestureDetector
                       GestureDetector(
@@ -277,15 +307,14 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                                   child: Container(
                                     padding: EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.7),
+                                      color: Theme.of(context).colorScheme.background.withOpacity(0.7),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: Icon(Icons.close,
-                                        color: Theme.of(context).colorScheme.onBackground,
-                                        size: 20),
+                                    child: Icon(
+                                      Icons.close,
+                                      color: Theme.of(context).colorScheme.onBackground,
+                                      size: 20
+                                    ),
                                   ),
                                 ),
                               ),
@@ -333,7 +362,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                       GestureDetector(
                         onTap: _openContentEditor,
                         child: Container(
-                          height: 150,
+                          height: 250,
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
@@ -346,7 +375,7 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                             children: [
                               Expanded(
                                 child: SingleChildScrollView(
-                                  physics: NeverScrollableScrollPhysics(),
+                                  physics: const AlwaysScrollableScrollPhysics(),
                                   child: Text(
                                     _contentController.text.isEmpty
                                         ? 'Add your contents here...'
@@ -463,10 +492,12 @@ class _AddArticleScreenState extends State<AddArticleScreen> {
                         children: [
                           ElevatedButton.icon(
                             onPressed: _submitArticle,
-                            icon: Icon(Icons.send, size: 24),
+                            icon: Icon(Icons.send_rounded, size: 24),
                             label: Text(
                               'Submit Article',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16
+                              ),
                             ),
                             style: ElevatedButton.styleFrom(
                               elevation: 0,

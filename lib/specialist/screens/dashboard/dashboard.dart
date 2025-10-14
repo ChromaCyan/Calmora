@@ -80,6 +80,9 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final bool hasNoAppointments =
+      !isLoading && errorMessage.isEmpty && upcomingAppointments.isEmpty;
+
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 800),
@@ -97,44 +100,53 @@ class _SpecialistDashboardScreenState extends State<SpecialistDashboardScreen> {
             ),
           ],
         ),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 📅 Upcoming Appointments
-              Center(
-                child: Text(
-                  'Your Upcoming Appointments',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                children: [
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      'Your Upcoming Appointments',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onBackground,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildUpcomingAppointments(),
+                  const SizedBox(height: 10),
+                  // _buildUpcomingAppointments(),
+                  hasNoAppointments
+                    ? SizedBox(
+                        height: 115,
+                        width: double.infinity,
+                        child: _buildUpcomingAppointments(),
+                      )
+                    : _buildUpcomingAppointments(),
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-              // 📊 Weekly Chart
-              Center(
-                child: Text(
-                  'Weekly Appointment Chart',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
+                  Center(
+                    child: Text(
+                      'Weekly Appointment Chart',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onBackground,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  WeeklyAppointmentChart(specialistId: widget.specialistId),
+
+                  const SizedBox(height: 30),
+                ],
               ),
-              const SizedBox(height: 10),
-              WeeklyAppointmentChart(specialistId: widget.specialistId),
-
-              const SizedBox(height: 30),
-
-              // ✨ (Optional) You could add a "Recommended Resources" or "Your Stats" section here later
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );
