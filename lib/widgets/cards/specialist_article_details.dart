@@ -27,6 +27,7 @@ class _SpecialistArticleDetailPageState
   @override
   void initState() {
     super.initState();
+    _loadSpecialistId();
     context.read<ArticleBloc>().add(FetchArticleById(widget.articleId));
   }
 
@@ -77,21 +78,12 @@ class _SpecialistArticleDetailPageState
               final userId = await storage.read(key: 'userId');
 
               if (userId != null) {
-                context.read<ArticleBloc>().add(FetchAllArticles());
+                context.read<ArticleBloc>().add(FetchArticlesBySpecialist(userId));
               }
 
               Navigator.pop(context);
             },
           ),
-          // title: Text(
-          //   "Specialist Details",
-          //   style: TextStyle(
-          //     color: Theme.of(context).colorScheme.onPrimaryContainer,
-          //     fontWeight: FontWeight.w600,
-          //     fontSize: 18,
-          //   ),
-          // ),
-          // centerTitle: true,
         ),
         body: Stack(
           fit: StackFit.expand,

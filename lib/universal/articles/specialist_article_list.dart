@@ -54,7 +54,7 @@ class _SpecialistArticleScreenState extends State<SpecialistArticleScreen> {
             AddArticleScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           var slideAnimation = Tween<Offset>(
-            begin: const Offset(1.0, 0.0), // slide from right
+            begin: const Offset(1.0, 0.0), 
             end: Offset.zero,
           ).animate(
             CurvedAnimation(parent: animation, curve: Curves.easeInOut),

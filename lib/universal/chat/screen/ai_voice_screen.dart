@@ -28,7 +28,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
 
   String _userSubtitle = '';
   String _aiSubtitle = '';
-  String _fullAIResponse = '';
 
   late AnimationController _animController;
   bool _useNaturalTTS = false;
@@ -38,7 +37,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         .replaceAll(RegExp(r'\*\*'), '')
         .replaceAll(RegExp(r'\*'), '')
         .replaceAll(RegExp(r'_'), '')
-        .replaceAll(RegExp(r'`'), '')
         .trim();
   }
 
@@ -49,20 +47,25 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
     _ttsService.initTTS();
 
     _ttsService.setOnComplete(() {
-      if (mounted) setState(() => _status = VoiceChatStatus.idle);
+      if (mounted) setState(() {
+        _status = VoiceChatStatus.idle;
+        _aiSubtitle = '';
+      });
     });
 
     _ttsService.setOnCancel(() {
-      if (mounted) setState(() => _status = VoiceChatStatus.idle);
+      if (mounted) setState(() {
+        _status = VoiceChatStatus.idle;
+        _aiSubtitle = '';
+      });
     });
 
     _ttsService.setOnError((msg) {
-      if (mounted) {
-        setState(() {
-          _status = VoiceChatStatus.error;
-          _errorMessage = msg;
-        });
-      }
+      print("TTS error: $msg");
+      if (mounted) setState(() {
+        _status = VoiceChatStatus.idle;
+        _aiSubtitle = '';
+      });
     });
 
     _animController =
@@ -70,7 +73,10 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
           ..repeat(reverse: true);
 
     _audioPlayer.onPlayerComplete.listen((_) {
-      setState(() => _status = VoiceChatStatus.idle);
+      setState(() {
+        _status = VoiceChatStatus.idle;
+        _aiSubtitle = '';
+      });
     });
   }
 
@@ -83,7 +89,9 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
 
   Future<void> _startListening() async {
     bool available = await _speech.initialize(
-      onStatus: (status) => print("Speech status: $status"),
+      onStatus: (status) {
+        print("Speech status: $status");
+      },
       onError: (error) {
         print("Speech error: ${error.errorMsg}");
         setState(() => _status = VoiceChatStatus.error);
@@ -95,13 +103,14 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         _status = VoiceChatStatus.listening;
         _userSubtitle = '';
       });
-
+      print("🎧 Listening for speech...");
       _speech.listen(
         onResult: (val) {
           setState(() {
             _lastWords = val.recognizedWords;
             _userSubtitle = val.recognizedWords;
           });
+          print("🗣️ Recognized: ${val.recognizedWords}");
         },
         listenFor: const Duration(minutes: 2),
         pauseFor: const Duration(seconds: 10),
@@ -109,6 +118,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         localeId: "en_US",
       );
     } else {
+      print("❌ Speech recognition unavailable");
       setState(() {
         _status = VoiceChatStatus.error;
         _errorMessage = "Speech recognition not available";
@@ -117,15 +127,26 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
   }
 
   Future<void> _stopListening() async {
+    print("🛑 Stopping listening...");
     await _speech.stop();
     setState(() => _status = VoiceChatStatus.idle);
 
     if (_lastWords.trim().isNotEmpty) {
+      print("📤 Sending to AI: $_lastWords");
       await _sendToAI(_lastWords);
       _lastWords = '';
       _userSubtitle = '';
     } else {
       print("⚠️ No speech detected.");
+    }
+  }
+
+  Future<void> _simulateAISubtitles(String text) async {
+    List<String> sentences = text.split(RegExp(r'(?<=[.!?]) '));
+    for (String s in sentences) {
+      if (!mounted) return;
+      setState(() => _aiSubtitle = s.trim());
+      await Future.delayed(const Duration(seconds: 2)); 
     }
   }
 
@@ -137,7 +158,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
           await _apiRepository.askGemini(text, withVoice: _useNaturalTTS);
 
       final aiReply = _cleanResponse(aiResponse['reply'] ?? '');
-      _fullAIResponse = aiReply;
 
       if (aiReply.isEmpty) return;
 
@@ -155,6 +175,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         if (audioBase64 != null) {
           final audioBytes = base64Decode(audioBase64);
           setState(() => _status = VoiceChatStatus.playing);
+          _simulateAISubtitles(aiReply);
           await _audioPlayer.play(BytesSource(audioBytes));
         } else {
           setState(() {
@@ -164,6 +185,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         }
       } else {
         setState(() => _status = VoiceChatStatus.playing);
+        _simulateAISubtitles(aiReply);
         await _ttsService.speak(aiReply);
       }
     } catch (e) {
@@ -172,34 +194,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         _errorMessage = e.toString();
       });
     }
-  }
-
-  Future<void> _stopSpeaking() async {
-    await _audioPlayer.stop();
-    await _ttsService.stop();
-    setState(() => _status = VoiceChatStatus.idle);
-  }
-
-  void _showFullAIResponse() {
-    if (_fullAIResponse.isEmpty) return;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("AI Response"),
-        content: SingleChildScrollView(
-          child: Text(
-            _fullAIResponse,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("Close"),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showTTSOptions() {
@@ -213,7 +207,8 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
             ListTile(
               leading: const Icon(Icons.record_voice_over),
               title: const Text("Natural AI Voice"),
-              subtitle: const Text("⚠️ Slower but more realistic"),
+              subtitle: const Text(
+                  "⚠️ Slower, but more realistic, response limited to 2–3 sentences"),
               onTap: () {
                 setState(() => _useNaturalTTS = true);
                 Navigator.pop(ctx);
@@ -324,15 +319,15 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
                   ),
                   const SizedBox(height: 40),
 
-                  // 🎙️ Mic / Stop button
+                  // 🎙️ Mic button
                   GestureDetector(
                     onTap: () async {
                       if (_status == VoiceChatStatus.idle) {
+                        print("🎤 Listening started...");
                         await _startListening();
                       } else if (_status == VoiceChatStatus.listening) {
+                        print("🛑 Listening stopped...");
                         await _stopListening();
-                      } else if (_status == VoiceChatStatus.playing) {
-                        await _stopSpeaking(); // Stop AI speaking
                       }
                     },
                     child: Container(
@@ -342,7 +337,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
                         color: _status == VoiceChatStatus.listening
                             ? scheme.error.withOpacity(0.8)
                             : scheme.primary.withOpacity(0.8),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 8,
@@ -351,11 +346,9 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
                         ],
                       ),
                       child: Icon(
-                        _status == VoiceChatStatus.playing
-                            ? Icons.stop_circle
-                            : (_status == VoiceChatStatus.listening
-                                ? Icons.stop
-                                : Icons.mic_none),
+                        _status == VoiceChatStatus.listening
+                            ? Icons.stop
+                            : Icons.mic_none,
                         size: 64,
                         color: Colors.white,
                       ),
@@ -370,18 +363,37 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 40),
-
-                  if (_fullAIResponse.isNotEmpty)
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: scheme.primaryContainer,
-                        foregroundColor: scheme.onPrimaryContainer,
+                  // 🧠 Subtitles (User + AI)
+                  const SizedBox(height: 50),
+                  AnimatedOpacity(
+                    opacity: _userSubtitle.isNotEmpty ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      _userSubtitle,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic,
                       ),
-                      onPressed: _showFullAIResponse,
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      label: const Text("Check AI Response"),
+                      textAlign: TextAlign.center,
                     ),
+                  ),
+                  AnimatedOpacity(
+                    opacity: _aiSubtitle.isNotEmpty ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text(
+                        _aiSubtitle,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
