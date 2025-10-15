@@ -9,9 +9,9 @@ import 'package:armstrong/config/global_loader.dart';
 
 class AppointmentBookingForm extends StatefulWidget {
   final String specialistId;
+  final VoidCallback? onBooked;
 
-  const AppointmentBookingForm({Key? key, required this.specialistId})
-      : super(key: key);
+  const AppointmentBookingForm({Key? key, required this.specialistId, this.onBooked}) : super(key: key);
 
   @override
   _AppointmentBookingFormState createState() => _AppointmentBookingFormState();
@@ -158,6 +158,38 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
     );
   }
 
+  // Widget _buildDatePicker() {
+  //   return ListTile(
+  //     leading: Icon(Icons.calendar_today,
+  //         color: Theme.of(context).colorScheme.primary),
+  //     title: Text(
+  //       _selectedDate == null
+  //           ? 'Select Date'
+  //           : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+  //       style: Theme.of(context).textTheme.bodyMedium,
+  //     ),
+  //     onTap: () async {
+  //       DateTime? pickedDate = await showDatePicker(
+  //         context: context,
+  //         initialDate: DateTime.now(),
+  //         firstDate: DateTime.now(),
+  //         lastDate: DateTime(2101),
+  //       );
+  //       if (pickedDate != null) {
+  //         setState(() {
+  //           _selectedDate = pickedDate;
+  //           _selectedTimeSlot = null;
+  //         });
+  //         context.read<TimeSlotBloc>().add(
+  //               GetAvailableSlotsEvent(
+  //                 specialistId: widget.specialistId,
+  //                 date: _selectedDate!,
+  //               ),
+  //             );
+  //       }
+  //     },
+  //   );
+  // }
   Widget _buildDatePicker() {
     return ListTile(
       leading: Icon(Icons.calendar_today,
@@ -169,17 +201,21 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
         style: Theme.of(context).textTheme.bodyMedium,
       ),
       onTap: () async {
+        DateTime now = DateTime.now();
+
         DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime.now(),
+          initialDate: now.add(Duration(days: 1)),
+          firstDate: now.add(Duration(days: 1)),
           lastDate: DateTime(2101),
         );
+
         if (pickedDate != null) {
           setState(() {
             _selectedDate = pickedDate;
             _selectedTimeSlot = null;
           });
+
           context.read<TimeSlotBloc>().add(
                 GetAvailableSlotsEvent(
                   specialistId: widget.specialistId,
@@ -259,12 +295,20 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
         } else if (state is TimeSlotFailure) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Text(
-              "Specialist has not set working hours yet.",
-              style: TextStyle(color: Colors.red),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                state.error,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  height: 1.4,
+                ),
+              ),
             ),
           );
         }
+
         return Container();
       },
     );

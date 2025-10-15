@@ -60,7 +60,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 colorScheme.primary,
                 homeKey,
                 context,
-                "Dashboard with personalized recommended articles, add your mood, and view your upcoming appointments",
+                "Dashboard with articles for understanding mental health, giving more information about the application, and recommended articles catered for you!",
               ),
               _buildNavItem(
                 Icons.handshake_outlined,

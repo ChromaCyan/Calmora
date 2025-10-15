@@ -134,7 +134,7 @@ class SpecialistArticleCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: AspectRatio(
-            aspectRatio: 16 / 9, // ✅ Same responsive layout as PatientArticleCard
+            aspectRatio: 16 / 9, 
             child: Stack(
               fit: StackFit.expand,
               children: [

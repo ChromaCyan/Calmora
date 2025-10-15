@@ -47,7 +47,12 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
       builder: (context) {
         return BlocProvider.value(
           value: BlocProvider.of<TimeSlotBloc>(context),
-          child: AppointmentBookingForm(specialistId: specialistId),
+          child: AppointmentBookingForm(
+            specialistId: specialistId,
+            onBooked: () {
+              Navigator.of(context).pop(); 
+            },
+          ),
         );
       },
     );
