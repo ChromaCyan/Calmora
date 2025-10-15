@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/tts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'dart:ui';
 
 enum VoiceChatStatus { idle, listening, loading, playing, error }
 
@@ -26,8 +26,21 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
   String _lastWords = '';
   String? _errorMessage;
 
+  String _userSubtitle = '';
+  String _aiSubtitle = '';
+  String _fullAIResponse = '';
+
   late AnimationController _animController;
   bool _useNaturalTTS = false;
+
+  String _cleanResponse(String text) {
+    return text
+        .replaceAll(RegExp(r'\*\*'), '')
+        .replaceAll(RegExp(r'\*'), '')
+        .replaceAll(RegExp(r'_'), '')
+        .replaceAll(RegExp(r'`'), '')
+        .trim();
+  }
 
   @override
   void initState() {
@@ -44,8 +57,12 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
     });
 
     _ttsService.setOnError((msg) {
-      print("TTS error: $msg");
-      if (mounted) setState(() => _status = VoiceChatStatus.idle);
+      if (mounted) {
+        setState(() {
+          _status = VoiceChatStatus.error;
+          _errorMessage = msg;
+        });
+      }
     });
 
     _animController =
@@ -65,14 +82,37 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
   }
 
   Future<void> _startListening() async {
-    bool available = await _speech.initialize();
+    bool available = await _speech.initialize(
+      onStatus: (status) => print("Speech status: $status"),
+      onError: (error) {
+        print("Speech error: ${error.errorMsg}");
+        setState(() => _status = VoiceChatStatus.error);
+      },
+    );
+
     if (available) {
-      setState(() => _status = VoiceChatStatus.listening);
+      setState(() {
+        _status = VoiceChatStatus.listening;
+        _userSubtitle = '';
+      });
+
       _speech.listen(
         onResult: (val) {
-          setState(() => _lastWords = val.recognizedWords);
+          setState(() {
+            _lastWords = val.recognizedWords;
+            _userSubtitle = val.recognizedWords;
+          });
         },
+        listenFor: const Duration(minutes: 2),
+        pauseFor: const Duration(seconds: 10),
+        partialResults: true,
+        localeId: "en_US",
       );
+    } else {
+      setState(() {
+        _status = VoiceChatStatus.error;
+        _errorMessage = "Speech recognition not available";
+      });
     }
   }
 
@@ -81,8 +121,11 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
     setState(() => _status = VoiceChatStatus.idle);
 
     if (_lastWords.trim().isNotEmpty) {
-      _sendToAI(_lastWords);
+      await _sendToAI(_lastWords);
       _lastWords = '';
+      _userSubtitle = '';
+    } else {
+      print("⚠️ No speech detected.");
     }
   }
 
@@ -93,16 +136,17 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
       final aiResponse =
           await _apiRepository.askGemini(text, withVoice: _useNaturalTTS);
 
-      final aiReply = aiResponse['reply'];
+      final aiReply = _cleanResponse(aiResponse['reply'] ?? '');
+      _fullAIResponse = aiReply;
+
+      if (aiReply.isEmpty) return;
 
       if (_useNaturalTTS) {
-        // --- NATURAL TTS ---
         final ttsId = aiResponse['id'];
         String? audioBase64;
-
-        // Poll until audio is ready
         int retries = 0;
-        while (audioBase64 == null && retries < 60) {
+
+        while (audioBase64 == null && retries < 100) {
           await Future.delayed(const Duration(seconds: 1));
           audioBase64 = await _apiRepository.fetchAudio(ttsId);
           retries++;
@@ -119,7 +163,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
           });
         }
       } else {
-        // --- FLUTTER TTS ---
         setState(() => _status = VoiceChatStatus.playing);
         await _ttsService.speak(aiReply);
       }
@@ -129,6 +172,34 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         _errorMessage = e.toString();
       });
     }
+  }
+
+  Future<void> _stopSpeaking() async {
+    await _audioPlayer.stop();
+    await _ttsService.stop();
+    setState(() => _status = VoiceChatStatus.idle);
+  }
+
+  void _showFullAIResponse() {
+    if (_fullAIResponse.isEmpty) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("AI Response"),
+        content: SingleChildScrollView(
+          child: Text(
+            _fullAIResponse,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Close"),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showTTSOptions() {
@@ -142,8 +213,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
             ListTile(
               leading: const Icon(Icons.record_voice_over),
               title: const Text("Natural AI Voice"),
-              subtitle: const Text(
-                  "⚠️ Slower, but more realistic, Response limited to 2-3 sentences"),
+              subtitle: const Text("⚠️ Slower but more realistic"),
               onTap: () {
                 setState(() => _useNaturalTTS = true);
                 Navigator.pop(ctx);
@@ -200,95 +270,123 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         break;
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Calmora Voice Mode"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: _showTTSOptions,
-          ),
-        ],
-      ),
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          /// Background Image
-          Image.asset(
-            "images/login_bg_image.png",
-            fit: BoxFit.cover,
-          ),
-
-          /// Blur + semi-transparent overlay
-          Container(
-            color: scheme.surface.withOpacity(0.5),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: const SizedBox.expand(), 
+    return WillPopScope(
+      onWillPop: () async {
+        await _audioPlayer.stop();
+        await _ttsService.stop();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Calmora Voice Mode"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: _showTTSOptions,
             ),
-          ),
-
-          /// Foreground content
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Animated circle
-                ScaleTransition(
-                  scale: Tween(begin: 0.9, end: 1.2).animate(
-                    CurvedAnimation(
-                      parent: _animController,
-                      curve: Curves.easeInOut,
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset("images/login_bg_image.png", fit: BoxFit.cover),
+            Container(
+              color: scheme.surface.withOpacity(0.5),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: const SizedBox.expand(),
+              ),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ScaleTransition(
+                    scale: Tween(begin: 0.9, end: 1.2).animate(
+                      CurvedAnimation(
+                        parent: _animController,
+                        curve: Curves.easeInOut,
+                      ),
                     ),
-                  ),
-                  child: Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          scheme.primary,
-                          scheme.primaryContainer,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [scheme.primary, scheme.primaryContainer],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
-                // Mic button
-                GestureDetector(
-                  onLongPressStart: (_) {
-                    if (_status == VoiceChatStatus.idle) _startListening();
-                  },
-                  onLongPressEnd: (_) {
-                    if (_status == VoiceChatStatus.listening) _stopListening();
-                  },
-                  child: Icon(
-                    statusIcon,
-                    size: 64,
-                    color: statusColor,
+                  // 🎙️ Mic / Stop button
+                  GestureDetector(
+                    onTap: () async {
+                      if (_status == VoiceChatStatus.idle) {
+                        await _startListening();
+                      } else if (_status == VoiceChatStatus.listening) {
+                        await _stopListening();
+                      } else if (_status == VoiceChatStatus.playing) {
+                        await _stopSpeaking(); // Stop AI speaking
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _status == VoiceChatStatus.listening
+                            ? scheme.error.withOpacity(0.8)
+                            : scheme.primary.withOpacity(0.8),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 8,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _status == VoiceChatStatus.playing
+                            ? Icons.stop_circle
+                            : (_status == VoiceChatStatus.listening
+                                ? Icons.stop
+                                : Icons.mic_none),
+                        size: 64,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
+                  Text(
+                    statusText,
+                    style: TextStyle(
+                      color: scheme.onBackground,
+                      fontSize: 18,
+                    ),
+                  ),
 
-                // Status text
-                Text(
-                  statusText,
-                  style: TextStyle(
-                    color: scheme.onBackground,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+                  const SizedBox(height: 40),
+
+                  if (_fullAIResponse.isNotEmpty)
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: scheme.primaryContainer,
+                        foregroundColor: scheme.onPrimaryContainer,
+                      ),
+                      onPressed: _showFullAIResponse,
+                      icon: const Icon(Icons.chat_bubble_outline),
+                      label: const Text("Check AI Response"),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

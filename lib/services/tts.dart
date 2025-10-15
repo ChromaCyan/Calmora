@@ -19,7 +19,7 @@ class TTSService {
 
     // Preferred voice priority: Canadian > UK > US
     final preferredVoice = voices.firstWhere(
-      (v) => v['locale'] == 'en-CA',
+      (v) => v['locale'] == 'fil-PH',
       orElse: () => voices.firstWhere(
         (v) => v['locale'] == 'en-GB',
         orElse: () => voices.firstWhere(
@@ -38,11 +38,11 @@ class TTSService {
           "Using voice: ${preferredVoice['name']} (${preferredVoice['locale']})");
     } else {
       print("No preferred English voices found, using default.");
-      await _flutterTts.setLanguage("en-US");
+      await _flutterTts.setLanguage("fil-PH");
     }
 
-    await _flutterTts.setPitch(1.0);
-    await _flutterTts.setSpeechRate(0.5);
+    await _flutterTts.setPitch(1.1);
+    await _flutterTts.setSpeechRate(0.7);
     await _flutterTts.setVolume(1.0);
 
     // ✅ Attach lifecycle handlers
