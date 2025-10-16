@@ -134,65 +134,6 @@ class _SpecialistArticleDetailPageState
     double specialistFontSize = screenWidth > 600 ? 18.0 : 16.0;
     double maxContentWidth = 800.0;
 
-    // return SingleChildScrollView(
-    //   padding: EdgeInsets.symmetric(horizontal: contentPadding, vertical: 24),
-    //   child: Center(
-    //     child: ConstrainedBox(
-    //       constraints: BoxConstraints(maxWidth: maxContentWidth),
-    //       child: Column(
-    //         crossAxisAlignment: CrossAxisAlignment.start,
-    //         children: [
-    //           ClipRRect(
-    //             borderRadius: BorderRadius.circular(12.0),
-    //             child: AspectRatio(
-    //               aspectRatio: 16 / 9,
-    //               child: Image.network(
-    //                 article.heroImage,
-    //                 width: double.infinity,
-    //                 fit: BoxFit.cover,
-    //                 errorBuilder: (context, error, stackTrace) =>
-    //                     const Icon(Icons.error, size: 50),
-    //               ),
-    //             ),
-    //           ),
-    //           const SizedBox(height: 20),
-    //           Text(
-    //             article.title,
-    //             style: theme.textTheme.headlineSmall?.copyWith(
-    //               fontWeight: FontWeight.bold,
-    //               fontSize: titleFontSize,
-    //             ),
-    //             softWrap: true,
-    //           ),
-    //           const SizedBox(height: 10),
-    //           Text(
-    //             'By ${article.specialistName}',
-    //             style: theme.textTheme.bodyMedium?.copyWith(
-    //               color: theme.colorScheme.onSurface.withOpacity(0.6),
-    //               fontSize: specialistFontSize,
-    //             ),
-    //           ),
-    //           const SizedBox(height: 16),
-    //           const Divider(thickness: 1, height: 24),
-    //           Text(
-    //             article.content,
-    //             style: theme.textTheme.bodyLarge?.copyWith(
-    //               fontSize: bodyFontSize,
-    //               height: 1.6,
-    //               letterSpacing: 0.3,
-    //             ),
-    //             textAlign: TextAlign.justify,
-    //             softWrap: true,
-    //             overflow: TextOverflow.clip,
-    //           ),
-    //           const SizedBox(height: 20),
-    //           _buildEditDeleteButtons(context, article),
-    //           const SizedBox(height: 20),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

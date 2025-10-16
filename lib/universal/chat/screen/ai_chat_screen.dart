@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:armstrong/universal/chat/screen/ai_voice_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:armstrong/universal/chat/screen/chat_bubble.dart';
-import 'package:armstrong/services/api.dart';
+import 'package:armstrong/services/gemini_api.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
@@ -26,6 +26,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _lastWords = '';
+  String _collectedSpeech = '';
 
   final List<Map<String, dynamic>> _messages = [];
 
@@ -38,8 +39,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
   void _sendInitialMessage() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    _addBotMessage(
-        "Hi there, I'm Calmora. How are you feeling today?");
+    _addBotMessage("Hi there, I'm Calmora. How are you feeling today?");
   }
 
   int _addBotMessage(String text, {bool isLoading = false}) {
@@ -69,7 +69,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _scrollToBottom();
   }
 
-  void _sendMessage() async {
+  Future<void> _sendMessage() async {
     final content = _controller.text.trim();
     if (content.isEmpty) return;
 
@@ -87,7 +87,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
         String? audioBase64;
         int retries = 0;
 
-        // Poll until audio is ready (max 15 retries)
         while (audioBase64 == null && retries < 60) {
           await Future.delayed(const Duration(seconds: 1));
           audioBase64 = await _apiRepository.fetchAudio(ttsId);
@@ -99,7 +98,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
           await _audioPlayer.stop();
           await _audioPlayer.play(BytesSource(audioBytes));
 
-          // Only add message after audio is ready
           _addBotMessage(aiReply);
         } else {
           print('Audio not ready after polling.');
@@ -107,7 +105,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
           _addBotMessage(aiReply);
         }
       } else {
-        // No voice mode: display immediately
         _addBotMessage(aiReply);
       }
     } catch (e) {
@@ -126,33 +123,86 @@ class _AIChatScreenState extends State<AIChatScreen> {
     });
   }
 
-  void _startListening() async {
+  Future<void> _startListening() async {
     bool available = await _speech.initialize(
-      onStatus: (val) => print('Speech status: $val'),
-      onError: (val) => print('Speech error: $val'),
+      onError: (val) {
+        print('Speech error: $val');
+        if (mounted) setState(() => _isListening = false);
+      },
+      onStatus: (val) async {
+        print('Speech status: $val');
+
+        // Detect when speech auto-stops
+        if (val == 'notListening' || val == 'done') {
+          if (mounted && _isListening) {
+            setState(() => _isListening = false);
+          }
+          // Only stop once, if still active
+          if (_speech.isListening) {
+            await _stopListeningAndSend();
+          }
+        }
+      },
     );
 
     if (available) {
-      setState(() => _isListening = true);
+      if (mounted) setState(() => _isListening = true);
+
+      _collectedSpeech = '';
+      _lastWords = '';
+
+      print("🎙️ Listening...");
+
       _speech.listen(
+        listenMode: stt.ListenMode.dictation,
+        partialResults: true,
+        cancelOnError: true,
         onResult: (val) {
-          setState(() {
-            _lastWords = val.recognizedWords;
-            _controller.text = _lastWords;
-          });
+          if (val.finalResult) {
+            _collectedSpeech += " ${val.recognizedWords}";
+          } else {
+            if (mounted) {
+              setState(() {
+                _controller.text =
+                    "${_collectedSpeech.trim()} ${val.recognizedWords}";
+              });
+            }
+          }
         },
       );
+    } else {
+      print("❌ Speech recognition not available.");
     }
   }
 
-  void _stopListeningAndSend() async {
-    await _speech.stop();
-    setState(() => _isListening = false);
+  Future<void> _stopListeningAndSend() async {
+    if (!_speech.isAvailable) return;
 
-    if (_lastWords.trim().isNotEmpty) {
-      _sendMessage();
-      _lastWords = '';
+    print("🛑 Stopping listening...");
+    try {
+      await _speech.stop();
+    } catch (_) {}
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (mounted) setState(() => _isListening = false);
+
+    final spokenText = (_controller.text.trim().isNotEmpty
+            ? _controller.text.trim()
+            : _collectedSpeech.trim())
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+
+    if (spokenText.isNotEmpty) {
+      print("📤 Sending recognized speech: $spokenText");
+      _controller.text = spokenText;
+      await _sendMessage();
+    } else {
+      print("⚠️ No speech detected to send.");
     }
+
+    _collectedSpeech = '';
+    _lastWords = '';
   }
 
   String _formatTimestamp(String timestamp) {
@@ -168,116 +218,125 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  final theme = Theme.of(context);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
-  return Scaffold(
-    resizeToAvoidBottomInset: true,
-    appBar: AppBar(
-      title: const Text("Calmora AI Chatbot"),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.graphic_eq),
-          tooltip: "Voice Mode",
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const VoiceChatScreen(),
-              ),
-            );
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        title: const Text("Calmora AI Chatbot"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.graphic_eq),
+            tooltip: "Voice Mode",
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VoiceChatScreen(),
+                ),
+              );
 
-            setState(() {
-              _voiceModeEnabled = false;
-            });
-          },
-        ),
-      ],
-    ),
-    body: Stack(
-      fit: StackFit.expand,
-      children: [
-        /// Background Image
-        Image.asset(
-          "images/login_bg_image.png",
-          fit: BoxFit.cover,
-        ),
-
-        /// Blurred Overlay
-        Container(
-          color: theme.colorScheme.surface.withOpacity(0.6),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            child: const SizedBox.expand(),
+              setState(() {
+                _voiceModeEnabled = false;
+              });
+            },
           ),
-        ),
-        SizedBox(height: 4),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          /// Background Image
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
 
-        /// Foreground Chat UI
-        Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final msg = _messages[index];
-                  return GestureDetector(
-                    child: ChatBubble(
-                      content: msg['content'],
-                      timestamp: _formatTimestamp(msg['timestamp']),
-                      status: 'sent',
-                      isSender: msg['isSender'],
-                      senderName: msg['isSender'] ? 'You' : 'Calmora',
-                    ),
-                  );
-                },
-              ),
+          /// Blurred Overlay
+          Container(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: const SizedBox.expand(),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: "Type a message or use mic...",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
+          ),
+          SizedBox(height: 4),
+
+          /// Foreground Chat UI
+          Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = _messages[index];
+                    return GestureDetector(
+                      child: ChatBubble(
+                        content: msg['content'],
+                        timestamp: _formatTimestamp(msg['timestamp']),
+                        status: 'sent',
+                        isSender: msg['isSender'],
+                        senderName: msg['isSender'] ? 'You' : 'Calmora',
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          decoration: InputDecoration(
+                            hintText: "Type a message or use mic...",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onLongPressStart: (_) => _startListening(),
-                      onLongPressEnd: (_) => _stopListeningAndSend(),
-                      child: Icon(
-                        _isListening ? Icons.mic : Icons.mic_none,
-                        size: 28,
-                        color: _isListening ? Colors.red : Colors.grey,
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () async {
+                          if (_isListening) {
+                            print("🛑 Tap detected: stopping listening...");
+                            await _stopListeningAndSend();
+                          } else {
+                            print("🎙️ Tap detected: starting listening...");
+                            await _startListening();
+                          }
+                        },
+                        child: Icon(
+                          _isListening ? Icons.stop_circle : Icons.mic_none,
+                          size: 32,
+                          color: _isListening ? Colors.red : Colors.grey,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      onPressed: _sendMessage,
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.send),
+                        onPressed: _sendMessage,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -27,7 +27,8 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
   String? _errorMessage;
 
   String _userSubtitle = '';
-  String _aiSubtitle = '';
+  String _fullAIResponse = '';
+  String _collectedSpeech = '';
 
   late AnimationController _animController;
   bool _useNaturalTTS = false;
@@ -44,28 +45,32 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
+    _initSpeech();
     _ttsService.initTTS();
 
     _ttsService.setOnComplete(() {
-      if (mounted) setState(() {
-        _status = VoiceChatStatus.idle;
-        _aiSubtitle = '';
-      });
+      if (mounted)
+        setState(() {
+          _status = VoiceChatStatus.idle;
+          _fullAIResponse = '';
+        });
     });
 
     _ttsService.setOnCancel(() {
-      if (mounted) setState(() {
-        _status = VoiceChatStatus.idle;
-        _aiSubtitle = '';
-      });
+      if (mounted)
+        setState(() {
+          _status = VoiceChatStatus.idle;
+          _fullAIResponse = '';
+        });
     });
 
     _ttsService.setOnError((msg) {
       print("TTS error: $msg");
-      if (mounted) setState(() {
-        _status = VoiceChatStatus.idle;
-        _aiSubtitle = '';
-      });
+      if (mounted)
+        setState(() {
+          _status = VoiceChatStatus.idle;
+          _fullAIResponse = '';
+        });
     });
 
     _animController =
@@ -75,49 +80,32 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() {
         _status = VoiceChatStatus.idle;
-        _aiSubtitle = '';
+        _fullAIResponse = '';
       });
     });
   }
 
-  @override
-  void dispose() {
-    _animController.dispose();
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-
-  Future<void> _startListening() async {
+  Future<void> _initSpeech() async {
     bool available = await _speech.initialize(
-      onStatus: (status) {
+      onStatus: (status) async {
         print("Speech status: $status");
+
+        if (status == "done" || status == "notListening") {
+          if (mounted && _status == VoiceChatStatus.listening) {
+            setState(() => _status = VoiceChatStatus.idle);
+          }
+
+          print("🛑 Speech done — stopping automatically...");
+          await _stopListening();
+        }
       },
       onError: (error) {
         print("Speech error: ${error.errorMsg}");
-        setState(() => _status = VoiceChatStatus.error);
+        if (mounted) setState(() => _status = VoiceChatStatus.error);
       },
     );
 
-    if (available) {
-      setState(() {
-        _status = VoiceChatStatus.listening;
-        _userSubtitle = '';
-      });
-      print("🎧 Listening for speech...");
-      _speech.listen(
-        onResult: (val) {
-          setState(() {
-            _lastWords = val.recognizedWords;
-            _userSubtitle = val.recognizedWords;
-          });
-          print("🗣️ Recognized: ${val.recognizedWords}");
-        },
-        listenFor: const Duration(minutes: 2),
-        pauseFor: const Duration(seconds: 10),
-        partialResults: true,
-        localeId: "en_US",
-      );
-    } else {
+    if (!available) {
       print("❌ Speech recognition unavailable");
       setState(() {
         _status = VoiceChatStatus.error;
@@ -126,40 +114,115 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
     }
   }
 
+  Future<void> _startListening() async {
+    if (!_speech.isAvailable) {
+      print("❌ Speech not initialized properly.");
+      return;
+    }
+
+    _collectedSpeech = '';
+    _lastWords = '';
+
+    setState(() {
+      _status = VoiceChatStatus.listening;
+      _userSubtitle = '';
+    });
+
+    print("🎧 Listening for speech...");
+    _speech.listen(
+      onResult: (val) {
+        if (val.recognizedWords.isNotEmpty &&
+            val.recognizedWords != _lastWords) {
+          setState(() {
+            _lastWords = val.recognizedWords;
+
+            // 🧠 Split sentences and limit to last 3
+            final sentences = _lastWords.split(RegExp(r'(?<=[.!?])\s+'));
+            final trimmed = sentences.length > 3
+                ? sentences.sublist(sentences.length - 3).join(' ')
+                : _lastWords;
+
+            _userSubtitle = trimmed;
+          });
+
+          // Accumulate final results
+          if (val.finalResult) {
+            _collectedSpeech =
+                "${_collectedSpeech.trim()} ${val.recognizedWords.trim()}";
+            print("✅ Final recognized: ${val.recognizedWords}");
+          } else {
+            print("🗣️ Partial: ${val.recognizedWords}");
+          }
+        }
+      },
+      listenFor: const Duration(minutes: 15),
+      pauseFor: const Duration(seconds: 5),
+      partialResults: true,
+      localeId: "en_US",
+      cancelOnError: false,
+      listenMode: stt.ListenMode.dictation,
+    );
+  }
+
+  Future<void> _resumeListening() async {
+    if (!_speech.isListening && _status == VoiceChatStatus.listening) {
+      print("🎧 Resuming listening...");
+      await _startListening();
+    }
+  }
+
   Future<void> _stopListening() async {
     print("🛑 Stopping listening...");
     await _speech.stop();
-    setState(() => _status = VoiceChatStatus.idle);
 
-    if (_lastWords.trim().isNotEmpty) {
-      print("📤 Sending to AI: $_lastWords");
-      await _sendToAI(_lastWords);
-      _lastWords = '';
-      _userSubtitle = '';
+    if (mounted) setState(() => _status = VoiceChatStatus.idle);
+
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    final fullSpeech = _collectedSpeech.trim().isNotEmpty
+        ? _collectedSpeech.trim()
+        : _lastWords.trim();
+
+    if (fullSpeech.isNotEmpty) {
+      print("📤 Sending to AI: $fullSpeech");
+      await _sendToAI(fullSpeech);
     } else {
       print("⚠️ No speech detected.");
     }
+
+    _collectedSpeech = '';
+    _lastWords = '';
+    _userSubtitle = '';
   }
 
   Future<void> _simulateAISubtitles(String text) async {
     List<String> sentences = text.split(RegExp(r'(?<=[.!?]) '));
     for (String s in sentences) {
       if (!mounted) return;
-      setState(() => _aiSubtitle = s.trim());
-      await Future.delayed(const Duration(seconds: 2)); 
+      await Future.delayed(const Duration(seconds: 2));
     }
   }
 
   Future<void> _sendToAI(String text) async {
     try {
-      setState(() => _status = VoiceChatStatus.loading);
+      setState(() {
+        _status = VoiceChatStatus.loading;
+        _errorMessage = null;
+      });
 
       final aiResponse =
           await _apiRepository.askGemini(text, withVoice: _useNaturalTTS);
 
-      final aiReply = _cleanResponse(aiResponse['reply'] ?? '');
+      if (aiResponse == null ||
+          aiResponse is! Map ||
+          !aiResponse.containsKey('reply')) {
+        throw const FormatException("Invalid AI response format");
+      }
 
-      if (aiReply.isEmpty) return;
+      final aiReply = _cleanResponse(aiResponse['reply'] ?? '');
+      _fullAIResponse = aiReply;
+
+      if (aiReply.isEmpty) throw Exception("Empty AI response");
 
       if (_useNaturalTTS) {
         final ttsId = aiResponse['id'];
@@ -178,20 +241,30 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
           _simulateAISubtitles(aiReply);
           await _audioPlayer.play(BytesSource(audioBytes));
         } else {
-          setState(() {
-            _status = VoiceChatStatus.error;
-            _errorMessage = "Failed to play AI response.";
-          });
+          throw Exception("Failed to load audio from server");
         }
       } else {
         setState(() => _status = VoiceChatStatus.playing);
         _simulateAISubtitles(aiReply);
         await _ttsService.speak(aiReply);
       }
-    } catch (e) {
+    } on FormatException {
       setState(() {
         _status = VoiceChatStatus.error;
-        _errorMessage = e.toString();
+        _errorMessage = "Something went wrong with the server response.";
+      });
+    } on Exception catch (e) {
+      print("AI request failed: $e");
+      setState(() {
+        _status = VoiceChatStatus.error;
+        _errorMessage =
+            "Something went wrong. Please check your internet connection.";
+      });
+    } catch (e) {
+      print("Unexpected error: $e");
+      setState(() {
+        _status = VoiceChatStatus.error;
+        _errorMessage = "An unexpected error occurred. Please try again.";
       });
     }
   }
@@ -239,7 +312,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
 
     switch (_status) {
       case VoiceChatStatus.idle:
-        statusText = "Hold to speak";
+        statusText = "Tap to speak";
         statusIcon = Icons.mic_none;
         statusColor = scheme.onBackground;
         break;
@@ -345,55 +418,121 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
                           ),
                         ],
                       ),
-                      child: Icon(
-                        _status == VoiceChatStatus.listening
-                            ? Icons.stop
-                            : Icons.mic_none,
-                        size: 64,
-                        color: Colors.white,
-                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    statusText,
-                    style: TextStyle(
-                      color: scheme.onBackground,
-                      fontSize: 18,
+                  if (_status == VoiceChatStatus.error) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        _errorMessage ??
+                            "Something went wrong. Please try again.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: scheme.error,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _status = VoiceChatStatus.idle;
+                          _errorMessage = null;
+                        });
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("Retry"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: scheme.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      statusText,
+                      style: TextStyle(
+                        color: scheme.onBackground,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
 
                   // 🧠 Subtitles (User + AI)
                   const SizedBox(height: 50),
+
                   AnimatedOpacity(
                     opacity: _userSubtitle.isNotEmpty ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      _userSubtitle,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  AnimatedOpacity(
-                    opacity: _aiSubtitle.isNotEmpty ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 300),
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text(
-                        _aiSubtitle,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Align(
+                        alignment:
+                            Alignment.centerRight, // same as sender alignment
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          padding: const EdgeInsets.all(12),
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.75,
+                          ),
+                          decoration: BoxDecoration(
+                            color: scheme.primary.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            _userSubtitle,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              height: 1.4,
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
+                  if (_fullAIResponse.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              scheme.primaryContainer.withOpacity(0.9),
+                          foregroundColor: scheme.onPrimaryContainer,
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text("AI Response"),
+                              content: SingleChildScrollView(
+                                child: Text(
+                                  _fullAIResponse,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text("Close"),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.chat_bubble_outline),
+                        label: const Text("Check AI Response"),
+                      ),
+                    ),
                 ],
               ),
             ),

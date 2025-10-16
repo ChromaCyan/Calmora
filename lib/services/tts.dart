@@ -41,11 +41,10 @@ class TTSService {
       await _flutterTts.setLanguage("fil-PH");
     }
 
-    await _flutterTts.setPitch(1.1);
-    await _flutterTts.setSpeechRate(0.7);
+    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
 
-    // ✅ Attach lifecycle handlers
     _flutterTts.setCompletionHandler(() {
       if (_onComplete != null) _onComplete!();
     });
@@ -67,7 +66,6 @@ class TTSService {
     await _flutterTts.stop();
   }
 
-  // Expose handlers so UI can subscribe
   void setOnComplete(Function() handler) => _onComplete = handler;
   void setOnCancel(Function() handler) => _onCancel = handler;
   void setOnError(Function(String msg) handler) => _onError = handler;
