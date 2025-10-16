@@ -52,7 +52,7 @@ class SpecialistBottomNavBar extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
           child: Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surface.withOpacity(0.7),

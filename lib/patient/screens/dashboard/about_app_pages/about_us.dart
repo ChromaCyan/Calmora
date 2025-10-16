@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-// import 'package:google_fonts/google_fonts.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -43,24 +42,19 @@ class AboutUsPage extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          /// Background image
           Image.asset(
             "images/login_bg_image.png",
             fit: BoxFit.fill,
           ),
 
-          /// Blur + overlay
-          /// Blur + overlay
           Container(
-            color: theme.colorScheme.surface
-                .withOpacity(0.6), // match transparency
+            color: theme.colorScheme.surface.withOpacity(0.6),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // match blur
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
               child: const SizedBox.expand(),
             ),
           ),
 
-          /// Foreground content
           Column(
             children: [
               Expanded(
@@ -69,21 +63,12 @@ class AboutUsPage extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.transparent, // match transparency
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        // BoxShadow(
-                        //   color: Colors.black
-                        //       .withOpacity(0.15), // softer like other page
-                        //   blurRadius: 8,
-                        //   offset: const Offset(0, 4),
-                        // ),
-                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        /// About Section
                         Text(
                           "What is Calmora?",
                           style: TextStyle(
@@ -93,7 +78,6 @@ class AboutUsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
 
-                        /// ✅ Centered Image
                         Center(
                           child: Image.asset(
                             "images/calmora_circle_crop.png",
@@ -113,7 +97,6 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Divider(color: Colors.grey.shade400),
 
-                        /// Mission
                         const SizedBox(height: 20),
                         Text(
                           "Our Mission",
@@ -134,7 +117,6 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Divider(color: Colors.grey.shade400),
 
-                        /// Vision
                         const SizedBox(height: 20),
                         Text(
                           "Our Vision",
@@ -154,7 +136,6 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Divider(color: Colors.grey.shade400),
 
-                        /// Team
                         const SizedBox(height: 20),
                         Text(
                           "Our Team",
@@ -201,27 +182,6 @@ class AboutUsPage extends StatelessWidget {
                   ),
                 ),
               ),
-
-              /// Footer
-              // Container(
-              //   width: double.infinity,
-              //   height: MediaQuery.of(context).size.height * 0.07,
-              //   padding: const EdgeInsets.all(10),
-              //   decoration: BoxDecoration(
-              //     color: theme.colorScheme.surface.withOpacity(0.9),
-              //   ),
-              //   child: Center(
-              //     child: Text(
-              //       "© 2025 Calmora, All Rights Reserved.",
-              //       style: GoogleFonts.lato(
-              //         fontSize: 14,
-              //         color: theme.brightness == Brightness.dark
-              //             ? Colors.white
-              //             : Colors.black,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ],
@@ -229,119 +189,63 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  /// Helper: Team member card
-  // Widget _buildTeamMember(
-  //     String name, String role, String quote, String imagePath) {
-  //   return Builder(
-  //     builder: (context) {
-  //       final theme = Theme.of(context);
-  //       return Container(
-  //         margin: const EdgeInsets.only(bottom: 16),
-  //         padding: const EdgeInsets.all(19),
-  //         decoration: BoxDecoration(
-  //           color: theme.colorScheme.surface.withOpacity(0.5), // ✅ theme-aware
-  //           borderRadius: BorderRadius.circular(20),
-  //           // border: Border.all(
-  //           //   color: Colors.white.withOpacity(0.9)
-  //           // ),
-  //         ),
-  //         child: Row(
-  //           children: [
-  //             CircleAvatar(
-  //               radius: 40,
-  //               backgroundImage: AssetImage(imagePath),
-  //             ),
-  //             const SizedBox(width: 12),
-  //             Expanded(
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   Text(
-  //                     name,
-  //                     style: GoogleFonts.lato(
-  //                       fontSize: 18,
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                   const Divider(color: Colors.grey),
-  //                   Text(
-  //                     "Role: $role",
-  //                     style: GoogleFonts.lato(fontSize: 14),
-  //                   ),
-  //                   const Divider(color: Colors.grey),
-  //                   Text(
-  //                     "Quote: $quote",
-  //                     style: GoogleFonts.lato(fontSize: 14),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-Widget _buildTeamMember(
-  String name,
-  String role,
-  String quote,
-  String imagePath,
-) {
-  return Builder(
-    builder: (context) {
-      final theme = Theme.of(context);
-      return Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(19),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start, // ✅ so it grows tall
-          children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: AssetImage(imagePath),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    // softWrap: true,              // ✅ allows wrapping
-                    // overflow: TextOverflow.visible, // ✅ no ellipsis
-                  ),
-                  const Divider(color: Colors.grey),
-                  Text(
-                    "Role: $role",
-                    style: TextStyle(fontSize: 14),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                  const Divider(color: Colors.grey),
-                  Text(
-                    "Quote: $quote",
-                    style: TextStyle(fontSize: 14),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                ],
+  Widget _buildTeamMember(
+    String name,
+    String role,
+    String quote,
+    String imagePath,
+  ) {
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(19),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: AssetImage(imagePath),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(color: Colors.grey),
+                    Text(
+                      "Role: $role",
+                      style: TextStyle(fontSize: 14),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                    ),
+                    const Divider(color: Colors.grey),
+                    Text(
+                      "Quote: $quote",
+                      style: TextStyle(fontSize: 14),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

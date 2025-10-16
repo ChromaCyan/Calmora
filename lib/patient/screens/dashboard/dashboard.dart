@@ -7,6 +7,8 @@ import 'package:armstrong/widgets/cards/article_list.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/widgets/cards/guide_card.dart';
 import 'package:armstrong/widgets/cards/app_section.dart';
+import 'package:armstrong/widgets/cards/hotline_card.dart';
+import 'package:armstrong/patient/screens/dashboard/hotlines_screen.dart';
 
 import 'package:armstrong/patient/screens/dashboard/mind_body_pages/meditation_details.dart';
 import 'package:armstrong/patient/screens/dashboard/mind_body_pages/breathing_details.dart';
@@ -66,14 +68,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
 
-        // 🟢 Scroll only inside this container
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
+                    child: Text(
+                      "Emergency Hotlines",
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onBackground,
+                        fontSize: 18
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  // const SizedBox(width: 5),
+                  SizedBox(
+                    width: 45, // Fixed size for the circular card
+                    height: 45,
+                    child: HotlineCard(
+                      imagePath: "images/hotline_icon2.png",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => HotlinesScreen(),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(1.0, 0.0); // Start off-screen right
+                              const end = Offset.zero;
+                              const curve = Curves.ease;
+
+                              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.red,
+                    size: 15,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              const Divider(
+                thickness: 1.5,
+                color: Colors.grey,
+                indent: 40,
+                endIndent: 40,
+              ),
               
-              // const SizedBox(height: 30),
+              const SizedBox(height: 10),
               Center(
                 child: Text(
                   'About Mental Health',
@@ -176,14 +235,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               const Divider(
                 thickness: 1.5,
                 color: Colors.grey,
                 indent: 40,
                 endIndent: 40,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Center(
                 child: Text(
                   'What is this app about?',
@@ -206,15 +265,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(
-                    child: AppSection(
-                      title: "Hotline Services",
-                      imageUrl: "images/splash/image7.png",
-                      onTap: () =>
-                          _navigateWithSlide(context, EmergencyServicePage()),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
+                  // Expanded(
+                  //   child: AppSection(
+                  //     title: "Hotline Services",
+                  //     imageUrl: "images/splash/image7.png",
+                  //     onTap: () =>
+                  //         _navigateWithSlide(context, EmergencyServicePage()),
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 10),
                   Expanded(
                     child: AppSection(
                       title: "Help\nCenter",

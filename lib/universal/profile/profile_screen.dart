@@ -92,6 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         profileData = user; // Assign the Profile object to profileData
         isLoading = false;
         _userType = user.userType;
+        _populateControllersFromProfile(user);
 
         // Common Fields
         firstNameController.text = user.firstName ?? "";
@@ -185,14 +186,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    // 🔌 Disconnect socket
     SocketService().disconnect();
 
-    // 🗑 Clear storage
+    // This clears storage the storage
     await _storage.delete(key: 'jwt');
     await _storage.delete(key: 'userId');
 
-    // ⬅ Clear entire navigation stack (prevents back button issue)
+    // This clears the entire navigation stack (prevents back button issue)
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -291,6 +291,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  void _populateControllersFromProfile(Profile user) {
+  // Common Fields
+  firstNameController.text = user.firstName ?? "";
+  lastNameController.text = user.lastName ?? "";
+  phoneNumberController.text = user.phoneNumber ?? "";
+  genderController.text = user.gender ?? "";
+  _imageUrl = (user.profileImage?.isNotEmpty ?? false) ? user.profileImage : null;
+
+  if (user.dateOfBirth != null) {
+    _selectedDateOfBirth = user.dateOfBirth;
+    dateOfBirthController.text = DateFormat('yyyy-MM-dd').format(user.dateOfBirth!);
+  }
+
+  // Specialist
+  if (user.userType == "Specialist") {
+    specializationController.text = user.specialization ?? "";
+    licenseNumberController.text = user.licenseNumber ?? "";
+    bioController.text = user.bio ?? "";
+    yearsOfExperienceController.text = user.yearsOfExperience?.toString() ?? "";
+    languagesSpokenController.text = (user.languagesSpoken ?? []).join(", ");
+    locationController.text = user.location ?? "";
+    clinicController.text = user.clinic ?? "";
+    availabilityController.text = user.availability ?? "";
+    _updateClinicLocationPreview();
+  }
+
+  // Patient
+  if (user.userType == "Patient") {
+    addressController.text = user.address ?? "";
+    medicalHistoryController.text = user.medicalHistory ?? "";
+    therapyGoalsController.text = (user.therapyGoals ?? []).join(", ");
+    emergencyContactNameController.text = user.emergencyContact?.name ?? "";
+    emergencyContactPhoneController.text = user.emergencyContact?.phone ?? "";
+    emergencyContactRelationController.text = user.emergencyContact?.relation ?? "";
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -303,6 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double buttonFontSize = screenWidth * 0.045;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent, 
@@ -347,238 +386,278 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: isLoading
           ? Center(
-                        child: GlobalLoader.loader,
-                      )
+            child: GlobalLoader.loader,
+          )
           : hasError
               ? const Center(child: Text("Failed to load profile"))
-              : SingleChildScrollView(
-                  child: Container(
-                    color: theme.colorScheme.primaryContainer,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        // Profile Picture Container
-                        Container(
-                          padding: EdgeInsets.all(screenWidth * 0.04),
-                          child: ProfilePictureWidget(
-                            selectedImage: _selectedImage,
-                            imageUrl: _imageUrl,
-                            onPickImage: isEditing ? _pickImage : () {},
-                            isEditing: isEditing,
-                          ),
+              : LayoutBuilder(
+                builder: (context, constraints) {
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        "images/login_bg_image.png",
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        color: theme.colorScheme.surface
+                            .withOpacity(0.6),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                          child: const SizedBox.expand(),
                         ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.04),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Appointment History Button
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CompletedAppointmentsScreen(),
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.history, size: 28),
-                                color: Theme.of(context).colorScheme.secondary,
-                                tooltip: "Appointment History",
-                              ),
-
-                              // Edit/Save & Cancel Buttons
-                              Row(
-                                children: [
-                                  if (isEditing)
-                                    IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          isEditing = false;
-                                          // Reset fields logic...
-                                        });
-                                      },
-                                      icon: const Icon(Icons.close, size: 28),
-                                      color: Colors.red,
-                                      tooltip: "Cancel Edit",
-                                    ),
-                                  IconButton(
-                                    onPressed: () {
-                                      if (isEditing) {
-                                        _saveProfile();
-                                      } else {
-                                        setState(() => isEditing = true);
-                                      }
-                                    },
-                                    icon: Icon(
-                                        isEditing ? Icons.save : Icons.edit,
-                                        size: 28),
-                                    color: isEditing
-                                        ? Colors.green
-                                        : Theme.of(context).colorScheme.primary,
-                                    tooltip: isEditing
-                                        ? "Save Changes"
-                                        : "Edit Profile",
-                                  ),
-                                ],
-                              ),
-                            ],
+                      ),
+                      SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
                           ),
-                        ),
-
-                        // Combined Form & Logout Button
-                        Container(
-                          padding: EdgeInsets.all(
-                              screenWidth * 0.04), // responsive padding
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.background,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(35),
-                              topRight: Radius.circular(35),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              // Form
-                              CombinedForm(
-                                firstNameController: firstNameController,
-                                lastNameController: lastNameController,
-                                phoneNumberController: phoneNumberController,
-                                genderController: genderController,
-                                dateOfBirthController: dateOfBirthController,
-                                addressController: addressController,
-                                medicalHistoryController:
-                                    medicalHistoryController,
-                                therapyGoalsController: therapyGoalsController,
-                                emergencyContactNameController:
-                                    emergencyContactNameController,
-                                emergencyContactPhoneController:
-                                    emergencyContactPhoneController,
-                                emergencyContactRelationController:
-                                    emergencyContactRelationController,
-                                specializationController:
-                                    specializationController,
-                                bioController: bioController,
-                                yearsOfExperienceController:
-                                    yearsOfExperienceController,
-                                languagesSpokenController:
-                                    languagesSpokenController,
-                                availabilityController: availabilityController,
-                                locationController: locationController,
-                                clinicController: clinicController,
-                                isEditing: isEditing,
-                                onPickDateOfBirth: _pickDateOfBirth,
-                                userType: _userType!,
-                              ),
-
-                              if (_userType == "Specialist" &&
-                                  _clinicLatLng != null) ...[
-                                Text(
-                                  'Clinic Location Preview',
-                                  style: theme.textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 8),
-                                SizedBox(
-                                  height: 200,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: GoogleMap(
-                                      initialCameraPosition: CameraPosition(
-                                        target: _clinicLatLng!,
-                                        zoom: 14,
-                                      ),
-                                      markers: {
-                                        Marker(
-                                          markerId:
-                                              const MarkerId('clinic_marker'),
-                                          position: _clinicLatLng!,
-                                        ),
-                                      },
-                                      zoomControlsEnabled: false,
-                                      liteModeEnabled: true,
-                                    ),
-                                  ),
-                                ),
+                          child: Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 const SizedBox(height: 20),
+                                // Profile Picture Container
+                                Container(
+                                  padding: EdgeInsets.all(screenWidth * 0.04),
+                                  child: ProfilePictureWidget(
+                                    selectedImage: _selectedImage,
+                                    imageUrl: _imageUrl,
+                                    onPickImage: isEditing ? _pickImage : () {},
+                                    isEditing: isEditing,
+                                  ),
+                                ),
 
-                                if (licenseNumberController.text.isNotEmpty)
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.04),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        'License Certificate Provided',
-                                        style: theme.textTheme.titleMedium
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      // Appointment History Button
+                                      IconButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const CompletedAppointmentsScreen(),
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.history, size: 28),
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        tooltip: "Appointment History",
                                       ),
-                                      const SizedBox(height: 8),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(
-                                          licenseNumberController.text,
+
+                                      // Edit/Save & Cancel Buttons
+                                      Row(
+                                        children: [
+                                          if (isEditing)
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isEditing = false;
+                                                  _selectedImage = null;
+                                                  
+                                                  if (profileData != null) {
+                                                    _populateControllersFromProfile(profileData!);
+                                                  }
+                                                  // Reset fields logic...
+                                                });
+                                              },
+                                              icon: const Icon(Icons.close, size: 28),
+                                              color: Colors.red,
+                                              tooltip: "Cancel Edit",
+                                            ),
+                                          IconButton(
+                                            onPressed: () {
+                                              if (isEditing) {
+                                                _saveProfile();
+                                              } else {
+                                                setState(() => isEditing = true);
+                                              }
+                                            },
+                                            icon: Icon(
+                                                isEditing ? Icons.save : Icons.edit,
+                                                size: 28),
+                                            color: isEditing
+                                                ? Colors.green
+                                                : Theme.of(context).colorScheme.primary,
+                                            tooltip: isEditing
+                                                ? "Save Changes"
+                                                : "Edit Profile",
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Combined Form & Logout Button
+                                Container(
+                                  padding: EdgeInsets.all(screenWidth * 0.04),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.background.withOpacity(0.6),
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(35),
+                                      topRight: Radius.circular(35),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 15),
+                                      // Form
+                                      CombinedForm(
+                                        firstNameController: firstNameController,
+                                        lastNameController: lastNameController,
+                                        phoneNumberController: phoneNumberController,
+                                        genderController: genderController,
+                                        dateOfBirthController: dateOfBirthController,
+                                        addressController: addressController,
+                                        medicalHistoryController:
+                                            medicalHistoryController,
+                                        therapyGoalsController: therapyGoalsController,
+                                        emergencyContactNameController:
+                                            emergencyContactNameController,
+                                        emergencyContactPhoneController:
+                                            emergencyContactPhoneController,
+                                        emergencyContactRelationController:
+                                            emergencyContactRelationController,
+                                        specializationController:
+                                            specializationController,
+                                        bioController: bioController,
+                                        yearsOfExperienceController:
+                                            yearsOfExperienceController,
+                                        languagesSpokenController:
+                                            languagesSpokenController,
+                                        availabilityController: availabilityController,
+                                        locationController: locationController,
+                                        clinicController: clinicController,
+                                        isEditing: isEditing,
+                                        onPickDateOfBirth: _pickDateOfBirth,
+                                        userType: _userType!,
+                                      ),
+
+                                      if (_userType == "Specialist" &&
+                                          _clinicLatLng != null) ...[
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          'Clinic Location Preview',
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        SizedBox(
                                           height: 200,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Container(
-                                            height: 200,
-                                            color: Colors.grey[300],
-                                            child: const Center(
-                                              child: Icon(
-                                                  Icons.image_not_supported,
-                                                  size: 40,
-                                                  color: Colors.grey),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(12),
+                                            child: GoogleMap(
+                                              initialCameraPosition: CameraPosition(
+                                                target: _clinicLatLng!,
+                                                zoom: 14,
+                                              ),
+                                              markers: {
+                                                Marker(
+                                                  markerId:
+                                                      const MarkerId('clinic_marker'),
+                                                  position: _clinicLatLng!,
+                                                ),
+                                              },
+                                              zoomControlsEnabled: false,
+                                              liteModeEnabled: true,
                                             ),
                                           ),
                                         ),
+                                        const SizedBox(height: 20),
+
+                                        if (licenseNumberController.text.isNotEmpty)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'License Certificate Provided',
+                                                style: theme.textTheme.titleMedium
+                                                    ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(12),
+                                                child: Image.network(
+                                                  licenseNumberController.text,
+                                                  height: 200,
+                                                  width: double.infinity,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (context, error, stackTrace) =>
+                                                          Container(
+                                                    height: 200,
+                                                    color: Colors.grey[300],
+                                                    child: const Center(
+                                                      child: Icon(
+                                                          Icons.image_not_supported,
+                                                          size: 40,
+                                                          color: Colors.grey),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                      ],
+
+                                      const SizedBox(height: 130),
+
+                                      // Logout Button
+                                      Center(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            await _logout(context);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            elevation: 0,
+                                            shadowColor: Colors.transparent,
+                                            minimumSize: Size(screenWidth * 0.4,
+                                                40), 
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 12),
+                                          ),
+                                          child: Text("Logout", style: TextStyle(fontSize: buttonFontSize)), 
+                                        ),
                                       ),
-                                      const SizedBox(height: 20),
+                                      const SizedBox(height: 30),
+                                      // if (_userType == "Patient") ...[
+                                      //   const SizedBox(height: 10),
+                                      //   Container(
+                                      //     height: 100, // adjust as needed
+                                      //     width: double.infinity,
+                                      //     color: Theme.of(context).colorScheme.background,
+                                      //   ),
+                                      // ],
                                     ],
                                   ),
-                              ],
-
-                              const SizedBox(height: 20),
-
-                              // Logout Button
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    await _logout(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                    minimumSize: Size(screenWidth * 0.4,
-                                        40), 
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                  ),
-                                  child: Text("Logout",
-                                      style: TextStyle(
-                                          fontSize:
-                                              buttonFontSize)), 
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
+                    ],
+                    
+                );
+
+                }
+              )
     );
   }
 }

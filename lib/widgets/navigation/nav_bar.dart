@@ -36,20 +36,23 @@ class CustomBottomNavBar extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.cardColor.withOpacity(0.7), // matches AppBar opacity
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+      child: ClipRRect(
+        borderRadius: BorderRadiusGeometry.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withOpacity(0.7),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+              borderRadius: BorderRadius.circular(20),
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -95,7 +98,11 @@ class CustomBottomNavBar extends StatelessWidget {
               ),
             ],
           ),
+          ),
         ),
+        
+          
+        
       ),
     );
   }

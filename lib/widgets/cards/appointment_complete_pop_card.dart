@@ -24,13 +24,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // 🔹 Background blur when dialog opens
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(color: Colors.black.withOpacity(0.2)), // subtle dim
-        ),
-
-        // 🔹 Centered dialog box
         Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(

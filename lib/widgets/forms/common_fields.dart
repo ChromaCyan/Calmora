@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:armstrong/widgets/cards/map_picker.dart';
+import 'package:armstrong/widgets/forms/bio_textfield.dart';
 import 'package:geocoding/geocoding.dart';
 
-class CombinedForm extends StatelessWidget {
+class CombinedForm extends StatefulWidget {
   final TextEditingController firstNameController;
   final TextEditingController lastNameController;
   final TextEditingController phoneNumberController;
@@ -58,6 +59,11 @@ class CombinedForm extends StatelessWidget {
     required this.userType,
   }) : super(key: key);
 
+  @override
+  State<CombinedForm> createState() => _CombinedFormState();
+}
+
+class _CombinedFormState extends State<CombinedForm> {
   String _getReadableClinicText(BuildContext context, String clinic) {
     if (clinic.isEmpty) return "Pick Clinic Location";
     final parts = clinic.split(',');
@@ -97,7 +103,7 @@ class CombinedForm extends StatelessWidget {
         borderSide: BorderSide(
           color: hideStandbyBorder
               ? Colors.transparent
-              : (isEditing
+              : (widget.isEditing
                   ? colorScheme.onSurface.withOpacity(0.5)
                   : colorScheme.onSurface.withOpacity(0.1)),
           width: 1.5,
@@ -142,26 +148,26 @@ class CombinedForm extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextField(
-                        controller: firstNameController,
+                        controller: widget.firstNameController,
                         decoration:
                             customInputDecoration("First Name", context),
-                        enabled: isEditing,
+                        enabled: widget.isEditing,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: TextField(
-                        controller: lastNameController,
+                        controller: widget.lastNameController,
                         decoration: customInputDecoration("Last Name", context),
-                        enabled: isEditing,
+                        enabled: widget.isEditing,
                       ),
                     ),
                   ],
                 ),
                 TextField(
-                  controller: phoneNumberController,
+                  controller: widget.phoneNumberController,
                   decoration: customInputDecoration("Phone Number", context),
-                  enabled: isEditing,
+                  enabled: widget.isEditing,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -170,8 +176,8 @@ class CombinedForm extends StatelessWidget {
                 ),
 
                 DropdownButtonFormField<String>(
-                  value: genderController.text.isNotEmpty
-                      ? genderController.text
+                  value: widget.genderController.text.isNotEmpty
+                      ? widget.genderController.text
                       : null,
                   decoration: customInputDecoration("Gender", context,
                       hideStandbyBorder: true),
@@ -184,29 +190,29 @@ class CombinedForm extends StatelessWidget {
                       child: Text(gender["label"]!),
                     );
                   }).toList(),
-                  onChanged: isEditing
+                  onChanged: widget.isEditing
                       ? (newValue) {
-                          genderController.text = newValue!;
+                          widget.genderController.text = newValue!;
                         }
                       : null,
-                  icon: isEditing
+                  icon: widget.isEditing
                       ? const Icon(Icons.arrow_drop_down)
                       : const SizedBox.shrink(),
                 ),
 
                 // Only show the date picker for patients
-                if (userType.toLowerCase() == "patient") ...[
+                if (widget.userType.toLowerCase() == "patient") ...[
                   GestureDetector(
-                    onTap: isEditing ? onPickDateOfBirth : null,
+                    onTap: widget.isEditing ? widget.onPickDateOfBirth : null,
                     child: AbsorbPointer(
                       child: TextField(
-                        controller: dateOfBirthController,
+                        controller: widget.dateOfBirthController,
                         readOnly: true,
                         decoration: customInputDecoration(
                                 "Date of Birth", context,
                                 hideStandbyBorder: true)
                             .copyWith(
-                          suffixIcon: isEditing
+                          suffixIcon: widget.isEditing
                               ? const Icon(Icons.calendar_today)
                               : null,
                         ),
@@ -216,7 +222,7 @@ class CombinedForm extends StatelessWidget {
                 ],
                 const SizedBox(height: 20),
 
-                if (userType.toLowerCase() == "specialist") ...[
+                if (widget.userType.toLowerCase() == "specialist") ...[
                   Text(
                     "Professional Information",
                     style: Theme.of(context)
@@ -226,8 +232,8 @@ class CombinedForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: specializationController.text.isNotEmpty
-                        ? specializationController.text
+                    value: widget.specializationController.text.isNotEmpty
+                        ? widget.specializationController.text
                         : null,
                     decoration:
                         customInputDecoration("Specialization", context),
@@ -238,30 +244,87 @@ class CombinedForm extends StatelessWidget {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: isEditing
+                    onChanged: widget.isEditing
                         ? (newValue) {
-                            specializationController.text = newValue!;
+                            widget.specializationController.text = newValue!;
                           }
                         : null,
                   ),
-                  Container(
-                    constraints: BoxConstraints(
-                        maxHeight: isEditing ? double.infinity : 100),
-                    child: SingleChildScrollView(
-                      child: TextField(
-                        controller: bioController,
-                        decoration: customInputDecoration("Bio", context),
-                        enabled: isEditing,
-                        maxLines: isEditing ? 4 : null,
-                        readOnly: !isEditing,
+                  const SizedBox(height: 30),
+                  // Container(
+                  //   constraints: BoxConstraints(
+                  //       maxHeight: isEditing ? double.infinity : 100),
+                  //   child: SingleChildScrollView(
+                  //     child: TextField(
+                  //       controller: bioController,
+                  //       decoration: customInputDecoration("Bio", context),
+                  //       enabled: isEditing,
+                  //       maxLines: isEditing ? 4 : null,
+                  //       readOnly: !isEditing,
+                  //     ),
+                  //   ),
+                  // ),
+                  GestureDetector(
+                    onTap: widget.isEditing
+                        ? () async {
+                            final updatedBio = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EditBioPage(initialBio: widget.bioController.text),
+                              ),
+                            );
+                            if (updatedBio != null && updatedBio != widget.bioController.text) {
+                              setState(() {
+                                widget.bioController.text = updatedBio;
+                              });
+                            }
+                          }
+                        : null,
+                    child: Container(
+                      height: 250,
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: Theme.of(context).dividerColor),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: Text(
+                                widget.bioController.text.isEmpty
+                                    ? 'Add your contents here...'
+                                    : widget.bioController.text,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: widget.bioController.text.isEmpty
+                                      ? Theme.of(context).hintColor
+                                      : Theme.of(context).textTheme.bodyLarge?.color,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.chevron_right,
+                            color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 20),
+
                   TextField(
-                    controller: yearsOfExperienceController,
+                    controller: widget.yearsOfExperienceController,
                     decoration:
                         customInputDecoration("Years of Experience", context),
-                    enabled: isEditing,
+                    enabled: widget.isEditing,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -275,7 +338,7 @@ class CombinedForm extends StatelessWidget {
                         'Tagalog',
                         'Pangasinan'
                       ];
-                      List<String> selectedLanguages = languagesSpokenController
+                      List<String> selectedLanguages = widget.languagesSpokenController
                           .text
                           .split(',')
                           .map((e) => e.trim())
@@ -307,7 +370,7 @@ class CombinedForm extends StatelessWidget {
                                   return FilterChip(
                                     label: Text(language),
                                     selected: isSelected,
-                                    onSelected: isEditing
+                                    onSelected: widget.isEditing
                                         ? (bool selected) {
                                             setModalState(() {
                                               if (selected) {
@@ -316,7 +379,7 @@ class CombinedForm extends StatelessWidget {
                                                 selectedLanguages
                                                     .remove(language);
                                               }
-                                              languagesSpokenController.text =
+                                              widget.languagesSpokenController.text =
                                                   selectedLanguages.join(', ');
                                             });
                                           }
@@ -339,8 +402,8 @@ class CombinedForm extends StatelessWidget {
                         ?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   DropdownButtonFormField<String>(
-                    value: availabilityController.text.isNotEmpty
-                        ? availabilityController.text
+                    value: widget.availabilityController.text.isNotEmpty
+                        ? widget.availabilityController.text
                         : null,
                     decoration: customInputDecoration("Availability", context),
                     items: ["Available", "Not Available"].map((String value) {
@@ -349,13 +412,13 @@ class CombinedForm extends StatelessWidget {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: isEditing
-                        ? (newValue) => availabilityController.text = newValue!
+                    onChanged: widget.isEditing
+                        ? (newValue) => widget.availabilityController.text = newValue!
                         : null,
                   ),
                   DropdownButtonFormField<String>(
-                    value: locationController.text.isNotEmpty
-                        ? locationController.text
+                    value: widget.locationController.text.isNotEmpty
+                        ? widget.locationController.text
                         : null,
                     decoration: customInputDecoration("Location", context),
                     items: ["Dagupan City", "Urdaneta City"]
@@ -364,9 +427,9 @@ class CombinedForm extends StatelessWidget {
                               child: Text(city),
                             ))
                         .toList(),
-                    onChanged: isEditing
+                    onChanged: widget.isEditing
                         ? (value) {
-                            locationController.text = value!;
+                            widget.locationController.text = value!;
                           }
                         : null,
                   ),
@@ -385,14 +448,14 @@ class CombinedForm extends StatelessWidget {
                         icon: const Icon(Icons.location_pin),
                         label: Text(
                           _getReadableClinicText(
-                              context, clinicController.text),
+                              context, widget.clinicController.text),
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
                         ),
-                        onPressed: isEditing
+                        onPressed: widget.isEditing
                             ? () async {
                                 final picked = await Navigator.push(
                                   context,
@@ -411,7 +474,7 @@ class CombinedForm extends StatelessWidget {
                                     );
                                     String readable =
                                         _formatPlacemark(placemarks.first);
-                                    clinicController.text =
+                                    widget.clinicController.text =
                                         "${picked.latitude},${picked.longitude}";
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
