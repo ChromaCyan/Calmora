@@ -204,7 +204,7 @@ class HotlinesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 35),
                   Text(
-                    "⚠WARNING⚠",
+                    "Disclaimer",
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
                       fontSize: 16,

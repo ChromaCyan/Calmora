@@ -5,6 +5,8 @@ import 'package:armstrong/services/api.dart';
 import 'package:armstrong/services/tts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/helpers/storage_helpers.dart';
 
 enum VoiceChatStatus { idle, listening, loading, playing, error }
 
@@ -30,6 +32,10 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
   String _fullAIResponse = '';
   String _collectedSpeech = '';
 
+  String? _userId;
+  String? _chatId;
+  bool _isLoading = true;
+
   late AnimationController _animController;
   bool _useNaturalTTS = false;
 
@@ -47,6 +53,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
     _speech = stt.SpeechToText();
     _initSpeech();
     _ttsService.initTTS();
+    _loadUserId();
 
     _ttsService.setOnComplete(() {
       if (mounted)
@@ -83,6 +90,16 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         _fullAIResponse = '';
       });
     });
+  }
+
+  Future<void> _loadUserId() async {
+    final id = await StorageHelper.getUserId();
+    if (id != null) {
+      setState(() => _userId = id);
+      print("User ID loaded: $_userId");
+    } else {
+      print("No user ID found!");
+    }
   }
 
   Future<void> _initSpeech() async {
@@ -210,8 +227,13 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
         _errorMessage = null;
       });
 
-      final aiResponse =
-          await _apiRepository.askGemini(text, withVoice: _useNaturalTTS);
+      final aiResponse = await _apiRepository.askGemini(
+        text,
+        withVoice: _useNaturalTTS,
+        userId: _userId,
+      );
+
+      _chatId ??= aiResponse['chatId'];
 
       if (aiResponse == null ||
           aiResponse is! Map ||
@@ -404,19 +426,26 @@ class _VoiceChatScreenState extends State<VoiceChatScreen>
                       }
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _status == VoiceChatStatus.listening
-                            ? scheme.error.withOpacity(0.8)
-                            : scheme.primary.withOpacity(0.8),
-                        boxShadow: [
+                            ? scheme.error.withOpacity(0.85)
+                            : scheme.primary.withOpacity(0.85),
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 8,
                             spreadRadius: 2,
                           ),
                         ],
+                      ),
+                      child: Icon(
+                        _status == VoiceChatStatus.listening
+                            ? Icons.stop
+                            : Icons.mic,
+                        color: Colors.white,
+                        size: 48,
                       ),
                     ),
                   ),

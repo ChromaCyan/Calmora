@@ -1153,14 +1153,23 @@ class ApiRepository {
     }
   }
 
-  Future<Map<String, dynamic>> askGemini(String message,
-      {bool withVoice = false}) async {
+  Future<Map<String, dynamic>> askGemini(
+    String message, {
+    bool withVoice = false,
+    String? userId,
+  }) async {
     final url = Uri.parse('$baseUrl/chatbot/ask-ai');
+
+    final body = {
+      'message': message,
+      'withVoice': withVoice,
+      if (userId != null) 'userId': userId,
+    };
 
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'message': message, 'withVoice': withVoice}),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
@@ -1186,6 +1195,25 @@ class ApiRepository {
     } else {
       final errorData = jsonDecode(response.body);
       throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  Future<Map<String, dynamic>?> getAIChatHistory(String userId) async {
+    final url = Uri.parse('$baseUrl/chatbot/chat-history/$userId');
+
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else if (response.statusCode == 404) {
+      return null;
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['error'] ?? 'Failed to load chat history';
     }
   }
 }

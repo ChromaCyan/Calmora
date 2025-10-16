@@ -67,71 +67,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
-                    child: Text(
-                      "Emergency Hotlines",
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onBackground,
-                        fontSize: 18
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  // const SizedBox(width: 5),
-                  SizedBox(
-                    width: 45, // Fixed size for the circular card
-                    height: 45,
-                    child: HotlineCard(
-                      imagePath: "images/hotline_icon2.png",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => HotlinesScreen(),
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              const begin = Offset(1.0, 0.0); // Start off-screen right
-                              const end = Offset.zero;
-                              const curve = Curves.ease;
 
-                              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Icon(
-                    Icons.play_arrow_rounded,
-                    color: Colors.red,
-                    size: 15,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              const Divider(
-                thickness: 1.5,
-                color: Colors.grey,
-                indent: 40,
-                endIndent: 40,
-              ),
-              
               const SizedBox(height: 10),
               Center(
                 child: Text(
@@ -151,15 +92,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: GuideCard(
                       title: "What is Mental Health?",
                       imageUrl: "images/about_mental_health/mental_health.jpg",
-                      onTap: () =>
-                          _navigateWithSlide(context, MentalHealth()),
+                      onTap: () => _navigateWithSlide(context, MentalHealth()),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: GuideCard(
                       title: "What is a Mental Disorder?",
-                      imageUrl: "images/about_mental_health/mental_disorder.jpg",
+                      imageUrl:
+                          "images/about_mental_health/mental_disorder.jpg",
                       onTap: () =>
                           _navigateWithSlide(context, MentalDisorder()),
                     ),
@@ -174,20 +115,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: GuideCard(
                       title: "Common types of mental disorder",
                       imageUrl: "images/about_mental_health/depress.jpg",
-                      onTap: () =>
-                          _navigateWithSlide(context, DisorderTypes()),
+                      onTap: () => _navigateWithSlide(context, DisorderTypes()),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: GuideCard(
                       title: "Calmora Specialists and who should you seek",
-                      imageUrl: "images/about_mental_health/types_of_specialists.jpg",
+                      imageUrl:
+                          "images/about_mental_health/types_of_specialists.jpg",
                       onTap: () =>
                           _navigateWithSlide(context, SpecialistTypes()),
                     ),
                   ),
                 ],
+              ),
+              const Divider(
+                thickness: 1.5,
+                color: Colors.grey,
+                indent: 40,
+                endIndent: 40,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
+                    child: Text(
+                      "Need Immediate Call? \n\ Press the red button.",
+                      style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onBackground,
+                          fontSize: 18),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 45,
+                    height: 45,
+                    child: HotlineCard(
+                      imagePath: "images/hotline_icon2.png",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    HotlinesScreen(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin =
+                                  Offset(1.0, 0.0);
+                              const end = Offset.zero;
+                              const curve = Curves.ease;
+
+                              final tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.red,
+                    size: 15,
+                  ),
+                ],
+              ),
+
+              const Divider(
+                thickness: 1.5,
+                color: Colors.grey,
+                indent: 40,
+                endIndent: 40,
               ),
 
               const SizedBox(height: 30),
@@ -276,9 +283,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // const SizedBox(width: 10),
                   Expanded(
                     child: AppSection(
-                      title: "Help\nCenter",
+                      title: "FAQ",
                       imageUrl: "images/splash/image2.png",
-                      onTap: () => _navigateWithSlide(context, FrequentlyAskedQuestions()),
+                      onTap: () => _navigateWithSlide(
+                          context, FrequentlyAskedQuestions()),
                     ),
                   ),
                   const SizedBox(width: 10),

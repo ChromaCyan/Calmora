@@ -8,6 +8,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:ui';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/helpers/storage_helpers.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -23,6 +25,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _voiceModeEnabled = false;
 
+  String? _chatId;
+  String? _userId;
+  bool _isLoading = true;
+
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _lastWords = '';
@@ -33,8 +39,43 @@ class _AIChatScreenState extends State<AIChatScreen> {
   @override
   void initState() {
     super.initState();
-    _sendInitialMessage();
     _speech = stt.SpeechToText();
+    _initializeChat();
+  }
+
+  Future<void> _initializeChat() async {
+    _userId = await StorageHelper.getUserId();
+
+    if (_userId == null) {
+      print("⚠️ No user ID found in storage!");
+      return;
+    }
+
+    try {
+      final chatData = await _apiRepository.getChatHistory(_userId!);
+
+      if (chatData != null) {
+        setState(() {
+          _chatId = chatData['chatId'];
+          _messages.addAll(List<Map<String, dynamic>>.from(chatData['messages'])
+              .map((msg) => {
+                    'content': msg['content'],
+                    'timestamp': msg['timestamp'],
+                    'isSender': msg['sender'] == 'user',
+                  }));
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottom();
+        });
+      } else {
+        _sendInitialMessage();
+      }
+    } catch (e) {
+      print("Error loading AI chat: $e");
+      _sendInitialMessage();
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _sendInitialMessage() async {
@@ -76,8 +117,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _addUserMessage(content);
 
     try {
-      final aiResponse =
-          await _apiRepository.askGemini(content, withVoice: _voiceModeEnabled);
+      final aiResponse = await _apiRepository.askGemini(
+        content,
+        withVoice: _voiceModeEnabled,
+        userId: _userId,
+      );
+
+      _chatId ??= aiResponse['chatId'];
 
       final aiReply = aiResponse['reply'];
       final ttsId = aiResponse['id'];

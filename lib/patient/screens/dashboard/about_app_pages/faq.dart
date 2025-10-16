@@ -119,7 +119,7 @@ class _FrequentlyAskedQuestionsState extends State<FrequentlyAskedQuestions> {
           },
         ),
         title: Text(
-          "Help Center",
+          "Frequently Asked Questions",
           style: TextStyle(
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             fontWeight: FontWeight.w600,
