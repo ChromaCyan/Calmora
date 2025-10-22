@@ -20,19 +20,18 @@ class SpecialistBioSection extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary, // Matches primary color
+              color: Theme.of(context).colorScheme.primary, 
             ),
           ),
         ),
         Card(
-          elevation: isDarkMode ? 2 : 4, // Less shadow in dark mode
+          elevation: isDarkMode ? 2 : 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          color: Theme.of(context).cardColor, // Matches theme
+          color: Theme.of(context).cardColor, 
           child: Container(
-            // width: screenWidth * 0.9, // 90% of the screen width
-            height: 300, // Fixed height for consistency
+            height: 300,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
@@ -45,7 +44,7 @@ class SpecialistBioSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.4,
-                    color: Theme.of(context).textTheme.bodyMedium?.color, // Adapts text color
+                    color: Theme.of(context).textTheme.bodyMedium?.color, 
                   ),
                 ),
               ),

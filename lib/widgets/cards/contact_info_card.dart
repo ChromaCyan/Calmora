@@ -24,7 +24,7 @@ class ContactInfoCard extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String text, Color iconColor) {
     return Row(
       children: [
-        Icon(icon, color: iconColor), // Uses primary color from theme
+        Icon(icon, color: iconColor), 
         const SizedBox(width: 8),
         Expanded(
           child: Text(

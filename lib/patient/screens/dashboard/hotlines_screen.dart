@@ -6,7 +6,6 @@ class HotlinesScreen extends StatelessWidget {
   const HotlinesScreen({super.key});
 
   final List<Map<String, String>> hotlines = const [
-
     {
       "name": "Suicide Crisis Lines",
       "phone": "+639178001123",
@@ -22,7 +21,6 @@ class HotlinesScreen extends StatelessWidget {
       "phone": "+639190571553",
       "network": "Smart",
     },
-    
     {
       "name": "HopeLine",
       "phone": "+639175584673",
@@ -44,84 +42,124 @@ class HotlinesScreen extends StatelessWidget {
     }
   }
 
- Future<void> _confirmAndLaunchPhone(
-      BuildContext context, String name, String phoneNumber) async {
+  Future<void> _confirmAndLaunchPhone(
+    BuildContext context,
+    String name,
+    String phoneNumber,
+  ) async {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     final bool? confirmed = await showDialog<bool>(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Call $name?',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
-          ),
-          content: Text(
-            'You will now be re-directed to your Phone with "$phoneNumber" pre-filled.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 15,
-            ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          contentPadding: const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 0),
-          actionsPadding: EdgeInsets.zero,
-          actions: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey.shade300, width: 0.5)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        foregroundColor: Colors.grey[700],
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      onPressed: () => Navigator.of(context).pop(false),
+        return Dialog(
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: scheme.surface.withOpacity(0.65),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: scheme.outlineVariant.withOpacity(0.3),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
                     ),
-                  ),
-                  Container(
-                    width: 0.5,
-                    height: 48,
-                    color: Colors.grey.shade300,
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                  ],
+                ),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 🧠 Call Icon
+                    Text(
+                      'Call $name?',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: scheme.onSurface,
                       ),
-                      child: Text(
-                        'Proceed',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      onPressed: () => Navigator.of(context).pop(true),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 10),
+
+                    // Description
+                    Text(
+                      'You’ll be redirected to your Phone app with:\n\n📞 $phoneNumber',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontSize: 15,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+                    const Divider(height: 1, thickness: 0.6),
+
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            style: TextButton.styleFrom(
+                              foregroundColor: scheme.error,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: scheme.error,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 0.8,
+                          height: 48,
+                          color: scheme.outlineVariant.withOpacity(0.3),
+                        ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              foregroundColor: scheme.primary,
+                            ),
+                            child: Text(
+                              "Proceed",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: scheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
         );
       },
     );

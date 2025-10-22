@@ -14,6 +14,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:armstrong/widgets/cards/map_picker.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SpecialistRegistrationScreen extends StatefulWidget {
   const SpecialistRegistrationScreen({super.key});
@@ -62,6 +63,7 @@ class _SpecialistRegistrationScreenState
   final ImagePicker _picker = ImagePicker();
   int _currentStep = 0;
   final int _totalSteps = 4;
+  bool _isAgreed = false;
 
   // Register button state
   final ValueNotifier<bool> isRegisterButtonEnabled = ValueNotifier(false);
@@ -101,7 +103,7 @@ class _SpecialistRegistrationScreenState
             _licenseImage != null;
 
     isRegisterButtonEnabled.value =
-        isCommonFieldsFilled && isSpecialistFieldsFilled;
+        isCommonFieldsFilled && isSpecialistFieldsFilled && _isAgreed;
   }
 
   final genderOptions = [
@@ -153,6 +155,115 @@ class _SpecialistRegistrationScreenState
         _passwordMatchColor = Colors.red;
       });
     }
+  }
+
+  void _showTermsDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+
+        return Stack(
+          children: [
+            // Centered dialog box
+            Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.9,
+                  maxHeight: MediaQuery.of(context).size.height * 0.8,
+                ),
+                child: Material(
+                  color: colorScheme.surface.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(24),
+                  elevation: 0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title
+                            Text(
+                              "Calmora Terms & Privacy Notice",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Scrollable content
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  '''
+Welcome to Calmora! By using this app, you agree to the following:
+
+1. Calmora is a mental health support app connecting users with verified specialists.
+2. Your personal data will be stored securely and will never be sold, rented, or shared with third parties without your consent.
+3. The information you provide is used solely for app features such as browsing articles, chatting with specialists, booking appointments, or using the AI chatbot.
+4. The initial survey is designed to personalize your recommended articles and enhance your overall wellness experience.
+5. The AI chatbot provides general emotional and mental wellness support. It is not intended to replace professional therapy, diagnosis, or treatment.
+6. All specialists within Calmora are verified by the admin team through submitted certificates or license IDs before their accounts are approved.
+7. The Calmora Admins continuously monitor the validity and activity of registered specialists to ensure that only active, verified, and legitimate professionals remain available in the platform.
+8. Articles published by specialists undergo admin review and approval to ensure that all content aligns with Calmora’s purpose and values.
+9. Articles that are found to be inaccurate, inappropriate, or misleading may be unpublished or removed by the Admin at any time.
+10. Calmora prioritizes user safety and data confidentiality at all times, following the principles outlined in the Philippine Mental Health Act of 2018 (RA 11036).
+11. While Calmora aims to provide early mental health support and educational resources, it does not guarantee clinical outcomes or replace professional counseling.
+12. Calmora is a school project built for educational and wellness purposes, with the goal of promoting accessible, stigma-free mental health care in the Philippines.
+''',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(height: 1.6),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Close button
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton.icon(
+                                onPressed: () => Navigator.pop(context),
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: colorScheme.primaryContainer,
+                                  foregroundColor:
+                                      colorScheme.onPrimaryContainer,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.check_rounded, size: 18),
+                                label: const Text(
+                                  "Close",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _pickLicenseImage() async {
@@ -445,7 +556,7 @@ class _SpecialistRegistrationScreenState
         else
           const SizedBox(width: 20),
 
-        const SizedBox(width: 20), // spacing between buttons
+        const SizedBox(width: 20),
 
         // Next or Sign Up Button
         if (_currentStep < _totalSteps - 1)
@@ -661,10 +772,8 @@ class _SpecialistRegistrationScreenState
                   }
 
                   setState(() {
-                    _clinicLocation =
-                        pickedLocation;
-                    _clinicLocationString =
-                        readableAddress; 
+                    _clinicLocation = pickedLocation;
+                    _clinicLocationString = readableAddress;
                   });
 
                   _checkFields();
@@ -692,7 +801,7 @@ class _SpecialistRegistrationScreenState
             Text("Step 3: Upload License",
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 20),
-            Text("Add your license picture (Certificate, Diploma, etc)",
+            Text("Add your license picture (Certificate, License ID)",
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 10),
@@ -824,6 +933,62 @@ class _SpecialistRegistrationScreenState
             ),
             Text(_passwordMatchMessage,
                 style: TextStyle(color: _passwordMatchColor)),
+
+            const SizedBox(height: 20),
+
+            // "Read Terms and Conditions" as button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _showTermsDialog,
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                ),
+                icon: const Icon(Icons.description_outlined, size: 20),
+                label: const Text(
+                  "Read Terms and Conditions",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Transform.scale(
+                  scale: 1.2,
+                  child: Checkbox(
+                    value: _isAgreed,
+                    onChanged: (val) {
+                      setState(() {
+                        _isAgreed = val ?? false;
+                      });
+                      _checkFields();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    "I have read and agree to the Terms and Conditions",
+                    style: TextStyle(fontSize: 15, height: 1.3),
+                  ),
+                ),
+              ],
+            ),
           ],
         );
 
