@@ -514,7 +514,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: colorScheme.onPrimary),
               label: Text(
                 "Back",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimary),
@@ -550,7 +550,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                 "Next",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimary),
               ),
-              icon: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+              icon: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: colorScheme.onPrimary),
             ),
           )
         else
@@ -754,7 +754,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                   padding:
                       const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 ),
-                icon: const Icon(Icons.description_outlined, size: 20),
+                icon: Icon(Icons.description_outlined, size: 20, color: colorScheme.onPrimary),
                 label: Text(
                   "Read Terms and Conditions",
                   style: TextStyle(

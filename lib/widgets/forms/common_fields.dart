@@ -244,12 +244,22 @@ class _CombinedFormState extends State<CombinedForm> {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: widget.isEditing
-                        ? (newValue) {
-                            widget.specializationController.text = newValue!;
-                          }
-                        : null,
+
+                    onChanged: null,
+                    disabledHint: Text(
+                      widget.specializationController.text.isNotEmpty
+                          ? widget.specializationController.text
+                          : "Not specified",
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.color
+                            ?.withOpacity(0.8),
+                      ),
+                    ),
                   ),
+
                   const SizedBox(height: 30),
                   // Container(
                   //   constraints: BoxConstraints(
@@ -270,10 +280,12 @@ class _CombinedFormState extends State<CombinedForm> {
                             final updatedBio = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => EditBioPage(initialBio: widget.bioController.text),
+                                builder: (_) => EditBioPage(
+                                    initialBio: widget.bioController.text),
                               ),
                             );
-                            if (updatedBio != null && updatedBio != widget.bioController.text) {
+                            if (updatedBio != null &&
+                                updatedBio != widget.bioController.text) {
                               setState(() {
                                 widget.bioController.text = updatedBio;
                               });
@@ -283,11 +295,16 @@ class _CombinedFormState extends State<CombinedForm> {
                     child: Container(
                       height: 250,
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surface
+                            .withOpacity(0.6),
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: Theme.of(context).dividerColor),
+                        border:
+                            Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -303,7 +320,10 @@ class _CombinedFormState extends State<CombinedForm> {
                                   fontSize: 16,
                                   color: widget.bioController.text.isEmpty
                                       ? Theme.of(context).hintColor
-                                      : Theme.of(context).textTheme.bodyLarge?.color,
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color,
                                 ),
                               ),
                             ),
@@ -311,7 +331,10 @@ class _CombinedFormState extends State<CombinedForm> {
                           const SizedBox(width: 8),
                           Icon(
                             Icons.chevron_right,
-                            color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                            color: Theme.of(context)
+                                .iconTheme
+                                .color
+                                ?.withOpacity(0.6),
                           ),
                         ],
                       ),
@@ -338,8 +361,8 @@ class _CombinedFormState extends State<CombinedForm> {
                         'Tagalog',
                         'Pangasinan'
                       ];
-                      List<String> selectedLanguages = widget.languagesSpokenController
-                          .text
+                      List<String> selectedLanguages = widget
+                          .languagesSpokenController.text
                           .split(',')
                           .map((e) => e.trim())
                           .where((e) => e.isNotEmpty)
@@ -379,7 +402,8 @@ class _CombinedFormState extends State<CombinedForm> {
                                                 selectedLanguages
                                                     .remove(language);
                                               }
-                                              widget.languagesSpokenController.text =
+                                              widget.languagesSpokenController
+                                                      .text =
                                                   selectedLanguages.join(', ');
                                             });
                                           }
@@ -413,7 +437,8 @@ class _CombinedFormState extends State<CombinedForm> {
                       );
                     }).toList(),
                     onChanged: widget.isEditing
-                        ? (newValue) => widget.availabilityController.text = newValue!
+                        ? (newValue) =>
+                            widget.availabilityController.text = newValue!
                         : null,
                   ),
                   DropdownButtonFormField<String>(
@@ -421,7 +446,7 @@ class _CombinedFormState extends State<CombinedForm> {
                         ? widget.locationController.text
                         : null,
                     decoration: customInputDecoration("Location", context),
-                    items: ["Dagupan City", "Urdaneta City"]
+                    items: ["Dagupan City"]
                         .map((city) => DropdownMenuItem(
                               value: city,
                               child: Text(city),
