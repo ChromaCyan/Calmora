@@ -153,6 +153,7 @@ class SpecialistAppointmentCard extends StatelessWidget {
             ),
             SizedBox(height: screenHeight * 0.01),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.calendar_today,
                     color: colorScheme.primary, size: screenWidth * 0.04),
@@ -185,10 +186,12 @@ class SpecialistAppointmentCard extends StatelessWidget {
                       onPressed: () =>
                           _acceptAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
                         backgroundColor: colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
+                              BorderRadius.circular(screenWidth * 0.04),
                         ),
                       ),
                       child: Text(
@@ -204,10 +207,12 @@ class SpecialistAppointmentCard extends StatelessWidget {
                       onPressed: () =>
                           _declineAppointment(context, appointmentId),
                       style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
                         backgroundColor: colorScheme.error,
                         shape: RoundedRectangleBorder(
                           borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
+                              BorderRadius.circular(screenWidth * 0.04),
                         ),
                       ),
                       child: Text(
@@ -233,9 +238,11 @@ class SpecialistAppointmentCard extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
                   backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.04),
                   ),
                 ),
                 child: Text(

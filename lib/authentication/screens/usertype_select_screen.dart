@@ -290,6 +290,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       // appBar: AppBar(
@@ -359,7 +360,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Text(
-                                "Do you seek help? Register as",
+                                "Do you seek help? Register as a",
                                 style: Theme.of(context).textTheme.bodyLarge,
                                 textAlign: TextAlign.center,
                               ),
@@ -395,31 +396,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     minimumSize:
                                         const Size(double.infinity, 60),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                     backgroundColor:
-                                        colorScheme.primaryContainer,
-                                    foregroundColor:
-                                        colorScheme.onPrimaryContainer,
-                                  ).copyWith(
-                                    overlayColor:
-                                        MaterialStateProperty.resolveWith<
-                                            Color?>((Set<MaterialState> state) {
-                                      if (state
-                                          .contains(MaterialState.hovered)) {
-                                        return Colors.blue.withOpacity(0.1);
-                                      }
-                                    }),
+                                        colorScheme.primary,
+                                    // foregroundColor:
+                                    //     colorScheme.onPrimaryContainer,
+                                  // ).copyWith(
+                                  //   overlayColor:
+                                  //       MaterialStateProperty.resolveWith<
+                                  //           Color?>((Set<MaterialState> state) {
+                                  //     if (state
+                                  //         .contains(MaterialState.hovered)) {
+                                  //       return Colors.blue.withOpacity(0.1);
+                                  //     }
+                                  //   }),
                                   ),
-                                  child: Text(
+                                  child: 
+                                  Text(
                                     "General User",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w900,
-                                        ),
+                                    style: TextStyle(
+                                      color: theme.colorScheme.surface,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900
+                                    )
                                   ),
                                 ),
                               ),
@@ -436,7 +436,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               const SizedBox(height: 30),
 
                               Text(
-                                "Do you provide support? Register as",
+                                "Do you provide support? Register as a",
                                 style: Theme.of(context).textTheme.bodyLarge,
                                 textAlign: TextAlign.center,
                               ),
@@ -450,16 +450,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                                secondaryAnimation) =>
-                                            const SpecialistRegistrationScreen(),
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
+                                        pageBuilder: (context, animation, secondaryAnimation) => const SpecialistRegistrationScreen(),
+                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                           return FadeTransition(
-                                              opacity: animation, child: child);
+                                            opacity: animation, 
+                                            child: child
+                                          );
                                         },
-                                        transitionDuration:
-                                            const Duration(milliseconds: 300),
+                                        transitionDuration: const Duration(milliseconds: 300),
                                         // builder: (_) => const SpecialistRegistrationScreen(),
                                       ),
                                     );
@@ -467,48 +465,45 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     shadowColor: Colors.transparent,
-                                    minimumSize:
-                                        const Size(double.infinity, 60),
+                                    minimumSize: const Size(double.infinity, 60),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                     backgroundColor:
-                                        colorScheme.primaryContainer,
-                                    foregroundColor:
-                                        colorScheme.onPrimaryContainer,
-                                  ).copyWith(
-                                    overlayColor:
-                                        MaterialStateProperty.resolveWith<
-                                            Color?>((Set<MaterialState> state) {
-                                      if (state
-                                          .contains(MaterialState.hovered)) {
-                                        return Colors.blue.withOpacity(0.1);
-                                      }
-                                    }),
+                                        colorScheme.primary,
+                                  //   foregroundColor:
+                                  //       colorScheme.onPrimaryContainer,
+                                  // ).copyWith(
+                                  //   overlayColor:
+                                  //       MaterialStateProperty.resolveWith<
+                                  //           Color?>((Set<MaterialState> state) {
+                                  //     if (state
+                                  //         .contains(MaterialState.hovered)) {
+                                  //       return Colors.blue.withOpacity(0.1);
+                                  //     }
+                                  //   }),
                                   ),
                                   child: Text(
                                     "Specialist",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w900,
-                                        ),
+                                    style: TextStyle(
+                                      color: theme.colorScheme.surface,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                    )
                                   ),
                                 ),
                               ),
 
                               const SizedBox(height: 30),
 
-                              // const Divider(
-                              //   thickness: 1.5,
-                              //   color: Colors.grey,
-                              //   indent: 40,
-                              //   endIndent: 40,
-                              // ),
+                              const Divider(
+                                thickness: 1.5,
+                                color: Colors.grey,
+                                indent: 40,
+                                endIndent: 40,
+                              ),
 
-                              // const SizedBox(height: 20),
+                              const SizedBox(height: 20),
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,

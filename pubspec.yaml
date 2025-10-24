@@ -219,6 +219,7 @@ flutter:
     - images/help_center.png
     - images/hotline_icon2.png
     - images/hotline_cover_image.png
+    - images/emergency_call.png
 
     # Fonts Assets
   fonts:
