@@ -15,7 +15,7 @@ List<OnBoards> onBoardData = [
   ),
     OnBoards(
     text: "Talk to our Calmora Chatbot that can offer you emphathetic responses and emotional wellness tips.",
-    image: "images/splash/chatbot.png",
+    image: "images/ai.png",
   ),
   OnBoards(
     text: "Find licensed therapists, and mental health experts to help you understand yourself.",

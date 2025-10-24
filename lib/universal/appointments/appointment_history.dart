@@ -23,15 +23,17 @@ class _CompletedAppointmentsScreenState
   bool isLoading = true;
   bool hasError = false;
   String? _userId;
+  String? _role;
 
   @override
   void initState() {
     super.initState();
-    _loadUserId();
+    _loadUserData();
   }
 
-  Future<void> _loadUserId() async {
+  Future<void> _loadUserData() async {
     _userId = await _storage.read(key: 'userId');
+    _role = await _storage.read(key: 'userType');
     if (_userId != null) {
       await _fetchCompletedAppointments();
     } else {
@@ -75,7 +77,10 @@ class _CompletedAppointmentsScreenState
     showDialog(
       context: context,
       builder: (context) {
-        return AppointmentDetailsDialog(appointment: appointment);
+        return AppointmentDetailsDialog(
+          appointment: appointment,
+          userRole: _role ?? 'Patient',
+        );
       },
     );
   }
@@ -106,7 +111,7 @@ class _CompletedAppointmentsScreenState
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded),
+          icon: const Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => Navigator.pop(context),
           color: theme.colorScheme.onPrimaryContainer,
         ),
@@ -114,13 +119,10 @@ class _CompletedAppointmentsScreenState
       body: Stack(
         fit: StackFit.expand,
         children: [
-          /// Background image
           Image.asset(
             "images/login_bg_image.png",
             fit: BoxFit.cover,
           ),
-
-          /// Frosted blur overlay
           Container(
             color: theme.colorScheme.surface.withOpacity(0.6),
             child: BackdropFilter(
@@ -128,16 +130,12 @@ class _CompletedAppointmentsScreenState
               child: const SizedBox.expand(),
             ),
           ),
-
-          /// Main content
           Column(
             children: [
               const SizedBox(height: 10),
               Expanded(
                 child: isLoading
-                    ? Center(
-                        child: GlobalLoader.loader,
-                      )
+                    ? Center(child: GlobalLoader.loader)
                     : hasError
                         ? Center(
                             child: Text(
@@ -160,14 +158,27 @@ class _CompletedAppointmentsScreenState
                                   final appointment =
                                       completedAppointments[index];
 
+                                  // Determine which user to display
+                                  final isSpecialist =
+                                      _role?.toLowerCase() == 'specialist';
+                                  final displayUser = isSpecialist
+                                      ? appointment["patient"]
+                                      : appointment["specialist"];
+
+                                  final fullName =
+                                      "${displayUser?["firstName"] ?? "Unknown"} ${displayUser?["lastName"] ?? ""}".trim();
+                                  final profileImage =
+                                      displayUser?["profileImage"] ?? "";
+
                                   return GestureDetector(
                                     onTap: () => _showAppointmentDetails(
                                         context, appointment),
                                     child: Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor.withOpacity(0.6),
+                                        color: theme.cardColor.withOpacity(0.6),
                                         borderRadius: BorderRadius.circular(20),
                                         boxShadow: [
                                           if (theme.brightness ==
@@ -180,49 +191,67 @@ class _CompletedAppointmentsScreenState
                                             ),
                                         ],
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      child: Row(
                                         children: [
-                                          Text(
-                                            '${appointment["specialist"]?["firstName"] ?? "Unknown"}',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: theme.brightness ==
-                                                      Brightness.light
-                                                  ? Colors.black
-                                                  : Colors.white,
-                                            ),
+                                          CircleAvatar(
+                                            radius: 25,
+                                            backgroundImage:
+                                                profileImage.isNotEmpty
+                                                    ? NetworkImage(profileImage)
+                                                    : const AssetImage(
+                                                            "images/default_avatar.png")
+                                                        as ImageProvider,
                                           ),
-                                          const SizedBox(height: 8),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_today,
-                                                size: 16,
-                                                color: theme.brightness ==
-                                                        Brightness.light
-                                                    ? Colors.black54
-                                                    : Colors.white70,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  _formatAppointmentTime(
-                                                      appointment),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  fullName,
                                                   style: TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
                                                     color: theme.brightness ==
                                                             Brightness.light
-                                                        ? Colors.black87
-                                                        : Colors.white70,
+                                                        ? Colors.black
+                                                        : Colors.white,
                                                   ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
-                                              ),
-                                            ],
+                                                const SizedBox(height: 8),
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.calendar_today,
+                                                      size: 16,
+                                                      color: theme.brightness ==
+                                                              Brightness.light
+                                                          ? Colors.black54
+                                                          : Colors.white70,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: Text(
+                                                        _formatAppointmentTime(
+                                                            appointment),
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: theme
+                                                                      .brightness ==
+                                                                  Brightness
+                                                                      .light
+                                                              ? Colors.black87
+                                                              : Colors.white70,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),

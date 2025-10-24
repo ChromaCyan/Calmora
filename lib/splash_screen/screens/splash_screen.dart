@@ -267,7 +267,7 @@ class _OnboardingItemState extends State<_OnboardingItem>
     const titles = [
       "Welcome",
       "Browse Resources!",
-      "AI Assistance",
+      "AI Chatbot",
       "Find a Specialist",
       "Find Peace",
     ];

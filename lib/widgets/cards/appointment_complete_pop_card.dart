@@ -4,24 +4,36 @@ import 'package:intl/intl.dart';
 
 class AppointmentDetailsDialog extends StatelessWidget {
   final dynamic appointment;
+  final String userRole;
 
-  const AppointmentDetailsDialog({super.key, required this.appointment});
+  const AppointmentDetailsDialog({
+    super.key,
+    required this.appointment,
+    required this.userRole,
+  });
 
   String _formatAppointmentTime(dynamic appointment) {
-    if (appointment["appointmentDate"] == null || appointment["timeSlot"] == null) {
+    if (appointment["appointmentDate"] == null ||
+        appointment["timeSlot"] == null) {
       return "N/A";
     }
 
     final appointmentDate = DateTime.parse(appointment["appointmentDate"]);
     final startTime = appointment["timeSlot"]["startTime"];
     final endTime = appointment["timeSlot"]["endTime"];
-
     final formattedDate = DateFormat("MMM dd, yyyy").format(appointmentDate);
+
     return "$formattedDate - $startTime to $endTime";
   }
 
   @override
   Widget build(BuildContext context) {
+    final isSpecialist = userRole.toLowerCase() == 'specialist';
+    final displayUser =
+        isSpecialist ? appointment["patient"] : appointment["specialist"];
+    final displayName =
+        "${displayUser?["firstName"] ?? "Unknown"} ${displayUser?["lastName"] ?? ""}".trim();
+
     return Stack(
       children: [
         Center(
@@ -42,23 +54,21 @@ class AppointmentDetailsDialog extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
                       Text(
                         "Appointment Details",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold,),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
-
-                      // Specialist / Patient
                       Text(
-                        "With: ${appointment["specialist"] != null ? "${appointment["specialist"]["firstName"]} ${appointment["specialist"]["lastName"]}" : appointment["patient"]?["firstName"] ?? "Unknown"}",
+                        "With: $displayName",
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
-
-                      // Time
                       Row(
                         children: [
                           const Icon(Icons.calendar_today, size: 18),
@@ -72,8 +82,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-
-                      // Status
                       const Text(
                         "Status: Completed",
                         style: TextStyle(
@@ -81,8 +89,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
-                      // Feedback
                       if (appointment["feedback"] != null) ...[
                         const SizedBox(height: 8),
                         const Text(
@@ -91,8 +97,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
                         ),
                         Text(appointment["feedback"]),
                       ],
-
-                      // Image
                       if (appointment["imageUrl"] != null &&
                           appointment["imageUrl"].isNotEmpty) ...[
                         const SizedBox(height: 12),
@@ -109,10 +113,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                           ),
                         ),
                       ],
-
                       const SizedBox(height: 5),
-
-                      // Close button
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
