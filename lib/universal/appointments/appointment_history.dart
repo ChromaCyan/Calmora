@@ -185,14 +185,14 @@ class _CompletedAppointmentsScreenState
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'With: ${appointment["specialist"]?["firstName"] ?? "Unknown"}',
+                                            '${appointment["specialist"]?["firstName"] ?? "Unknown"}',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                               color: theme.brightness ==
                                                       Brightness.light
                                                   ? Colors.black
-                                                  : Colors.white, // text adapts
+                                                  : Colors.white,
                                             ),
                                           ),
                                           const SizedBox(height: 8),

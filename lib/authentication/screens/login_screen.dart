@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Background
           Positioned.fill(
             child: Image.asset(
               'images/login_bg_image.png',
@@ -62,14 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Foreground scrollable
           SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
               children: [
-                const SizedBox(height: 80), // top spacing for logo
+                const SizedBox(height: 80), 
 
-                // Overlapping logo
                 AnimatedOpacity(
                   duration: const Duration(milliseconds: 1000),
                   opacity: _showLogo ? 1.0 : 0.0,
@@ -82,14 +79,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 200,
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.6),
-                          shape: BoxShape.circle, // Circular shape
+                          shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
                             width: 1.5,
                           ),
                         ),
                         child: ClipOval(
-                          // Ensure image is clipped to circle as well
                           child: Image.asset(
                             'images/calmora_transparent.png',
                             fit: BoxFit.cover,
@@ -200,8 +196,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(123),
-                      topRight: Radius.circular(123),
+                      topLeft: Radius.circular(75),
+                      topRight: Radius.circular(75),
                     ),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
@@ -215,8 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               .surface
                               .withOpacity(0.6),
                           borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(123),
-                            topRight: Radius.circular(123),
+                            topLeft: Radius.circular(75),
+                            topRight: Radius.circular(75),
                           ),
                           boxShadow: [
                             BoxShadow(
