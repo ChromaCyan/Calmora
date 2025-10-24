@@ -328,7 +328,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     children: [
                       const SizedBox(height: 100),
                       Text(
-                        "HOLA!",
+                        "Kamusta!",
                         style: GoogleFonts.pacifico(
                           textStyle: Theme.of(context).textTheme.headlineSmall,
                           fontWeight: FontWeight.bold,
@@ -398,9 +398,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     backgroundColor:
-                                        colorScheme.primaryContainer,
+                                        colorScheme.primary,
                                     foregroundColor:
-                                        colorScheme.onPrimaryContainer,
+                                        colorScheme.onPrimary,
                                   ).copyWith(
                                     overlayColor:
                                         MaterialStateProperty.resolveWith<
@@ -419,6 +419,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         ?.copyWith(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w900,
+                                          color: colorScheme.onPrimary,
                                         ),
                                   ),
                                 ),
@@ -473,9 +474,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     backgroundColor:
-                                        colorScheme.primaryContainer,
+                                        colorScheme.primary,
                                     foregroundColor:
-                                        colorScheme.onPrimaryContainer,
+                                        colorScheme.onPrimary,
                                   ).copyWith(
                                     overlayColor:
                                         MaterialStateProperty.resolveWith<
@@ -494,6 +495,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         ?.copyWith(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w900,
+                                          color: colorScheme.onPrimary,
                                         ),
                                   ),
                                 ),

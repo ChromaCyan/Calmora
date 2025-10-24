@@ -21,7 +21,7 @@ class AIChatScreen extends StatefulWidget {
 class _AIChatScreenState extends State<AIChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _controller = TextEditingController();
-  final ApiRepository _apiRepository = ApiRepository();
+  final ApiRepository2 _apiRepository = ApiRepository2();
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _voiceModeEnabled = false;
 
@@ -79,8 +79,30 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   void _sendInitialMessage() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _addBotMessage("Hi there, I'm Calmora. How are you feeling today?");
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    _addBotMessage(
+      "Hi there, I'm Calmora — your emotional support companion here in the app.",
+    );
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    _addBotMessage(
+      "I'm here to listen and help you process your thoughts and feelings whenever you need someone to talk to.",
+    );
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    _addBotMessage(
+      "Just a quick note: I’m not a licensed specialist and I don’t provide medical advice or diagnoses. "
+      "If you ever feel like you need professional help, I can help you connect with one of our verified specialists anytime.",
+    );
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    _addBotMessage(
+      "So, how are you feeling today?",
+    );
   }
 
   int _addBotMessage(String text, {bool isLoading = false}) {

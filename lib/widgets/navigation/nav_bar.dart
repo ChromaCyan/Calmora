@@ -83,7 +83,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 colorScheme.secondary,
                 chatKey,
                 context,
-                "View existing chats you had with a specialist",
+                "View existing chats you had with a specialist, or use talk to AI chatbot Calmora!",
               ),
               _buildNavItemWithBadge(
                 Icons.checklist,

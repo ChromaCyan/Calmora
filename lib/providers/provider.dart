@@ -5,10 +5,12 @@ import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:armstrong/authentication/blocs/auth_blocs.dart';
 import 'package:armstrong/services/api.dart';
+import 'package:armstrong/services/gemini_api.dart';
 
 class AppProviders {
   static List<BlocProvider> getProviders() {
     final ApiRepository apiRepository = ApiRepository();
+    final ApiRepository2 apiRepository2 = ApiRepository2();
 
     return [
       // Authentication

@@ -18,7 +18,7 @@ class LoginButton extends StatelessWidget {
         height: 55,
         decoration: BoxDecoration(
           color: isEnabled
-              ? Theme.of(context).colorScheme.secondary
+              ? Theme.of(context).colorScheme.primary
               : Theme.of(context).disabledColor.withOpacity(0.3),
           borderRadius: BorderRadius.circular(15),
           boxShadow: isEnabled
@@ -40,7 +40,7 @@ class LoginButton extends StatelessWidget {
             Text(
               "LOG IN",
               style: GoogleFonts.montserrat(
-                color: Theme.of(context).colorScheme.onSecondary,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
               ),

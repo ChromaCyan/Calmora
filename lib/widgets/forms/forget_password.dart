@@ -301,7 +301,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           child: ElevatedButton(
                             onPressed: _handleNextStep,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.secondary,
+                              backgroundColor: colorScheme.primary,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
                             ),
@@ -319,7 +319,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
-                                    ?.copyWith(color: colorScheme.onSecondary),
+                                    ?.copyWith(color: colorScheme.onPrimary),
                               ),
                             ),
                           ),

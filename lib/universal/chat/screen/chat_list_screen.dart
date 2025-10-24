@@ -136,15 +136,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.psychology_alt, color: Colors.white),
+                    children: [
+                      Icon(Icons.psychology_alt, color: theme.colorScheme.onPrimary,),
                       SizedBox(width: 10),
                       Text(
                         'Talk to our AI Chatbot',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: theme.colorScheme.onPrimary,
                         ),
                       ),
                     ],
