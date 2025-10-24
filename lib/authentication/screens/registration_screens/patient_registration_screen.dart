@@ -506,8 +506,8 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                backgroundColor: colorScheme.primaryContainer,
-                foregroundColor: colorScheme.onPrimaryContainer,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -515,16 +515,16 @@ Welcome to Calmora! By using this app, you agree to the following:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-              label: const Text(
+              label: Text(
                 "Back",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimary),
               ),
             ),
           )
         else
           const SizedBox(width: 20),
 
-        const SizedBox(width: 20), // spacing between buttons
+        const SizedBox(width: 20), 
 
         // Next or Sign Up Button
         if (_currentStep < _totalSteps - 1)
@@ -538,17 +538,17 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                backgroundColor: colorScheme.primaryContainer,
-                foregroundColor: colorScheme.onPrimaryContainer,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
-              label: const Text(
+              label: Text(
                 "Next",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimary),
               ),
               icon: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
             ),
@@ -566,7 +566,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                     elevation: 0,
                     shadowColor: Colors.transparent,
                     backgroundColor:
-                        isEnabled ? colorScheme.primaryContainer : Colors.grey,
+                        isEnabled ? colorScheme.primary : Colors.grey,
                     foregroundColor: isEnabled
                         ? colorScheme.onPrimaryContainer
                         : Colors.black45,
@@ -581,6 +581,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimary,
                         ),
                   ),
                 );
@@ -745,8 +746,8 @@ Welcome to Calmora! By using this app, you agree to the following:
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   shadowColor: Colors.transparent,
-                  backgroundColor: colorScheme.primaryContainer,
-                  foregroundColor: colorScheme.onPrimaryContainer,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -754,11 +755,12 @@ Welcome to Calmora! By using this app, you agree to the following:
                       const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 ),
                 icon: const Icon(Icons.description_outlined, size: 20),
-                label: const Text(
+                label: Text(
                   "Read Terms and Conditions",
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
+                    color: colorScheme.onPrimary
                   ),
                 ),
               ),

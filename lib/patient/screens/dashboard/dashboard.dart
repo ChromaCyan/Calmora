@@ -166,13 +166,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
-                    backgroundColor: Colors.red, // red hotline button
+                    backgroundColor: Colors.red, 
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   icon: Image.asset(
                     "images/hotline_icon2.png",
