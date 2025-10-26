@@ -710,6 +710,25 @@ class ApiRepository {
     }
   }
 
+  // Mark survey as completed (Skip Survey)
+  Future<void> markSurveyCompleted(String patientId) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/survey/$patientId/survey-completed');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Failed to mark survey as completed';
+    }
+  }
+
   // Get survey results for a patient
   Future<SurveyResult> getPatientSurveyResults(String patientId) async {
     final token = await _storage.read(key: 'token');

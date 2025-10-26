@@ -11,6 +11,8 @@ import 'package:showcaseview/showcaseview.dart';
 import 'dart:ui';
 import 'package:armstrong/services/socket_service.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:armstrong/helpers/storage_helpers.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -81,7 +83,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   // Method to check if the showcase has been completed
   Future<void> _checkShowcaseStatus() async {
-    final showcaseCompleted = await _storage.read(key: 'showcase_completed');
+    final showcaseCompleted = await StorageHelper.getShowcaseCompleted();
+    await StorageHelper.saveShowcaseCompleted();
     setState(() {
       _showcaseCompleted = showcaseCompleted == 'true';
     });

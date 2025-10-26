@@ -1,31 +1,16 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageHelper {
   static const _storage = FlutterSecureStorage();
 
+  // ===========================
+  // USER INFO
+  // ===========================
+
   // Save userId
   static Future<void> saveUserId(String userId) async {
     await _storage.write(key: 'userId', value: userId);
-  }
-
-  // Save userType
-  static Future<void> saveUserType(String userType) async {
-    await _storage.write(key: 'userType', value: userType);
-  }
-
-  // Get userType
-  static Future<String?> getUserType() async {
-    return await _storage.read(key: 'userType');
-  }
-
-  // Get userId
-  static Future<String?> getFirstname() async {
-    return await _storage.read(key: 'firstName');
-  }
-
-  // Save First Name
-  static Future<void> saveUser(String firstName) async {
-    await _storage.write(key: 'fisrtName', value: firstName);
   }
 
   // Get userId
@@ -53,20 +38,22 @@ class StorageHelper {
     await _storage.delete(key: 'jwt');
   }
 
-  // Save user role
-  static Future<void> saveRole(String role) async {
-    await _storage.write(key: 'userType', value: role);
+  // Save user type / role
+  static Future<void> saveUserType(String userType) async {
+    await _storage.write(key: 'userType', value: userType);
   }
 
-  // Get user role
-  static Future<String?> getRole() async {
+  static Future<String?> getUserType() async {
     return await _storage.read(key: 'userType');
   }
 
-  // Clear user role
-  static Future<void> clearRole() async {
+  static Future<void> clearUserType() async {
     await _storage.delete(key: 'userType');
   }
+
+  // ===========================
+  // SURVEY
+  // ===========================
 
   static Future<void> saveSurveyCompleted(String userId, bool completed) async {
     await _storage.write(
@@ -92,5 +79,20 @@ class StorageHelper {
     final value =
         await _storage.read(key: 'survey_onboarding_completed_$userId');
     return value == 'true';
+  }
+
+  static Future<void> saveShowcaseCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('showcase_completed', true);
+  }
+
+  static Future<bool> getShowcaseCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('showcase_completed') ?? false;
+  }
+
+  static Future<void> resetShowcase() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('showcase_completed');
   }
 }

@@ -275,7 +275,40 @@ class _QuestionScreenState extends State<QuestionScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
+                            final FlutterSecureStorage storage =
+                                FlutterSecureStorage();
+
+                            if (_userId != null) {
+                              try {
+                                await _apiRepository
+                                    .markSurveyCompleted(_userId!);
+
+                                await storage.write(
+                                    key: 'hasCompletedSurvey_$_userId',
+                                    value: 'true');
+                                await storage.write(
+                                  key: 'survey_onboarding_completed_$_userId',
+                                  value: 'true',
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    elevation: 0,
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: Colors.transparent,
+                                    content: AwesomeSnackbarContent(
+                                      title: 'Error!',
+                                      message: 'Failed to skip survey: $e',
+                                      contentType: ContentType.failure,
+                                    ),
+                                    duration: const Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                            }
+
+                            // 3️⃣ Redirect to home
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
