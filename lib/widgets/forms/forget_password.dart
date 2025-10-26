@@ -260,7 +260,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 : Colors.red,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        // const SizedBox(height: 20),
                         CustomTextField(
                           label: "Confirm Password",
                           controller: _confirmPasswordController,
@@ -318,30 +318,33 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Center(
-                  child: ElevatedButton(
-                    onPressed: _handleNextStep,
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                      backgroundColor: colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                      child: Text(
-                        step == "verify"
-                          ? "Send Code"
-                          : step == "enter_code"
-                              ? "Verify Code"
-                              : step == "reset_password"
-                                  ? "Reset Password"
-                                  : "Done",
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: colorScheme.onPrimary, fontWeight: FontWeight.w900),
+                  child: SizedBox(
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: _handleNextStep,
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                        backgroundColor: colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(35)
                         ),
                       ),
-                    ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                        child: Text(
+                          step == "verify"
+                            ? "Send Code"
+                            : step == "enter_code"
+                                ? "Verify Code"
+                                : step == "reset_password"
+                                    ? "Reset Password"
+                                    : "Done",
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(color: colorScheme.onPrimary, fontWeight: FontWeight.w900),
+                          ),
+                        ),
+                      ),
+                  ),
                   ),
                 ],
               ),

@@ -20,16 +20,17 @@ class LoginButton extends StatelessWidget {
           color: isEnabled
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).disabledColor.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: isEnabled
-              ? [
-                  BoxShadow(
-                    color: Theme.of(context).shadowColor.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
+          borderRadius: BorderRadius.circular(35),
+          // boxShadow: isEnabled
+          //     ? [
+          //         BoxShadow(
+          //           color: Theme.of(context).shadowColor.withOpacity(0.2),
+          //           blurRadius: 8,
+          //           offset: const Offset(0, 4),
+          //         ),
+          //       ]
+          //     : [],
+          boxShadow: null,
         ),
         alignment: Alignment.center,
         child: Row(

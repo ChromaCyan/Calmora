@@ -185,6 +185,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          const SizedBox(height: 20),
                           /// Profile Image and Name
                           Center(
                             child: Column(
@@ -220,12 +221,15 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                           ),
 
                           /// Availability
-                          Center(
-                            child: _buildAvailabilityCard(context,
-                                specialist.availability ?? 'Unavailable'),
-                          ),
+                          // Center(
+                          //   child: _buildAvailabilityCard(
+                          //     context,
+                          //     specialist.availability 
+                          //         ?? 'Unavailable'
+                          //   ),
+                          // ),
 
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 20),
 
                           /// Action buttons
                           Row(
@@ -233,30 +237,31 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                               /// Schedule Button
                               Expanded(
                                 child: ElevatedButton.icon(
-                                  onPressed: () => _bookAppointment(
-                                      context, widget.specialistId),
-                                  icon: const Icon(Icons.calendar_today,
-                                      size: 22),
-                                  label: const Text(
+                                  onPressed: () => _bookAppointment(context, widget.specialistId),
+                                  icon: Icon(
+                                    color: theme.colorScheme.primaryContainer,
+                                    Icons.calendar_today, 
+                                    size: 22,
+                                  ),
+                                  label:  Text(
                                     "Schedule",
                                     style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                      color: theme.colorScheme.primaryContainer,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w900,
                                     ),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     shadowColor: Colors.transparent,
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
+                                    backgroundColor: theme.colorScheme.primary,
                                     foregroundColor: Theme.of(context)
                                         .colorScheme
                                         .onPrimaryContainer,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
                                 ),
@@ -295,27 +300,29 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                       }
                                     }
                                   },
-                                  icon: const Icon(Icons.message, size: 22),
-                                  label: const Text(
+                                  icon: Icon(
+                                    Icons.message, 
+                                    size: 22,
+                                    color: theme.colorScheme.primaryContainer,
+                                  ),
+                                  label: Text(
                                     "Message",
                                     style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                      color: theme.colorScheme.primaryContainer,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w900,
                                     ),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     shadowColor: Colors.transparent,
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
+                                    backgroundColor: theme.colorScheme.primary,
                                     foregroundColor: Theme.of(context)
                                         .colorScheme
                                         .onPrimaryContainer,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
                                 ),

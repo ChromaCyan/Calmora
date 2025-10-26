@@ -114,40 +114,47 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
             ),
 
+            const SizedBox(height: 10),
+
             /// AI Chatbot Button (if patient)
             if (_role == 'Patient')
               Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AIChatScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 3,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.psychology_alt, color: theme.colorScheme.onPrimary,),
-                      SizedBox(width: 10),
-                      Text(
-                        'Talk to our AI Chatbot',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onPrimary,
+                padding: const EdgeInsets.only(bottom: 16,),
+                child: SizedBox(
+                  width: 235,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AIChatScreen()
                         ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(35),
                       ),
-                    ],
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.psychology_alt, color: theme.colorScheme.primaryContainer,),
+                        SizedBox(width: 10),
+                        Text(
+                          'Talk to our AI Chatbot',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: theme.colorScheme.primaryContainer,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

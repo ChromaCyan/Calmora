@@ -70,75 +70,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
     });
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final theme = Theme.of(context);
-  //   final isDarkMode = theme.brightness == Brightness.dark;
-
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       TextFormField(
-  //         controller: widget.controller,
-  //         obscureText: widget.obscureText,
-  //         readOnly: widget.readOnly,
-  //         onTap: widget.onTap,
-  //         focusNode: _focusNode,
-  //         onChanged: (value) {
-  //           _validateField();
-  //           if (widget.onChanged != null) widget.onChanged!(value);
-  //         },
-  //         decoration: InputDecoration(
-  //           labelText: widget.label,
-  //           floatingLabelBehavior: FloatingLabelBehavior.auto,
-  //           labelStyle: TextStyle(
-  //             color: isDarkMode ? Colors.white : Colors.black,
-  //           ),
-  //           floatingLabelStyle: TextStyle(
-  //             color: isDarkMode ? Colors.white70 : Colors.black87,
-  //           ),
-  //           filled: true,
-  //           fillColor: theme.colorScheme.background,
-  //           enabledBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: BorderSide(
-  //               color: _showError ? Colors.red : theme.colorScheme.primary,
-  //               width: 2,
-  //             ),
-  //           ),
-  //           focusedBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: BorderSide(
-  //               color: _showError ? Colors.red : theme.colorScheme.primary,
-  //               width: 2,
-  //             ),
-  //           ),
-  //           errorBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: const BorderSide(
-  //               color: Colors.red,
-  //               width: 2,
-  //             ),
-  //           ),
-  //           focusedErrorBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: const BorderSide(
-  //               color: Colors.red,
-  //               width: 2,
-  //             ),
-  //           ),
-  //           errorText: _showError ? _errorMessage : null,
-  //           errorStyle: const TextStyle(color: Colors.red, fontSize: 14),
-  //           suffixIcon: widget.suffixIcon,
-  //           suffixIconConstraints: const BoxConstraints(
-  //             minWidth: 40,
-  //             minHeight: 40,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -153,7 +84,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
           readOnly: widget.readOnly,
           onTap: widget.onTap,
           focusNode: _focusNode,
-          keyboardType: widget.keyboardtype,
           onChanged: (value) {
             _validateField();
             if (widget.onChanged != null) widget.onChanged!(value);
@@ -162,45 +92,43 @@ class _CustomTextFieldState extends State<CustomTextField> {
             labelText: widget.label,
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             labelStyle: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black,
+              color: isDarkMode ? Colors.white.withOpacity(0.6) : Colors.black.withOpacity(0.6),
             ),
             floatingLabelStyle: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.black87,
             ),
-            // 🔑 Explicitly set filled to false
-            filled: false,
-
-            // 🔑 Set background color explicitly to transparent (just in case)
-            fillColor: Colors.transparent,
-
-            // 🔄 Replace all OutlineInputBorder with UnderlineInputBorder
-            enabledBorder: UnderlineInputBorder(
+            filled: true,
+            fillColor: theme.colorScheme.background.withOpacity(0.6),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
               borderSide: BorderSide(
-                color: _showError ? Colors.red : theme.colorScheme.primary,
-                width: 1.5,
+                color: Colors.transparent,
+                width: 1,
               ),
             ),
-            focusedBorder: UnderlineInputBorder(
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
               borderSide: BorderSide(
-                color: _showError ? Colors.red : theme.colorScheme.primary,
-                width: 2.0,
+                color: _showError ? Colors.red : Colors.transparent,
+                // width: 1,
               ),
             ),
-            errorBorder: UnderlineInputBorder(
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
               borderSide: const BorderSide(
                 color: Colors.red,
-                width: 1.5,
+                width: 1,
               ),
             ),
-            focusedErrorBorder: UnderlineInputBorder(
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
               borderSide: const BorderSide(
                 color: Colors.red,
-                width: 2.0,
+                width: 1,
               ),
             ),
 
-            errorText: _showError ? _errorMessage : null,
-            errorStyle: const TextStyle(color: Colors.red, fontSize: 14),
+            errorText: null,
             suffixIcon: widget.suffixIcon,
             suffixIconConstraints: const BoxConstraints(
               minWidth: 40,
@@ -208,7 +136,126 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
           ),
         ),
+
+         // Custom error message below, with fixed height
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: 20, // Reserve fixed height
+          alignment: Alignment.centerLeft,
+          child: _showError
+              ? Text(
+                  _errorMessage ?? '',
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 13,
+                    height: 1.2,
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
       ],
     );
   }
+
+
+
+  
+  // @override
+  // Widget build(BuildContext context) {
+  //   final theme = Theme.of(context);
+  //   final isDarkMode = theme.brightness == Brightness.dark;
+
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       TextFormField(
+  //         controller: widget.controller,
+  //         obscureText: widget.obscureText,
+  //         readOnly: widget.readOnly,
+  //         onTap: widget.onTap,
+  //         focusNode: _focusNode,
+  //         keyboardType: widget.keyboardtype,
+  //         onChanged: (value) {
+  //           _validateField();
+  //           if (widget.onChanged != null) widget.onChanged!(value);
+  //         },
+  //         decoration: InputDecoration(
+  //           labelText: widget.label,
+  //           floatingLabelBehavior: FloatingLabelBehavior.auto,
+  //           labelStyle: TextStyle(
+  //             color: isDarkMode ? Colors.white : Colors.black,
+  //           ),
+  //           floatingLabelStyle: TextStyle(
+  //             color: isDarkMode ? Colors.white70 : Colors.black87,
+  //           ),
+  //           // 🔑 Explicitly set filled to false
+  //           filled: false,
+
+  //           // 🔑 Set background color explicitly to transparent (just in case)
+  //           fillColor: Colors.transparent,
+
+  //           // 🔄 Replace all OutlineInputBorder with UnderlineInputBorder
+  //           enabledBorder: UnderlineInputBorder(
+  //             borderSide: BorderSide(
+  //               color: _showError ? Colors.red : theme.colorScheme.primary,
+  //               width: 1.5,
+  //             ),
+  //           ),
+  //           focusedBorder: UnderlineInputBorder(
+  //             borderSide: BorderSide(
+  //               color: _showError ? Colors.red : theme.colorScheme.primary,
+  //               width: 2.0,
+  //             ),
+  //           ),
+  //           errorBorder: UnderlineInputBorder(
+  //             borderSide: const BorderSide(
+  //               color: Colors.red,
+  //               width: 1.5,
+  //             ),
+  //           ),
+  //           focusedErrorBorder: UnderlineInputBorder(
+  //             borderSide: const BorderSide(
+  //               color: Colors.red,
+  //               width: 2.0,
+  //             ),
+  //           ),
+
+  //           // errorText: _showError ? _errorMessage : null,
+  //           // errorStyle: const TextStyle(color: Colors.red, fontSize: 14),
+  //           // suffixIcon: widget.suffixIcon,
+  //           // suffixIconConstraints: const BoxConstraints(
+  //           //   minWidth: 40,
+  //           //   minHeight: 40,
+  //           // ),
+
+
+  //            // Don’t show the built-in error text
+  //           errorText: null,
+  //           suffixIcon: widget.suffixIcon,
+  //           suffixIconConstraints: const BoxConstraints(
+  //             minWidth: 40,
+  //             minHeight: 40,
+  //           ),
+  //         ),
+  //       ),
+
+  //        // Custom error message below, with fixed height
+  //       AnimatedContainer(
+  //         duration: const Duration(milliseconds: 200),
+  //         height: 18, // Reserve fixed height
+  //         alignment: Alignment.centerLeft,
+  //         child: _showError
+  //             ? Text(
+  //                 _errorMessage ?? '',
+  //                 style: const TextStyle(
+  //                   color: Colors.red,
+  //                   fontSize: 13,
+  //                   height: 1.2,
+  //                 ),
+  //               )
+  //             : const SizedBox.shrink(),
+  //       ),
+  //     ],
+  //   );
+  // }
 }
