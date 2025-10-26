@@ -77,6 +77,8 @@ class _ChatScreenState extends State<ChatScreen> {
       _socketService.registerUserRoom(userId);
       _socketService.joinChatRoom(widget.chatId);
 
+      _socketService.markChatAsRead(widget.chatId, userId);
+
       _socketService.onMessageReceived = (message) {
         final isDuplicate = _messages.any((m) =>
             m['senderId'] == message['senderId'] &&
@@ -86,6 +88,15 @@ class _ChatScreenState extends State<ChatScreen> {
         if (!isDuplicate) {
           setState(() {
             _messages.add(message);
+            if (widget.chatId == message['chatId']) {
+              _socketService.markMessageAsRead(widget.chatId, _userId!);
+              setState(() {
+                final msgIndex = _messages.indexWhere(
+                  (m) => m['timestamp'] == message['timestamp'],
+                );
+                if (msgIndex != -1) _messages[msgIndex]['status'] = 'read';
+              });
+            }
           });
 
           if (!_isScrolledUp) {
@@ -95,6 +106,22 @@ class _ChatScreenState extends State<ChatScreen> {
           }
         }
       };
+
+      _socketService.socket!.on('messageDelivered', (data) {
+        setState(() {
+          final msgIndex =
+              _messages.indexWhere((m) => m['timestamp'] == data['timestamp']);
+          if (msgIndex != -1) _messages[msgIndex]['status'] = 'delivered';
+        });
+      });
+
+      _socketService.socket!.on('messageReadUpdate', (data) {
+        setState(() {
+          final msgIndex =
+              _messages.indexWhere((m) => m['timestamp'] == data['timestamp']);
+          if (msgIndex != -1) _messages[msgIndex]['status'] = 'read';
+        });
+      });
     }
   }
 
@@ -164,7 +191,7 @@ class _ChatScreenState extends State<ChatScreen> {
         'senderId': _userId!,
         'content': messageContent,
         'timestamp': DateTime.now().toIso8601String(),
-        'status': 'sent',
+        'status': 'sending',
       };
 
       setState(() {
@@ -177,6 +204,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
         _socketService.sendMessage(
             _userId!, widget.recipientId, messageContent, widget.chatId);
+
+        _socketService.socket!.emit('messageDelivered', {
+          'chatId': widget.chatId,
+          'timestamp': message['timestamp'],
+        });
 
         setState(() {
           message['status'] = 'delivered';
@@ -217,107 +249,110 @@ class _ChatScreenState extends State<ChatScreen> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(title: Text("Chat with ${widget.recipientName}")),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          /// Background image
-          Image.asset(
-            "images/login_bg_image.png",
-            fit: BoxFit.cover,
-          ),
+    return WillPopScope(
+      onWillPop: () async {
+        if (_userId != null) {
+          // Leave the chat room
+          _socketService.leaveChatRoom(widget.chatId);
+          print("🚪 Left chat room ${widget.chatId}");
 
-          /// Frosted glass overlay
-          Container(
-            color: scheme.surface.withOpacity(0.6),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: const SizedBox.expand(),
+          // Rejoin personal room
+          _socketService.joinPersonalRoom(_userId!);
+        }
+
+        Navigator.pop(context); // Go back to previous screen
+        return false; // Prevent default pop since we already handled it
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text("Chat with ${widget.recipientName}")),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset("images/login_bg_image.png", fit: BoxFit.cover),
+            Container(
+              color: scheme.surface.withOpacity(0.6),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: const SizedBox.expand(),
+              ),
             ),
-          ),
 
-          /// Main Chat UI
-          Column(
-            children: <Widget>[
-              if (!_isSpecialist)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () => _bookAppointment(context),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 30),
-                      backgroundColor: scheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      shadowColor: Colors.black.withOpacity(0.2),
-                      elevation: 5,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            color: Colors.white, size: 22),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "Book Appointment Now",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+            // Main UI column remains unchanged...
+            Column(
+              children: <Widget>[
+                if (!_isSpecialist)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () => _bookAppointment(context),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 30),
+                        backgroundColor: scheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                        shadowColor: Colors.black.withOpacity(0.2),
+                        elevation: 5,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.calendar_today,
+                              color: Colors.white, size: 22),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Book Appointment Now",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-
-              /// Chat messages
-              Expanded(
-                child: _isLoading
-                    ? Center(
-                        child: GlobalLoader.loader,
-                      )
-                    : _messages.isEmpty
-                        ? const Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.chat_bubble_outline,
-                                    size: 50, color: Colors.grey),
-                                SizedBox(height: 10),
-                                Text(
-                                  "No messages yet",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.grey),
-                                ),
-                              ],
+                Expanded(
+                  child: _isLoading
+                      ? Center(child: GlobalLoader.loader)
+                      : _messages.isEmpty
+                          ? const Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.chat_bubble_outline,
+                                      size: 50, color: Colors.grey),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "No messages yet",
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: _scrollController,
+                              itemCount: _messages.length,
+                              itemBuilder: (context, index) {
+                                final message = _messages[index];
+                                return ChatBubble(
+                                  content: message['content'] ?? 'No message',
+                                  timestamp:
+                                      _formatTimestamp(message['timestamp']),
+                                  status: message['status'] ?? 'sent',
+                                  isSender: message['senderId'] == _userId,
+                                  senderName: widget.recipientName,
+                                );
+                              },
                             ),
-                          )
-                        : ListView.builder(
-                            controller: _scrollController,
-                            itemCount: _messages.length,
-                            itemBuilder: (context, index) {
-                              final message = _messages[index];
-                              return ChatBubble(
-                                content: message['content'] ?? 'No message',
-                                timestamp:
-                                    _formatTimestamp(message['timestamp']),
-                                status: message['status'] ?? 'sent',
-                                isSender: message['senderId'] == _userId,
-                                senderName: widget.recipientName,
-                              );
-                            },
-                          ),
-              ),
-
-              /// Input
-              TextNSend(controller: _controller, onSend: _sendMessage),
-            ],
-          ),
-        ],
+                ),
+                TextNSend(controller: _controller, onSend: _sendMessage),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

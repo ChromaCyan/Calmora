@@ -11,7 +11,9 @@ class AppointmentBookingForm extends StatefulWidget {
   final String specialistId;
   final VoidCallback? onBooked;
 
-  const AppointmentBookingForm({Key? key, required this.specialistId, this.onBooked}) : super(key: key);
+  const AppointmentBookingForm(
+      {Key? key, required this.specialistId, this.onBooked})
+      : super(key: key);
 
   @override
   _AppointmentBookingFormState createState() => _AppointmentBookingFormState();
@@ -97,8 +99,19 @@ class _AppointmentBookingFormState extends State<AppointmentBookingForm> {
               "Appointment successfully booked!",
               ContentType.success,
             );
+
+            Future.delayed(const Duration(milliseconds: 800), () {
+              Navigator.of(context).pop(); 
+              widget.onBooked?.call(); 
+            });
+
+            // Optionally clear form fields
+            setState(() {
+              _selectedDate = null;
+              _selectedTimeSlot = null;
+              _messageController.clear();
+            });
           } else {
-            // ✅ Available slots fetched
             _showSnackBar(
               "Slots Loaded",
               "Available slots have been loaded.",

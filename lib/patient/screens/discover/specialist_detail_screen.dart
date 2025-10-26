@@ -50,7 +50,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
           child: AppointmentBookingForm(
             specialistId: specialistId,
             onBooked: () {
-              Navigator.of(context).pop(); 
             },
           ),
         );
@@ -238,7 +237,7 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                   icon: const Icon(Icons.calendar_today,
                                       size: 22),
                                   label: const Text(
-                                    "Schedule",
+                                    "Schedule Appointment",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
