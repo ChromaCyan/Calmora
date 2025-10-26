@@ -38,18 +38,21 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   @override
   void initState() {
     super.initState();
+    print('🩵 [INIT] PatientHomeScreen initState() called');
+    _checkShowcaseStatus();
     _pageController = PageController(initialPage: 0);
     _loadUserId();
     _init();
-    _checkShowcaseStatus();
   }
 
   Future<void> _init() async {
     final userId = await _storage.read(key: 'userId');
     final token = await _storage.read(key: 'token');
+    print('🧠 [INIT] userId=$userId | token=${token != null}');
 
     if (userId != null && token != null) {
       setState(() => _userId = userId);
+      print('✅ [INIT] User ID set: $_userId');
 
       SocketService().connect(token, userId);
       SocketService().registerUserRoom(userId);
@@ -59,6 +62,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         setState(() {
           _unreadCount++;
         });
+        print('🔔 [SOCKET] Notification received. Unread: $_unreadCount');
       };
 
       await _fetchUnreadNotificationsCount();
@@ -67,6 +71,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   Future<void> _loadUserId() async {
     final userId = await _storage.read(key: 'userId');
+    print('📦 [LOAD] Loaded userId: $userId');
 
     setState(() {
       _userId = userId;
@@ -81,16 +86,31 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     }
   }
 
-  // Method to check if the showcase has been completed
-  Future<void> _checkShowcaseStatus() async {
-    final showcaseCompleted = await StorageHelper.getShowcaseCompleted();
-    await StorageHelper.saveShowcaseCompleted();
+  Future<void> _completeShowcase() async {
+    print("💾 [SHOWCASE] Completing showcase...");
+    await _storage.write(key: 'showcaseCompleted', value: 'true');
+
+    final verify = await _storage.read(key: 'showcaseCompleted');
+    print("✅ [SHOWCASE] Showcase saved as completed: $verify");
+
     setState(() {
-      _showcaseCompleted = showcaseCompleted == 'true';
+      _showcaseCompleted = true;
+    });
+  }
+
+  Future<void> _checkShowcaseStatus() async {
+    print("🟦 [SHOWCASE] Checking showcase status...");
+    final value = await _storage.read(key: 'showcaseCompleted');
+    final showcaseCompleted = value == 'true';
+
+    print("🟢 [SHOWCASE] Stored value: $showcaseCompleted");
+
+    setState(() {
+      _showcaseCompleted = showcaseCompleted;
     });
 
-    // Start showcase if it hasn't been completed
-    if (!_showcaseCompleted) {
+    if (!showcaseCompleted) {
+      print("🚀 [SHOWCASE] Showcase not completed — starting sequence now...");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context).startShowCase([
           _homeKey,
@@ -99,15 +119,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           _appointmentsKey,
         ]);
       });
+    } else {
+      print("✅ [SHOWCASE] Already completed — skipping showcase.");
     }
-  }
-
-  // Method to mark the showcase as completed
-  Future<void> _completeShowcase() async {
-    await _storage.write(key: 'showcase_completed', value: 'true');
-    setState(() {
-      _showcaseCompleted = true;
-    });
   }
 
   Future<void> _fetchUnreadNotificationsCount() async {
@@ -119,12 +133,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       setState(() {
         _unreadCount = unreadCount;
       });
+      print('📨 [NOTIF] Unread notifications count: $_unreadCount');
     } catch (e) {
-      print("Failed to fetch unread notifications: $e");
+      print("❌ [ERROR] Failed to fetch unread notifications: $e");
     }
   }
 
   void _onTabSelected(int index) {
+    print('📱 [NAV] Switched tab to index: $index');
     setState(() {
       _selectedIndex = index;
       _pageController.animateToPage(
@@ -137,12 +153,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   @override
   void dispose() {
+    print('🧹 [DISPOSE] Disposing PatientHomeScreen');
     _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print(
+        '🎨 [BUILD] Building PatientHomeScreen — showcaseCompleted=$_showcaseCompleted');
     final theme = Theme.of(context);
 
     return BlocProvider(
@@ -261,15 +280,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         ),
         body: Stack(
           children: [
-            // --- 1) Background Image ---
             Positioned.fill(
               child: Image.asset(
                 "images/login_bg_image.png",
                 fit: BoxFit.cover,
               ),
             ),
-
-            // --- 2) Blur Layer ---
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
@@ -278,7 +294,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
               ),
             ),
-
             SafeArea(
               child: PageView(
                 controller: _pageController,
@@ -291,9 +306,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   ChatListScreen(),
                   _userId != null
                       ? AppointmentListScreen(patientId: _userId!)
-                      : Center(
-                          child: GlobalLoader.loader,
-                        ),
+                      : Center(child: GlobalLoader.loader),
                 ],
               ),
             ),
