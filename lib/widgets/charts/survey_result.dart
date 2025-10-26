@@ -35,30 +35,56 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
   }
 
   Map<String, dynamic> getInterpretation(int score, ColorScheme colorScheme) {
-    if (score >= 85) {
+    if (score >= 30) {
       return {
-        'text': "Great job! You're in a strong place with your mental health.",
+        'title': "You're in a Good Space 💚",
+        'message':
+            "You seem to be feeling quite balanced and in touch with yourself. "
+                "Keep nurturing that mindset — we’ll recommend resources to help you maintain your wellbeing.",
         'color': Colors.green
       };
-    } else if (score >= 70) {
+    } else if (score >= 22 && score < 30) {
       return {
-        'text':
-            "You're doing well! A few areas to focus on, but you're on the right track.",
+        'title': "You're Managing Things Well 🌼",
+        'message':
+            "It looks like you might be juggling a few thoughts or emotions lately — and that’s okay. "
+                "Our articles and guides will help you stay centered and take care of your peace of mind.",
         'color': Colors.orange
       };
-    } else if (score >= 50) {
+    } else if (score >= 15 && score < 22) {
       return {
-        'text':
-            "Keep going! It's normal to have ups and downs, and you have the strength to work through them.",
+        'title': "You Might Be Going Through a Lot 💜",
+        'message': "Things may feel heavy at times, and that’s completely valid. "
+            "You’re not alone — we’ll recommend resources and self-help tools that can support you day by day.",
         'color': Colors.purple
       };
     } else {
       return {
-        'text':
-            "You're not alone! Every step you take toward better mental health counts, and we're here to support you.",
+        'title': "It Seems You're Having a Hard Time ❤️",
+        'message': "You might be facing something challenging right now. "
+            "That’s okay — reaching out and getting support is a strong step. "
+            "We’ll guide you with helpful tools and options to talk to someone who can help.",
         'color': Colors.red
       };
     }
+  }
+
+  Widget buildEmoteIcon(String title, Color color) {
+    IconData iconData;
+
+    if (title.contains("Good Space")) {
+      iconData = LucideIcons.smile;
+    } else if (title.contains("Managing")) {
+      iconData = LucideIcons.smilePlus;
+    } else if (title.contains("Going Through")) {
+      iconData = LucideIcons.meh;
+    } else if (title.contains("Hard Time")) {
+      iconData = LucideIcons.frown;
+    } else {
+      iconData = LucideIcons.helpCircle;
+    }
+
+    return Icon(iconData, color: color, size: 80);
   }
 
   @override
@@ -86,12 +112,13 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
         final interpretationData = getInterpretation(score, colorScheme);
 
         return Card(
-          elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          color: colorScheme.surface,
+          elevation: 0,
+          color: colorScheme.surface.withOpacity(0.9),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -99,8 +126,8 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(LucideIcons.scrollText,
-                        color: colorScheme.primary, size: 30),
-                    const SizedBox(width: 10),
+                        color: colorScheme.primary, size: 26),
+                    const SizedBox(width: 8),
                     Text(
                       "Survey Score",
                       style: theme.textTheme.titleLarge?.copyWith(
@@ -112,51 +139,39 @@ class _SurveyScoreChartState extends State<SurveyScoreChart> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "$score / 100",
+                  "$score / 35",
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
                   ),
                 ),
+                const SizedBox(height: 12),
+                Text(
+                  interpretationData['title'],
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: interpretationData['color'],
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 10),
                 Text(
-                  interpretationData['text'],
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: interpretationData['color'],
-                    fontWeight: FontWeight.w600,
+                  interpretationData['message'],
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.8),
+                    height: 1.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 200,
-                  child: PieChart(
-                    PieChartData(
-                      sections: [
-                        PieChartSectionData(
-                          value: score.toDouble(),
-                          color: colorScheme.primary,
-                          title: '$score%',
-                          radius: 50,
-                          titleStyle: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
-                        PieChartSectionData(
-                          value: (100 - score).toDouble(),
-                          color: colorScheme.secondaryContainer,
-                          title: '${100 - score}%',
-                          radius: 50,
-                          titleStyle: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 40,
-                    ),
+                buildEmoteIcon(
+                    interpretationData['title'], interpretationData['color']),
+                const SizedBox(height: 10),
+                Text(
+                  "$score / 35",
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],

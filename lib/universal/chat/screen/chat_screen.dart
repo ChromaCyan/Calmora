@@ -262,7 +262,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             color: Colors.white, size: 22),
                         const SizedBox(width: 10),
                         const Text(
-                          "Create Appointment Now",
+                          "Book Appointment Now",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

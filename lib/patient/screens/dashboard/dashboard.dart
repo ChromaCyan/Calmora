@@ -130,7 +130,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 30),
+              Center(
+                child: Text(
+                  'Recommended Articles',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
+                ),
+              ),
+              const ArticleList(),
+
+              const SizedBox(height: 30),
+              Center(
+                child: Text(
+                  'Mind & Body Wellness',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onBackground,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: GuideCard(
+                      title: "Meditation Exercise Guide",
+                      imageUrl: "images/meditation2.jpeg",
+                      onTap: () =>
+                          _navigateWithSlide(context, MindfulMeditation()),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GuideCard(
+                      title: "Breathing Exercise Guide",
+                      imageUrl: "images/breathing_exercise_dp.jpg",
+                      onTap: () =>
+                          _navigateWithSlide(context, BreathingGuideScreen()),
+                    ),
+                  ),
+                ],
+              ),
               const Divider(
                 thickness: 1.5,
                 color: Colors.grey,
@@ -189,60 +234,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-
-              const Divider(
-                thickness: 1.5,
-                color: Colors.grey,
-                indent: 40,
-                endIndent: 40,
-              ),
-
-              const SizedBox(height: 30),
-              Center(
-                child: Text(
-                  'Recommended Articles',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
-                  ),
-                ),
-              ),
-              const ArticleList(),
-
-              const SizedBox(height: 30),
-              Center(
-                child: Text(
-                  'Mind & Body Wellness',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: GuideCard(
-                      title: "Meditation Exercise Guide",
-                      imageUrl: "images/meditation2.jpeg",
-                      onTap: () =>
-                          _navigateWithSlide(context, MindfulMeditation()),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GuideCard(
-                      title: "Breathing Exercise Guide",
-                      imageUrl: "images/breathing_exercise_dp.jpg",
-                      onTap: () =>
-                          _navigateWithSlide(context, BreathingGuideScreen()),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
               const Divider(
                 thickness: 1.5,
                 color: Colors.grey,

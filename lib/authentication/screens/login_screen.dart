@@ -51,9 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
+          // --- BG Image stays fixed ---
           Positioned.fill(
             child: Image.asset(
               'images/login_bg_image.png',
@@ -61,329 +62,285 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: Column(
-              children: [
-                const SizedBox(height: 80), 
-
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 1000),
-                  opacity: _showLogo ? 1.0 : 0.0,
-                  child: ClipOval(
-                    // Clip to a circle
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.6),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'images/calmora_transparent.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+          // --- Keyboard-aware area ---
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                  ),
-                ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 40),
 
-                const SizedBox(height: 120),
-
-                // Glass container (now scrolls with content)
-                BlocListener<AuthBloc, AuthState>(
-                  listener: (context, state) async {
-                    if (state is AuthSuccess) {
-                      final userData = state.userData;
-                      final userType = userData['userType'];
-                      final userId = userData['userId'];
-                      final approvalStatus = userData['approvalStatus'];
-                      final token = userData['token'];
-                      final surveyCompleted = userData['surveyCompleted'] ?? false;
-
-                      if (userType == 'Specialist') {
-                        if (approvalStatus == 'rejected') {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              elevation: 0,
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Colors.transparent,
-                              content: AwesomeSnackbarContent(
-                                title: 'Access Denied',
-                                message:
-                                    'Your specialist account was rejected. Please contact support.',
-                                contentType: ContentType.failure,
-                              ),
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                          return;
-                        } else if (approvalStatus == 'pending') {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              elevation: 0,
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Colors.transparent,
-                              content: AwesomeSnackbarContent(
-                                title: 'Pending Approval',
-                                message:
-                                    'Your specialist account is still under review.',
-                                contentType: ContentType.warning,
-                              ),
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                          return;
-                        }
-                      }
-
-                      await StorageHelper.saveUserId(userId);
-                      await StorageHelper.saveToken(token);
-                      await StorageHelper.saveUserType(userType);
-
-                      if (userType == 'Patient') {
-                        await StorageHelper.saveSurveyCompleted(
-                            userId, surveyCompleted);
-
-                        await StorageHelper.saveSurveyOnboarding(userId, false);
-
-                        if (surveyCompleted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PatientHomeScreen()),
-                          );
-                        } else {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SurveyScreen()),
-                          );
-                        }
-                      } else if (userType == 'Specialist') {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SpecialistHomeScreen()),
-                        );
-                      }
-                    } else if (state is AuthError) {
-                      final errorMessage =
-                          state.message ?? 'Something went wrong';
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          elevation: 0,
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.transparent,
-                          content: AwesomeSnackbarContent(
-                            title: 'Login Failed',
-                            message: errorMessage,
-                            contentType: ContentType.failure,
-                          ),
-                          duration: const Duration(seconds: 4),
-                        ),
-                      );
-                    }
-                  },
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(75),
-                      topRight: Radius.circular(75),
-                    ),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 0),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 36, vertical: 32),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surface
-                              .withOpacity(0.6),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(75),
-                            topRight: Radius.circular(75),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context)
-                                  .shadowColor
-                                  .withOpacity(0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, -5),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width > 500
-                                  ? 500
-                                  : MediaQuery.of(context).size.width * 0.9,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 30),
-                                Text(
-                                  "LOG IN",
-                                  style: GoogleFonts.montserrat(
-                                    textStyle: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                  ),
-                                ),
-                                const SizedBox(height: 50),
-
-                                // Email
-                                CustomTextField(
-                                  label: "Email:",
-                                  controller: emailController,
-                                  obscureText: false,
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Password
-                                CustomTextField(
-                                  label: "Password:",
-                                  controller: passwordController,
-                                  obscureText: _obscureText,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(_obscureText
-                                        ? Icons.visibility
-                                        : Icons.visibility_off),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscureText = !_obscureText;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              const ForgotPasswordScreen(),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            return FadeTransition(
-                                              opacity: animation,
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Forgot Password?",
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                          // --- Logo stays on top ---
+                          Center(
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 800),
+                              opacity: _showLogo ? 1.0 : 0.0,
+                              child: ClipOval(
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                      sigmaX: 10.0, sigmaY: 10.0),
+                                  child: Container(
+                                    width: 175,
+                                    height: 175,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.6),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.3),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'images/calmora_transparent.png',
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 42),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "No account yet?",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation,
-                                                    secondaryAnimation) =>
-                                                RegistrationScreen(),
-                                            transitionsBuilder: (context,
-                                                animation,
-                                                secondaryAnimation,
-                                                child) {
-                                              return FadeTransition(
-                                                opacity: animation,
-                                                child: child,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      child: Text(
-                                        "Sign up",
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(height: 30),
-
-                                ValueListenableBuilder<bool>(
-                                  valueListenable: isButtonEnabled,
-                                  builder: (context, isEnabled, child) {
-                                    return LoginButton(
-                                      onTap: isEnabled
-                                          ? () {
-                                              context.read<AuthBloc>().add(
-                                                    LoginEvent(
-                                                      email:
-                                                          emailController.text,
-                                                      password:
-                                                          passwordController
-                                                              .text,
-                                                    ),
-                                                  );
-                                            }
-                                          : null,
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 70),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
+
+                          const Spacer(),
+
+                          BlocListener<AuthBloc, AuthState>(
+                            listener: _authListener,
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(75),
+                                topRight: Radius.circular(75),
+                              ),
+                              child: BackdropFilter(
+                                filter:
+                                    ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.only(
+                                    left: 36,
+                                    right: 36,
+                                    top: 32,
+                                    bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom +
+                                        32,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surface
+                                        .withOpacity(0.6),
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(75),
+                                      topRight: Radius.circular(75),
+                                    ),
+                                  ),
+                                  child: _buildLoginForm(context),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildLoginForm(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 30),
+        Text(
+          "LOG IN",
+          style: GoogleFonts.montserrat(
+            textStyle: Theme.of(context).textTheme.headlineSmall,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          ),
+        ),
+        const SizedBox(height: 30),
+        CustomTextField(
+          label: "Email:",
+          controller: emailController,
+          obscureText: false,
+        ),
+        const SizedBox(height: 24),
+        CustomTextField(
+          label: "Password:",
+          controller: passwordController,
+          obscureText: _obscureText,
+          suffixIcon: IconButton(
+            icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => _obscureText = !_obscureText),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, _, __) => const ForgotPasswordScreen(),
+                  transitionsBuilder: (context, animation, _, child) =>
+                      FadeTransition(opacity: animation, child: child),
+                ),
+              );
+            },
+            child: Text(
+              "Forgot Password?",
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("No account yet?",
+                style: Theme.of(context).textTheme.bodyMedium),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, _, __) => RegistrationScreen(),
+                    transitionsBuilder: (context, animation, _, child) =>
+                        FadeTransition(opacity: animation, child: child),
+                  ),
+                );
+              },
+              child: Text(
+                "Sign up",
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 30),
+        ValueListenableBuilder<bool>(
+          valueListenable: isButtonEnabled,
+          builder: (context, isEnabled, child) {
+            return LoginButton(
+              onTap: isEnabled
+                  ? () {
+                      context.read<AuthBloc>().add(LoginEvent(
+                            email: emailController.text,
+                            password: passwordController.text,
+                          ));
+                    }
+                  : null,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _authListener(BuildContext context, AuthState state) async {
+    if (state is AuthSuccess) {
+      final userData = state.userData;
+      final userType = userData['userType'];
+      final userId = userData['userId'];
+      final approvalStatus = userData['approvalStatus'];
+      final token = userData['token'];
+      final surveyCompleted = userData['surveyCompleted'] ?? false;
+
+      if (userType == 'Specialist') {
+        if (approvalStatus == 'rejected') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              content: AwesomeSnackbarContent(
+                title: 'Access Denied',
+                message:
+                    'Your specialist account was rejected. Please contact support.',
+                contentType: ContentType.failure,
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          return;
+        } else if (approvalStatus == 'pending') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              content: AwesomeSnackbarContent(
+                title: 'Pending Approval',
+                message: 'Your specialist account is still under review.',
+                contentType: ContentType.warning,
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
+      }
+
+      await StorageHelper.saveUserId(userId);
+      await StorageHelper.saveToken(token);
+      await StorageHelper.saveUserType(userType);
+
+      if (userType == 'Patient') {
+        await StorageHelper.saveSurveyCompleted(userId, surveyCompleted);
+        await StorageHelper.saveSurveyOnboarding(userId, false);
+
+        if (surveyCompleted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => PatientHomeScreen()),
+            (route) => false,
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => SurveyScreen()),
+          );
+        }
+      } else if (userType == 'Specialist') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SpecialistHomeScreen()),
+        );
+      }
+    } else if (state is AuthError) {
+      final errorMessage = state.message ?? 'Something went wrong';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Login Failed',
+            message: errorMessage,
+            contentType: ContentType.failure,
+          ),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   // void _showForgotPasswordDialog(BuildContext context) {

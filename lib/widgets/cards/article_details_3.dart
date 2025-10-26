@@ -53,7 +53,7 @@ class ArticleDetailPage extends StatelessWidget {
               final userId = await storage.read(key: 'userId');
 
               if (userId != null) {
-                context.read<ArticleBloc>().add(FetchAllArticles());
+                context.read<ArticleBloc>().add(FetchRecommendedArticles(userId));
               }
 
               Navigator.pop(context);

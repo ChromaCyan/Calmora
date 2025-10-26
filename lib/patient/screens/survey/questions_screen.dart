@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'dart:ui';
 import 'package:armstrong/config/global_loader.dart';
+import 'package:armstrong/widgets/charts/survey_result.dart';
 
 class QuestionScreen extends StatefulWidget {
   @override
@@ -31,9 +32,17 @@ class _QuestionScreenState extends State<QuestionScreen> {
     _checkIfSurveyCompleted();
   }
 
+  // Future<void> _loadUserId() async {
+  //   final FlutterSecureStorage storage = FlutterSecureStorage();
+  //   _userId = await storage.read(key: 'userId');
+  // }
+
   Future<void> _loadUserId() async {
     final FlutterSecureStorage storage = FlutterSecureStorage();
-    _userId = await storage.read(key: 'userId');
+    final id = await storage.read(key: 'userId');
+    setState(() {
+      _userId = id;
+    });
   }
 
   Future<void> _checkIfSurveyCompleted() async {
@@ -122,7 +131,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => PatientHomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => SurveyResultScreen(userId: _userId!),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -152,7 +163,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
       });
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final glassColor =
         isDark ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.4);
 
@@ -248,8 +261,151 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.9),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PatientHomeScreen()),
+                            );
+                          },
+                          child: Text(
+                            "Skip Survey",
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  color: colorScheme.onPrimary,
+                                ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+        ],
+      ),
+    );
+  }
+}
+
+class SurveyResultScreen extends StatelessWidget {
+  final String userId;
+
+  const SurveyResultScreen({super.key, required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final glassColor =
+        isDark ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.4);
+
+    return Scaffold(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            "images/login_bg_image.png",
+            fit: BoxFit.cover,
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+              child: Container(color: glassColor),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: glassColor.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Survey Completed!",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        SurveyScoreChart(patientId: userId),
+                        const SizedBox(height: 20),
+                        Text(
+                          "Thank you for completing the survey. \n We use this data to give you personalized articles. \n"
+                          "You can now proceed to your dashboard.",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.9),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 14),
+                    ),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PatientHomeScreen()),
+                      );
+                    },
+                    child: Text(
+                      "Continue to Dashboard",
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
