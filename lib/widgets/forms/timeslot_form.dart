@@ -206,8 +206,32 @@ class _TimeSlotPageState extends State<TimeSlotForm> {
       //   onBackPressed: () => _navigateBack(context),
       // ),
       appBar: AppBar(
-        title: Text(widget.slotId == null ? "Add Time Slot" : "Edit Time Slot",
+        elevation: 1,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+            ),
+          ),
         ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+          onPressed: () async {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(widget.slotId == null ? "Add Time Slot" : "Edit Time Slot", style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: BlocListener<TimeSlotBloc, TimeSlotState>(
         listener: (context, state) {
@@ -246,135 +270,136 @@ class _TimeSlotPageState extends State<TimeSlotForm> {
               ),
             ),
             Column(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Form(
-                      key: _formKey,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Day of the week dropdown
-                            _buildDropdown(
-                              'Select Day',
-                              _daysOfWeek,
-                              _selectedDay,
-                              (value) => setState(() => _selectedDay = value),
-                            ),
-                            const SizedBox(height: 16),
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    const SizedBox(height: 30),
+    // Removed Expanded and Center — we’ll directly use Padding and Form at the top
+    Padding(
+      padding: const EdgeInsets.all(21.0),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Select which day will you be available.",
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 15,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 10),
 
-                            // Start time
-                            _buildTimeField(
-                              'Start Time',
-                              _startTime,
-                              (value) => setState(() => _startTime = value),
-                            ),
-                            const SizedBox(height: 16),
+              // Day of the week dropdown
+              _buildDropdown(
+                'Select Day',
+                _daysOfWeek,
+                _selectedDay,
+                (value) => setState(() => _selectedDay = value),
+              ),
 
-                            // End time
-                            _buildTimeField(
-                              'End Time',
-                              _endTime,
-                              (value) => setState(() => _endTime = value),
-                            ),
-                            const SizedBox(height: 24),
+              const SizedBox(height: 25),
 
-                            // Submit Button
-                            // SizedBox(
-                            //   width: double.infinity,
-                            //   child: ElevatedButton(
-                            //     onPressed: _submitForm,
-                            //     style: ElevatedButton.styleFrom(
-                            //       padding: const EdgeInsets.symmetric(vertical: 16),
-                            //       shape: RoundedRectangleBorder(
-                            //         borderRadius: BorderRadius.circular(8),
-                            //       ),
-                            //     ),
-                            //     child: Text(
-                            //       widget.slotId == null
-                            //           ? 'Add Time Slot'
-                            //           : 'Update Time Slot',
-                            //       style: const TextStyle(
-                            //           fontSize: 16, fontWeight: FontWeight.bold),
-                            //     ),
-                            //   ),
-                            // ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: _clearForm,
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: theme.colorScheme.onPrimaryContainer,
-                                    padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(12),
-                                        bottomLeft: Radius.circular(12),
-                                      ),
-                                      side: BorderSide(
-                                        color: Colors.grey.shade500,
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Clear',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
+              Text(
+                "What time will you be available?",
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 15,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 10),
 
-                                // const SizedBox(width: 16), // space between buttons
+              // Start time
+              _buildTimeField(
+                'Start Time',
+                _startTime,
+                (value) => setState(() => _startTime = value),
+              ),
 
-                                ElevatedButton(
-                                  onPressed: _submitForm,
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: theme.colorScheme.onPrimaryContainer,
-                                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(12), 
-                                        bottomRight: Radius.circular(12),
-                                      ),
-                                      side: BorderSide(
-                                        color: Colors.grey.shade500,
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    widget.slotId == null ? 'Add Time Slot' : 'Update Time Slot',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+              const SizedBox(height: 25),
 
+              Text(
+                "What time will you no longer be available?",
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 15,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 10),
 
-                          ],
-                        ),
+              // End time
+              _buildTimeField(
+                'End Time',
+                _endTime,
+                (value) => setState(() => _endTime = value),
+              ),
+
+              const SizedBox(height: 75),
+
+              // Buttons row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _clearForm,
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(18)),
+                      ),
+                      side: BorderSide(
+                        color: Colors.grey.shade500,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      'Clear Time Slot',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 15),
+                  ElevatedButton(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(18)),
+                      ),
+                    ),
+                    child: Text(
+                      widget.slotId == null ? 'Save Time Slot' : 'Update Time Slot',
+                      style: TextStyle(
+                        color: theme.colorScheme.surface,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ],
+)
           ],
         ),
       ),
