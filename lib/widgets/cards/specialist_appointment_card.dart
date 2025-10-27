@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:armstrong/services/api.dart';
 import 'package:armstrong/specialist/screens/appointments/appointment_complete.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:armstrong/widgets/forms/reschedule_appointment_form.dart';
 
 class SpecialistAppointmentCard extends StatelessWidget {
   final Map<String, dynamic> appointment;
@@ -37,15 +39,36 @@ class SpecialistAppointmentCard extends StatelessWidget {
     return '$formattedStartTime - $formattedEndTime';
   }
 
+  void _showSnackBar(
+      BuildContext context, String title, String message, ContentType type) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: title,
+          message: message,
+          contentType: type,
+        ),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   Future<void> _acceptAppointment(
       BuildContext context, String appointmentId) async {
     try {
       await _apiRepository.acceptAppointment(appointmentId);
       onStatusChanged();
+      _showSnackBar(
+          context,
+          "Appointment Accepted",
+          "You have successfully accepted this appointment.",
+          ContentType.success);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error accepting appointment')),
-      );
+      _showSnackBar(context, "Error", "Failed to accept appointment.",
+          ContentType.failure);
     }
   }
 
@@ -54,11 +77,98 @@ class SpecialistAppointmentCard extends StatelessWidget {
     try {
       await _apiRepository.declineAppointment(appointmentId);
       onStatusChanged();
+      _showSnackBar(context, "Appointment Declined",
+          "You have declined this appointment.", ContentType.warning);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error declining appointment')),
-      );
+      _showSnackBar(context, "Error", "Failed to decline appointment.",
+          ContentType.failure);
     }
+  }
+
+  Future<void> _cancelAppointment(
+      BuildContext context, String appointmentId) async {
+    try {
+      await _apiRepository.cancelAppointment(
+          appointmentId, "specialist", "Schedule conflict");
+      onStatusChanged();
+      _showSnackBar(
+          context,
+          "Appointment Cancelled",
+          "The appointment has been successfully cancelled.",
+          ContentType.warning);
+    } catch (e) {
+      _showSnackBar(
+          context,
+          "Error",
+          "Error cancelling appointment. Please try again.",
+          ContentType.failure);
+    }
+  }
+
+  void _openRescheduleForm(
+      BuildContext context, String appointmentId, String specialistId) {
+    showDialog(
+      context: context,
+      builder: (context) => RescheduleAppointmentForm(
+        appointmentId: appointmentId,
+        specialistId: specialistId,
+        onRescheduled: onStatusChanged,
+      ),
+    );
+  }
+
+  void _onMenuSelected(
+      BuildContext context, String action, String appointmentId) {
+    switch (action) {
+      case 'accept':
+        _acceptAppointment(context, appointmentId);
+        break;
+      case 'decline':
+        _declineAppointment(context, appointmentId);
+        break;
+      case 'cancel':
+        _cancelAppointment(context, appointmentId);
+        break;
+      case 'complete':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                AppointmentCompleteScreen(appointmentId: appointmentId),
+          ),
+        ).then((_) {
+          onStatusChanged();
+        });
+        break;
+
+      case 'reschedule':
+        _openRescheduleForm(context, appointmentId, appointment['specialist']);
+        break;
+    }
+  }
+
+  List<PopupMenuEntry<String>> _buildMenuOptions(String status) {
+    if (status == 'pending') {
+      return [
+        const PopupMenuItem(value: 'accept', child: Text('Accept')),
+        const PopupMenuItem(value: 'decline', child: Text('Decline')),
+      ];
+    } else if (status == 'accepted') {
+      return [
+        const PopupMenuItem(
+            value: 'complete', child: Text('Proceed to Complete')),
+        const PopupMenuItem(value: 'reschedule', child: Text('Reschedule')),
+        const PopupMenuItem(value: 'cancel', child: Text('Cancel')),
+      ];
+    } else if (status == 'rescheduled') {
+      return [
+        const PopupMenuItem(
+            value: 'complete', child: Text('Proceed to Complete')),
+        const PopupMenuItem(value: 'reschedule', child: Text('Reschedule')),
+        const PopupMenuItem(value: 'cancel', child: Text('Cancel')),
+      ];
+    }
+    return [];
   }
 
   @override
@@ -68,14 +178,8 @@ class SpecialistAppointmentCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final specialistId =
-        appointment['specialist']; // This is the ID, not the object
-    final specialistName = specialistId != null
-        ? 'Loading Specialist...' // You should show a loading indicator or fetch specialist details from an API
-        : 'Specialist';
     final patient = appointment['patient'];
     final patientName = '${patient['firstName']} ${patient['lastName']}';
-
     final timeSlot = appointment['timeSlot'] ?? {};
     final status = appointment['status'] ?? 'pending';
     final appointmentId = appointment['_id'];
@@ -91,15 +195,15 @@ class SpecialistAppointmentCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceVariant.withOpacity(0.4),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withOpacity(0.2)
-          ),
+          border:
+              Border.all(color: colorScheme.outlineVariant.withOpacity(0.2)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
+                // Patient Name + Status
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(screenWidth * 0.02),
@@ -121,130 +225,53 @@ class SpecialistAppointmentCard extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             color: status == 'pending'
                                 ? colorScheme.tertiary
-                                : status == 'accepted'
-                                    ? colorScheme.primary
-                                    : colorScheme.error,
+                                : colorScheme.primary,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.02),
-                  child: Container(
-                    height: screenWidth * 0.15,
-                    width: screenWidth * 0.15,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: patient['profileImage'] != null &&
-                                patient['profileImage'].isNotEmpty
-                            ? NetworkImage(patient['profileImage'])
-                            : const AssetImage(
-                                    "images/no_profile3.png")
-                                as ImageProvider,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
+                // Patient Profile
+                CircleAvatar(
+                  radius: screenWidth * 0.075,
+                  backgroundImage: (patient['profileImage'] != null &&
+                          patient['profileImage'].isNotEmpty)
+                      ? NetworkImage(patient['profileImage'])
+                      : const AssetImage("images/no_profile3.png")
+                          as ImageProvider,
+                ),
+                const SizedBox(width: 2),
+                // Settings Icon for menu
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert, size: screenWidth * 0.07),
+                  onSelected: (value) =>
+                      _onMenuSelected(context, value, appointmentId),
+                  itemBuilder: (context) => _buildMenuOptions(status),
                 ),
               ],
             ),
             SizedBox(height: screenHeight * 0.01),
+            // Date and Time
             Row(
               children: [
                 Icon(Icons.calendar_today,
                     color: colorScheme.primary, size: screenWidth * 0.04),
                 SizedBox(width: screenWidth * 0.02),
-                Text(
-                  formattedStartDate,
-                  style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      color: colorScheme.onSurfaceVariant),
-                ),
+                Text(formattedStartDate,
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: colorScheme.onSurfaceVariant)),
                 SizedBox(width: screenWidth * 0.05),
                 Icon(Icons.access_time,
                     color: colorScheme.secondary, size: screenWidth * 0.04),
                 SizedBox(width: screenWidth * 0.02),
-                Text(
-                  timeRange,
-                  style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      color: colorScheme.onSurfaceVariant),
-                ),
+                Text(timeRange,
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: colorScheme.onSurfaceVariant)),
               ],
             ),
-            SizedBox(height: screenHeight * 0.015),
-            if (status == 'pending') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          _acceptAppointment(context, appointmentId),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
-                        ),
-                      ),
-                      child: Text(
-                        'Accept',
-                        style: TextStyle(
-                            color: Colors.white, fontSize: screenWidth * 0.04),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.03),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          _declineAppointment(context, appointmentId),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.error,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.02),
-                        ),
-                      ),
-                      child: Text(
-                        'Decline',
-                        style: TextStyle(
-                            color: Colors.white, fontSize: screenWidth * 0.04),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (status == 'accepted') ...[
-              SizedBox(height: screenHeight * 0.015),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AppointmentCompleteScreen(
-                          appointmentId: appointmentId),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                  ),
-                ),
-                child: Text(
-                  'Proceed to Complete',
-                  style: TextStyle(
-                      color: Colors.white, fontSize: screenWidth * 0.04),
-                ),
-              ),
-            ],
           ],
         ),
       ),

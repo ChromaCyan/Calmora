@@ -77,6 +77,8 @@ class _ChatScreenState extends State<ChatScreen> {
       _socketService.registerUserRoom(userId);
       _socketService.joinChatRoom(widget.chatId);
 
+      _socketService.currentChatId = widget.chatId;
+
       _socketService.markChatAsRead(widget.chatId, userId);
 
       _socketService.onMessageReceived = (message) {
@@ -245,6 +247,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    _socketService.onMessageReceived = null;
+    _socketService.onMessageDelivered = null;
+    _socketService.onMessageRead = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
@@ -253,6 +263,7 @@ class _ChatScreenState extends State<ChatScreen> {
       onWillPop: () async {
         if (_userId != null) {
           // Leave the chat room
+          _socketService.currentChatId = null;
           _socketService.leaveChatRoom(widget.chatId);
           print("🚪 Left chat room ${widget.chatId}");
 
