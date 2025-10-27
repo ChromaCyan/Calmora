@@ -42,132 +42,116 @@ class HotlinesScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _confirmAndLaunchPhone(
-    BuildContext context,
-    String name,
-    String phoneNumber,
-  ) async {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
+Future<void> _confirmAndLaunchPhone(
+  BuildContext context,
+  String name,
+  String phoneNumber,
+) async {
+  final theme = Theme.of(context);
+  final scheme = theme.colorScheme;
 
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Dialog(
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          backgroundColor: Colors.transparent,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: scheme.surface.withOpacity(0.65),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: scheme.outlineVariant.withOpacity(0.3),
-                    width: 1.2,
+  final bool? confirmed = await showDialog<bool>(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(35),
+        ),
+        backgroundColor: scheme.surface,
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              Padding(
+                padding:
+                    const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 8),
+                child: Text(
+                  'Call $name?',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 🧠 Call Icon
-                    Text(
-                      'Call $name?',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: scheme.onSurface,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Description
-                    Text(
-                      'You’ll be redirected to your Phone app with:\n\n📞 $phoneNumber',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        fontSize: 15,
-                        height: 1.5,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-                    const Divider(height: 1, thickness: 0.6),
-
-                    // Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            style: TextButton.styleFrom(
-                              foregroundColor: scheme.error,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            child: Text(
-                              "Cancel",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: scheme.error,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 0.8,
-                          height: 48,
-                          color: scheme.outlineVariant.withOpacity(0.3),
-                        ),
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              foregroundColor: scheme.primary,
-                            ),
-                            child: Text(
-                              "Proceed",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: scheme.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-          ),
-        );
-      },
-    );
 
-    if (confirmed == true) {
-      _launchPhone(phoneNumber);
-    }
+              // Message
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                child: Text(
+                  'You’ll be redirected to your Phone app with:\n\n📞 $phoneNumber',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              const Divider(height: 20, thickness: 0.5),
+
+              // Action buttons (Cupertino-style)
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(13)),
+                      onTap: () => Navigator.of(context).pop(false),
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 0.5,
+                    height: 44,
+                    color: Colors.grey.withOpacity(0.4),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(13)),
+                      splashColor: Colors.green.shade700.withOpacity(0.3),
+                      onTap: () => Navigator.of(context).pop(true),
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'Proceed',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  if (confirmed == true) {
+    _launchPhone(phoneNumber);
   }
+}
 
   @override
   Widget build(BuildContext context) {
