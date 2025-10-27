@@ -68,22 +68,84 @@ class _SpecialistRegistrationScreenState
   // Register button state
   final ValueNotifier<bool> isRegisterButtonEnabled = ValueNotifier(false);
 
-  InputDecoration customInputDecoration(String label, BuildContext context) {
-    final theme = Theme.of(context);
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: theme.colorScheme.onSurface),
-      filled: false,
-      fillColor: Colors.transparent,
-      enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
+  // InputDecoration customInputDecoration(String label, BuildContext context) {
+  //   final theme = Theme.of(context);
+  //   return InputDecoration(
+  //     labelText: label,
+  //     labelStyle: TextStyle(color: theme.colorScheme.onSurface),
+  //     filled: false,
+  //     fillColor: Colors.transparent,
+  //     enabledBorder: UnderlineInputBorder(
+  //       borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
+  //     ),
+  //     focusedBorder: UnderlineInputBorder(
+  //       borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+  //     ),
+  //     contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+  //   );
+  // }
+
+InputDecoration customInputDecoration(
+  String label,
+  BuildContext context, {
+  Widget? suffixIcon,
+  bool showError = false,
+}) {
+  final theme = Theme.of(context);
+  final isDarkMode = theme.brightness == Brightness.dark;
+
+  return InputDecoration(
+    labelText: label,
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    labelStyle: TextStyle(
+      color: isDarkMode
+          ? Colors.white.withOpacity(0.6)
+          : Colors.black.withOpacity(0.6),
+    ),
+    floatingLabelStyle: TextStyle(
+      color: isDarkMode ? Colors.white70 : Colors.black87,
+    ),
+
+    filled: true,
+    fillColor: theme.colorScheme.background.withOpacity(0.6),
+
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(25),
+      borderSide: const BorderSide(
+        color: Colors.transparent,
+        width: 1,
       ),
-      focusedBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(25),
+      borderSide: BorderSide(
+        color: showError ? Colors.red : Colors.transparent,
+        width: 1,
       ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-    );
-  }
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(25),
+      borderSide: const BorderSide(
+        color: Colors.red,
+        width: 1,
+      ),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(25),
+      borderSide: const BorderSide(
+        color: Colors.red,
+        width: 1,
+      ),
+    ),
+
+    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+    suffixIcon: suffixIcon,
+    suffixIconConstraints: const BoxConstraints(
+      minWidth: 40,
+      minHeight: 40,
+    ),
+  );
+}
 
   void _checkFields() {
     final isValidEmail = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
@@ -286,7 +348,7 @@ Welcome to Calmora! By using this app, you agree to the following:
           elevation: 0,
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.transparent,
-          content: const AwesomeSnackbarContent(
+          content: AwesomeSnackbarContent(
             title: 'Missing Fields!',
             message: 'Please fill out all required fields before proceeding.',
             contentType: ContentType.warning,
@@ -418,6 +480,7 @@ Welcome to Calmora! By using this app, you agree to the following:
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -487,15 +550,12 @@ Welcome to Calmora! By using this app, you agree to the following:
                       return GlobalLoader.loader;
                     }
 
-                    return SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 100, horizontal: 30),
-                      child: Form(
-                        key: _formKey,
+                    return SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 60), // Top spacing for title
                             Text(
                               "Create Your Account",
                               style: Theme.of(context)
@@ -504,10 +564,24 @@ Welcome to Calmora! By using this app, you agree to the following:
                                   ?.copyWith(fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 40),
-                            _buildStep(_currentStep),
-                            const SizedBox(height: 35),
-                            _buildStepperNavigationButtons(),
+                            const SizedBox(height: 30),
+
+                            // Scrollable step content
+                            Expanded(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Form(
+                                  key: _formKey,
+                                  child: _buildStep(_currentStep),
+                                ),
+                              ),
+                            ),
+
+                            // Fixed bottom buttons
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20, top: 10),
+                              child: _buildStepperNavigationButtons(),
+                            ),
                           ],
                         ),
                       ),
@@ -522,103 +596,117 @@ Welcome to Calmora! By using this app, you agree to the following:
 
   Widget _buildStepperNavigationButtons() {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLastStep = _currentStep == _totalSteps - 1;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Back Button
-        if (_currentStep > 0)
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  _currentStep--;
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              ),
-              icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: colorScheme.onPrimary),
-              label: Text(
-                "Back",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimary),
-              ),
-            ),
-          )
-        else
-          const SizedBox(width: 20),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final buttonWidth = screenWidth > 400 ? 180.0 : screenWidth * 0.38; // adaptive
+        final buttonHeight = 50.0;
 
-        const SizedBox(width: 20),
-
-        // Next or Sign Up Button
-        if (_currentStep < _totalSteps - 1)
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  _currentStep++;
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              ),
-              label: Text(
-                "Next",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimary),
-              ),
-              icon: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: colorScheme.onPrimary),
-            ),
-          )
-        else
-          Expanded(
-            child: ValueListenableBuilder<bool>(
-              valueListenable: isRegisterButtonEnabled,
-              builder: (context, isEnabled, child) {
-                return ElevatedButton(
-                  onPressed: isEnabled ? _onRegisterButtonPressed : null,
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 🡐 Back Button
+            if (_currentStep > 0)
+              SizedBox(
+                width: buttonWidth,
+                height: buttonHeight,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _currentStep--;
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     shadowColor: Colors.transparent,
-                    backgroundColor:
-                        isEnabled ? colorScheme.primary : Colors.grey,
-                    foregroundColor: isEnabled
-                        ? colorScheme.primary
-                        : Colors.black45,
+                    backgroundColor: colorScheme.surfaceVariant,
+                    // foregroundColor: colorScheme.onSurfaceVariant,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(18),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 15),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
-                  child: Text(
-                    "Sign up",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimary
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      size: 18, color: colorScheme.onSurfaceVariant),
+                  label: Text(
+                    "Back",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              )
+            else
+              SizedBox(width: buttonWidth),
+
+            const SizedBox(width: 20),
+
+            // 🡒 Next or Sign Up Button
+            SizedBox(
+              width: buttonWidth,
+              height: buttonHeight,
+              child: ValueListenableBuilder<bool>(
+                valueListenable: isRegisterButtonEnabled,
+                builder: (context, isEnabled, child) {
+                  final isEnabledNow = isLastStep ? isEnabled && _isAgreed : true;
+                  return ElevatedButton(
+                    onPressed: isEnabledNow
+                        ? () {
+                            if (isLastStep) {
+                              _onRegisterButtonPressed();
+                            } else {
+                              setState(() {
+                                _currentStep++;
+                              });
+                            }
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      backgroundColor: isEnabledNow
+                          ? colorScheme.primary
+                          : colorScheme.onSurface.withOpacity(0.12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          isLastStep ? "Sign Up" : "Next",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: colorScheme.onPrimary,
+                          ),
                         ),
-                  ),
-                );
-              },
+                        const SizedBox(width: 8), // spacing between text and icon
+                        Icon(
+                          isLastStep
+                              ? Icons.check_circle_outline_rounded
+                              : Icons.arrow_forward_ios_rounded,
+                          size: 20,
+                          color: colorScheme.onPrimary,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -638,21 +726,21 @@ Welcome to Calmora! By using this app, you agree to the following:
               focusNode: _firstNameFocus,
               onChanged: (_) => _checkFields(),
             ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
             CustomTextField(
               label: "Last Name",
               controller: _lastNameController,
               focusNode: _lastNameFocus,
               onChanged: (_) => _checkFields(),
             ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
             CustomTextField(
               label: "Email",
               controller: _emailController,
               focusNode: _emailFocus,
               onChanged: (_) => _checkFields(),
             ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
             CustomTextField(
               label: "Phone Number",
               controller: _phoneNumberController,
@@ -660,7 +748,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               keyboardtype: TextInputType.phone,
               onChanged: (_) => _checkFields(),
             ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               value: _genderController.text.isNotEmpty
                   ? _genderController.text
@@ -671,6 +759,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
+                  borderRadius: BorderRadius.circular(25),
               items: genderOptions.map((option) {
                 return DropdownMenuItem<String>(
                   value: option["value"],
@@ -702,6 +791,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
+                  borderRadius: BorderRadius.circular(25),
               items: specializationOptions.map((value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -724,6 +814,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
+                  borderRadius: BorderRadius.circular(25),
               items: locationOptions.map((value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -735,9 +826,9 @@ Welcome to Calmora! By using this app, you agree to the following:
                 _checkFields();
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 55),
             ElevatedButton.icon(
-              icon: Icon(Icons.location_pin, color: colorScheme.onPrimary),
+              icon: Icon(Icons.location_pin, color: colorScheme.primary),
               label: Text(
                 _clinicLocationString != null
                     ? "Location Picked: $_clinicLocationString"
@@ -745,7 +836,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onPrimary
+                      color: colorScheme.primary
                     ),
               ),
               onPressed: () async {
@@ -784,10 +875,10 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 shadowColor: Colors.transparent,
-                backgroundColor: colorScheme.primary,
+                backgroundColor: colorScheme.primary.withOpacity(0.1),
                 foregroundColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(25),
                 ),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -949,7 +1040,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   padding:
                       const EdgeInsets.symmetric(vertical: 14, horizontal: 16),

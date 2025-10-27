@@ -635,7 +635,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Text(
                                               "LOG OUT", 
                                               style: GoogleFonts.montserrat(
-                                                color: theme.colorScheme.surface,
+                                                color: Colors.white,
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 15,
                                               ),

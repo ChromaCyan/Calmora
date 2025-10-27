@@ -157,7 +157,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                   // Cancel button
                   Expanded(
                     child: InkWell(
-                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(13)),
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20)),
                       onTap: () => Navigator.pop(context),
                       child: Container(
                         alignment: Alignment.center,
@@ -184,7 +184,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
                   // Delete button
                   Expanded(
                     child: InkWell(
-                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(13)),
+                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(20)),
                       splashColor: Colors.red.shade700.withOpacity(0.2),
                       onTap: () {
                         Navigator.pop(context);
@@ -398,6 +398,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
 
 // Sample helper for building slot tile
   Widget _buildSlotTile(TimeSlotModel slot) {
+    final theme = Theme.of(context);
     String formatTime(String time) {
       final parsed = DateFormat("HH:mm").parse(time);
       return DateFormat("h:mm a").format(parsed);
@@ -409,7 +410,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: theme.colorScheme.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(25),
         border: Border.all(color: Colors.white.withOpacity(0.15)),
       ),
@@ -426,11 +427,11 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
           spacing: 4,
           children: [
             IconButton(
-              icon: const Icon(Icons.edit, size: 22),
+              icon: Icon(Icons.edit, size: 22,),
               onPressed: () => _navigateToEditSlot(slot),
             ),
             IconButton(
-              icon: const Icon(Icons.delete, size: 22),
+              icon: Icon(Icons.delete, size: 22, color: Colors.red.shade700,),
               onPressed: () => _confirmDeleteSlot(slot.id),
             ),
           ],

@@ -450,7 +450,7 @@ class _SpecialistArticleDetailPageState
                   child: InkWell(
                     onTap: () => Navigator.pop(context),
                     borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(13),
+                      bottomLeft: Radius.circular(20),
                     ),
                     child: Container(
                       alignment: Alignment.center,
@@ -479,7 +479,7 @@ class _SpecialistArticleDetailPageState
                       Navigator.pop(context, true);
                     },
                     borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(13),
+                      bottomRight: Radius.circular(20),
                     ),
                     child: Container(
                       alignment: Alignment.center,
