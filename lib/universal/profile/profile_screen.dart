@@ -615,24 +615,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                       // Logout Button
                                       Center(
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            await _logout(context);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            elevation: 0,
-                                            shadowColor: Colors.transparent,
-                                            minimumSize: Size(screenWidth * 0.4,
-                                                40), 
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                        child: SizedBox(
+                                          height: 55,
+                                          width: 150,
+                                          child: ElevatedButton(
+                                            onPressed: () async {
+                                              await _logout(context);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              elevation: 0,
+                                              shadowColor: Colors.transparent,
+                                              minimumSize: Size(screenWidth * 0.4, 40), 
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
+                                              backgroundColor: Colors.red.shade700,
+                                              foregroundColor: Colors.white,
+                                              padding: const EdgeInsets.symmetric(
+                                                  vertical: 12),
                                             ),
-                                            backgroundColor: Colors.red,
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 12),
+                                            child: Text(
+                                              "LOG OUT", 
+                                              style: GoogleFonts.montserrat(
+                                                color: theme.colorScheme.surface,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15,
+                                              ),
+                                            ), 
                                           ),
-                                          child: Text("Logout", style: TextStyle(fontSize: buttonFontSize)), 
                                         ),
                                       ),
                                       const SizedBox(height: 30),

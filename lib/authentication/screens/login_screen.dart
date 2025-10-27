@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // --- BG Image stays fixed ---
@@ -119,19 +119,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                 topRight: Radius.circular(75),
                               ),
                               child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                                 child: Container(
                                   width: double.infinity,
-                                  padding: EdgeInsets.only(
-                                    left: 36,
-                                    right: 36,
-                                    top: 32,
-                                    bottom: MediaQuery.of(context)
-                                            .viewInsets
-                                            .bottom +
-                                        32,
-                                  ),
+                                  // padding: EdgeInsets.only(
+                                  //   left: 36,
+                                  //   right: 36,
+                                  //   top: 32,
+                                  //   bottom: MediaQuery.of(context)
+                                  //           .viewInsets
+                                  //           .bottom +
+                                  //       32,
+                                  // ),
+                                  
+                                  padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 32),
+
                                   decoration: BoxDecoration(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -165,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(height: 30),
+        // const SizedBox(height: 10),
         Text(
           "LOG IN",
           style: GoogleFonts.montserrat(
@@ -180,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
           controller: emailController,
           obscureText: false,
         ),
-        const SizedBox(height: 24),
+        // const SizedBox(height: 10),
         CustomTextField(
           label: "Password:",
           controller: passwordController,
@@ -190,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => setState(() => _obscureText = !_obscureText),
           ),
         ),
-        const SizedBox(height: 16),
+        // const SizedBox(height: 5),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
@@ -210,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 45),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -234,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 30),
+        // const SizedBox(height: 10),
         ValueListenableBuilder<bool>(
           valueListenable: isButtonEnabled,
           builder: (context, isEnabled, child) {

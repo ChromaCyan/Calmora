@@ -176,12 +176,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
               const Divider(
                 thickness: 1.5,
                 color: Colors.grey,
                 indent: 40,
                 endIndent: 40,
               ),
+              const SizedBox(height: 10),
 
               SizedBox(
                 width: double.infinity,
@@ -211,7 +213,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
-                    backgroundColor: Colors.red, 
+                    backgroundColor: Colors.red.shade700, 
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -234,13 +236,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
               const Divider(
                 thickness: 1.5,
                 color: Colors.grey,
                 indent: 40,
                 endIndent: 40,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 20),
               Center(
                 child: Text(
                   'What is this app about?',
