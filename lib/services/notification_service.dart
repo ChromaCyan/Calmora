@@ -7,6 +7,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+
+  static FlutterLocalNotificationsPlugin get flutterLocalNotifications =>
+      _localNotifications;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   final String baseUrl = 'http://192.168.18.253:5000/api';
 
@@ -29,29 +32,31 @@ class NotificationService {
         ?.requestNotificationsPermission();
   }
 
-  // Show local notification
-  static Future<void> showNotification(String title, String message) async {
-    const AndroidNotificationDetails androidDetails =
+  // Show local notification with payload
+  static Future<void> showNotification(
+      String title, String message, Map<String, dynamic> payload) async {
+    final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
       'channel_id',
       'Notifications',
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
+      styleInformation: BigTextStyleInformation(message, contentTitle: title),
     );
 
-    const NotificationDetails platformDetails =
+    final NotificationDetails platformDetails =
         NotificationDetails(android: androidDetails);
 
     await _localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch % 100000, 
+      DateTime.now().millisecondsSinceEpoch % 100000,
       title,
       message,
       platformDetails,
+      payload: jsonEncode(payload), // <-- This is key for navigation
     );
   }
 
-  // Fetch notifications from the server
   Future<void> fetchAndDisplayNotifications(String userId) async {
     try {
       final token = await _storage.read(key: 'token');
@@ -72,7 +77,12 @@ class NotificationService {
         for (var notification in notifications) {
           String title = notification["title"] ?? "New Notification";
           String message = notification["message"] ?? "You have a new update!";
-          showNotification(title, message);
+
+          // Pass payload as 3rd argument
+          showNotification(title, message, {
+            "type": notification["type"] ?? "general",
+            "id": notification["id"] ?? "",
+          });
         }
       } else {
         print("❌ Failed to load notifications: ${response.body}");

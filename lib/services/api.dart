@@ -1007,7 +1007,7 @@ class ApiRepository {
   // Mark a notification as read
   Future<void> markNotificationAsRead(String notificationId) async {
     final token = await _storage.read(key: 'token');
-    final url = Uri.parse('$baseUrl/notification/mark-read/$notificationId');
+    final url = Uri.parse('$baseUrl/notification/$notificationId/read');
 
     final response = await http.put(
       url,

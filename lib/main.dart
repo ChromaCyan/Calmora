@@ -18,6 +18,11 @@ import 'dart:async';
 import 'services/supabase.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'services/socket_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:convert';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +39,19 @@ void main() async {
   bool hasCompletedSurvey = false;
   bool surveyOnboardingCompleted = false;
 
+  // Get the notification that opened the app
+  final NotificationAppLaunchDetails? notificationLaunchDetails =
+      await NotificationService.flutterLocalNotifications
+          .getNotificationAppLaunchDetails();
+
+  Map<String, dynamic>? initialPayload;
+  if (notificationLaunchDetails?.didNotificationLaunchApp ?? false) {
+    if (notificationLaunchDetails!.notificationResponse?.payload != null) {
+      initialPayload = Map<String, dynamic>.from(
+          jsonDecode(notificationLaunchDetails.notificationResponse!.payload!));
+    }
+  }
+
   if (token != null) {
     try {
       final jwt = JWT.verify(token, SecretKey('your_jwt_secret_key'));
@@ -44,7 +62,8 @@ void main() async {
       if (token != null && role == 'Patient') {
         hasCompletedSurvey = hasCompletedSurveyFromJWT;
         surveyOnboardingCompleted =
-            await storage.read(key: 'survey_onboarding_completed_$userId') == 'true';
+            await storage.read(key: 'survey_onboarding_completed_$userId') ==
+                'true';
       }
     } catch (e) {
       print('Invalid token: $e');
@@ -57,7 +76,10 @@ void main() async {
   // Setup EasyLoading globally
   _setupEasyLoading();
 
+  SocketService().navigatorKey = navigatorKey;
+
   runApp(MyApp(
+    initialNotificationPayload: initialPayload,
     isLoggedIn: token != null,
     role: role,
     onboardingCompleted: onboardingCompleted,
@@ -87,6 +109,7 @@ class MyApp extends StatelessWidget {
   final bool onboardingCompleted;
   final bool hasCompletedSurvey;
   final bool surveyOnboardingCompleted;
+  final Map<String, dynamic>? initialNotificationPayload; 
 
   const MyApp({
     super.key,
@@ -95,6 +118,7 @@ class MyApp extends StatelessWidget {
     required this.onboardingCompleted,
     required this.hasCompletedSurvey,
     required this.surveyOnboardingCompleted,
+    this.initialNotificationPayload,
   });
 
   @override
@@ -110,6 +134,7 @@ class MyApp extends StatelessWidget {
         ],
         child: ShowCaseWidget(
           builder: (context) => MaterialApp(
+            navigatorKey: navigatorKey,
             title: 'Armstrong',
             theme: AppTheme.light.copyWith(
               textTheme: AppTheme.light.textTheme.apply(

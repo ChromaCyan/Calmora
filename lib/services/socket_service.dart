@@ -1,26 +1,23 @@
-import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
+import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
+import 'package:armstrong/universal/chat/screen/chat_screen.dart';
+import 'package:armstrong/services/notification_service.dart';
 
 class SocketService {
+  // Singleton setup
   static final SocketService _instance = SocketService._internal();
   factory SocketService() => _instance;
   SocketService._internal();
 
+  // Socket and callbacks
   IO.Socket? socket;
-  String? currentChatId;
-
-  // Callbacks for specific screens
   Function(Map<String, dynamic>)? onMessageReceived;
   Function(Map<String, dynamic>)? onNotificationReceived;
-  Function(Map<String, dynamic>)? onMessageDelivered;
-  Function(Map<String, dynamic>)? onMessageRead;
-
-  // 🔥 Stream for global notification listeners (badge, etc.)
-  final StreamController<Map<String, dynamic>> _notificationController =
-      StreamController<Map<String, dynamic>>.broadcast();
-  Stream<Map<String, dynamic>> get notificationStream =>
-      _notificationController.stream;
+  GlobalKey<NavigatorState>? navigatorKey;
 
   // Local notifications
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -28,22 +25,69 @@ class SocketService {
 
   /// Initialize local notifications
   Future<void> initNotifications() async {
-    const androidSettings =
+    print("🔔 Initializing Local Notifications...");
+
+    const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    final settings = InitializationSettings(android: androidSettings);
+
+    final InitializationSettings settings =
+        InitializationSettings(android: androidSettings);
 
     await _localNotifications.initialize(
       settings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {},
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload != null && navigatorKey != null) {
+          final payloadMap =
+              Map<String, dynamic>.from(jsonDecode(response.payload!));
+          final type = payloadMap["type"];
+
+          switch (type) {
+            case "chat":
+              navigatorKey!.currentState!.push(MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  chatId: payloadMap["chatId"],
+                  recipientId: payloadMap["senderId"],
+                  recipientName:
+                      "${payloadMap["senderFirstName"]} ${payloadMap["senderLastName"]}",
+                ),
+              ));
+              break;
+
+            case "appointment":
+              final userRole = payloadMap["role"];
+              if (userRole == "Patient") {
+                navigatorKey!.currentState!.push(MaterialPageRoute(
+                  builder: (_) => PatientHomeScreen(initialTabIndex: 3),
+                ));
+              } else if (userRole == "Specialist") {
+                navigatorKey!.currentState!.push(MaterialPageRoute(
+                  builder: (_) => SpecialistHomeScreen(initialTabIndex: 4),
+                ));
+              }
+              break;
+
+            case "article":
+              navigatorKey!.currentState!.push(MaterialPageRoute(
+                builder: (_) => SpecialistHomeScreen(initialTabIndex: 1),
+              ));
+              break;
+
+            default:
+              break;
+          }
+        }
+      },
     );
   }
 
   /// Show local notification
-  Future<void> showNotification(String title, String body) async {
-    final androidDetails = AndroidNotificationDetails(
+  Future<void> showNotification(
+      String title, String body, Map<String, dynamic> payload) async {
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
       'chat_channel',
       'Chat Notifications',
-      channelDescription: 'Messages and updates from Calmora',
+      channelDescription: 'Messages from your chats',
       importance: Importance.max,
       priority: Priority.high,
       playSound: true,
@@ -51,18 +95,29 @@ class SocketService {
       styleInformation: BigTextStyleInformation(body, contentTitle: title),
     );
 
-    final details = NotificationDetails(android: androidDetails);
+    final NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
 
-    await _localNotifications.show(
-      0,
+    // ⚡ Pass payload as JSON string
+    await NotificationService.flutterLocalNotifications.show(
+      DateTime.now().millisecondsSinceEpoch % 100000,
       title,
       body,
-      details,
+      platformDetails,
+      payload: jsonEncode(payload), 
     );
+  }
+
+  String? _activeChatId;
+
+  void setActiveChat(String? chatId) {
+    _activeChatId = chatId;
+    print("🟩 Active chat set to: $_activeChatId");
   }
 
   /// Connect to the Socket.IO server
   void connect(String token, String userId) {
+    // Avoid reconnecting if already connected
     if (socket != null && socket!.connected) return;
 
     socket = IO.io(
@@ -78,74 +133,71 @@ class SocketService {
 
     socket!.onConnect((_) {
       print('✅ Connected to Socket.IO server');
-      registerUserRoom(userId);
+      joinRoom(userId); // Join user's personal room
     });
 
     socket!.onDisconnect((_) => print('❌ Disconnected from server'));
     socket!.onError((error) => print('⚠️ Socket error: $error'));
     socket!.onReconnect((_) => print('🔄 Reconnecting to server...'));
 
-    // 🔹 Receive message
+    // Incoming message listener
     socket!.on('receiveMessage', (data) {
-      final message = Map<String, dynamic>.from(data);
-      print('📩 Received message: $message');
-      onMessageReceived?.call(message);
+      print('📩 Received message: $data');
+      onMessageReceived?.call(Map<String, dynamic>.from(data));
+
+      final chatId = data["chatId"];
+      final senderName =
+          "${data["senderFirstName"] ?? ""} ${data["senderLastName"] ?? ""}"
+              .trim();
+      final messageContent = data["content"] ?? "You have a new message";
+
+      // 🧠 Only show system notification if the message is for a different chat
+      if (_activeChatId == null || _activeChatId != chatId) {
+        if (_activeChatId == null || _activeChatId != chatId) {
+          showNotification(senderName, messageContent, {
+            "type": "chat",
+            "chatId": chatId,
+            "senderId": data["senderId"],
+            "senderFirstName": data["senderFirstName"],
+            "senderLastName": data["senderLastName"],
+          });
+        }
+      } else {
+        print(
+            "💬 Message belongs to active chat ($_activeChatId), skipping system notification.");
+      }
     });
 
-    // 🔹 Message delivered acknowledgment
-    socket!.on('messageDelivered', (data) {
-      final deliveredData = Map<String, dynamic>.from(data);
-      print('📬 Message delivered: $deliveredData');
-      onMessageDelivered?.call(deliveredData);
-    });
-
-    // 🔹 Message read update
-    socket!.on('messageReadUpdate', (data) {
-      final readData = Map<String, dynamic>.from(data);
-      print('👀 Message read update: $readData');
-      onMessageRead?.call(readData);
-    });
-
-    // 🔹 New notification (only triggered if recipient not in chat)
     socket!.on('new_notification', (data) {
-      final notification = Map<String, dynamic>.from(data);
-      print("🔔 New Notification: $notification");
+      final Map<String, dynamic> notification = Map<String, dynamic>.from(data);
 
-      // Skip if already in the chat being notified about
-      if (notification['chatId'] == currentChatId) {
-        print("💬 Skipping notification — already in chat ${currentChatId}");
-        return;
-      }
-
-      final type = notification["type"] ?? "general";
+      String type = notification["type"] ?? "general";
       String title = "Notification";
-      String body = notification["message"] ?? "You have a new message";
+      String body = notification["message"] ?? "You have a new notification";
 
-      if (type == "chat") {
-        final senderName =
-            "${notification["senderFirstName"] ?? ""} ${notification["senderLastName"] ?? ""}".trim();
-        title = "New Message";
-        body = senderName.isNotEmpty
-            ? "$senderName: ${notification["message"]}"
-            : notification["message"];
+      switch (type) {
+        case "chat":
+          title = "New Message";
+          body =
+              "${notification["senderFirstName"]} ${notification["senderLastName"]}: ${notification["message"]}";
+          break;
+        case "appointment":
+          title = "Appointment Update";
+          break;
+        case "article":
+          title = "Article Update";
+          break;
       }
 
-      // Local notification popup
-      showNotification(title, body);
-
-      // 🔥 Broadcast event globally (for unread badge, etc.)
-      _notificationController.add(notification);
-
-      // Trigger screen-specific callback if assigned
+      NotificationService.showNotification(title, body);
       onNotificationReceived?.call(notification);
     });
   }
 
-  /// Send message
+  /// Send a message
   void sendMessage(
       String senderId, String recipientId, String message, String chatId) {
     if (socket == null || !socket!.connected) return;
-    print("📤 Sending message: $message");
     socket!.emit('sendMessage', {
       'senderId': senderId,
       'recipientId': recipientId,
@@ -154,17 +206,12 @@ class SocketService {
     });
   }
 
-  /// Emit read receipt
-  void markMessageAsRead(String chatId, String readerId) {
+  /// Join a chat room
+  void joinRoom(String roomId) {
     if (socket == null || !socket!.connected) return;
-    print("👀 Emitting messageRead for chat: $chatId by $readerId");
-    socket!.emit('messageRead', {
-      'chatId': chatId,
-      'readerId': readerId,
-    });
+    socket!.emit('joinRoom', roomId);
   }
 
-  /// Join chat room
   void joinChatRoom(String chatId) {
     if (socket != null && socket!.connected) {
       socket!.emit('joinRoom', chatId);
@@ -179,37 +226,17 @@ class SocketService {
     }
   }
 
-  /// Register user for personal notifications
   void registerUserRoom(String userId) {
     if (socket != null && socket!.connected) {
       socket!.emit('registerUser', userId);
-      print("✅ Registered to personal room $userId");
+      print("✅ Registered to personal room $userId for notifications");
     }
   }
 
-  void joinPersonalRoom(String userId) {
-    if (socket != null && socket!.connected) {
-      socket!.emit('registerUser', userId);
-      print("👤 Rejoined personal room: $userId");
-    }
-  }
-
-  void markChatAsRead(String chatId, String userId) {
-    if (socket != null && socket!.connected) {
-      print("👀 Marking chat $chatId as read by $userId");
-      socket!.emit('messageRead', {'chatId': chatId, 'readerId': userId});
-    }
-  }
-
-  /// Disconnect
+  /// Disconnect from server
   void disconnect() {
     if (socket != null && socket!.connected) {
       socket!.disconnect();
     }
-  }
-
-  /// Dispose the controller safely
-  void dispose() {
-    _notificationController.close();
   }
 }

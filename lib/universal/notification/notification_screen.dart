@@ -5,6 +5,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:ui';
 import 'package:armstrong/config/global_loader.dart';
 import 'package:armstrong/config/global_error.dart';
+import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
+import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:armstrong/helpers/storage_helpers.dart';
+import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   @override
@@ -20,11 +25,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool hasError = false;
   String? _userId;
   String selectedCategory = 'unread';
+  String? _role;
 
   @override
   void initState() {
     super.initState();
     _initializeNotifications();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final role = await _storage.read(key: 'userType');
+    setState(() => _role = role);
   }
 
   Future<void> _initializeNotifications() async {
@@ -106,8 +118,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Icons.arrow_back_ios_new_rounded,
             color: Theme.of(context).colorScheme.onPrimaryContainer,
           ),
-          onPressed: _markAllAsReadAndExit,
+          onPressed: () => Navigator.pop(context), // 👈 only go back
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.done_all_rounded, color: Colors.greenAccent),
+            tooltip: 'Mark all as read',
+            onPressed: _markAllAsReadAndExit, // 👈 manual trigger
+          ),
+        ],
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -141,7 +160,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     : hasError
                         ? GlobalErrorWidget(
                             onRetry: () async {
-                              await fetchNotifications(); 
+                              await fetchNotifications();
                             },
                             message: "Failed to load notifications",
                           )
@@ -157,17 +176,85 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   await fetchNotifications();
                                 },
                                 child: ListView.builder(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  itemCount: displayedNotifications.length,
-                                  itemBuilder: (context, index) {
-                                    return NotificationCard(
-                                      notification:
-                                          displayedNotifications[index],
-                                    );
-                                  },
-                                ),
-                              ),
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    itemCount: displayedNotifications.length,
+                                    itemBuilder: (context, index) {
+                                      final notif =
+                                          displayedNotifications[index];
+
+                                      return NotificationCard(
+                                        notification: notif,
+                                        onMarkAsRead: () async {
+                                          try {
+                                            await apiService
+                                                .markNotificationAsRead(
+                                                    notif["_id"]);
+                                            setState(
+                                                () => notif["isRead"] = true);
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      "Failed to mark as read")),
+                                            );
+                                          }
+                                        },
+                                        onTap: () async {
+                                          // Mark as read if unread
+                                          if (notif["isRead"] == false) {
+                                            await apiService
+                                                .markNotificationAsRead(
+                                                    notif["_id"]);
+                                            setState(
+                                                () => notif["isRead"] = true);
+                                          }
+
+                                          if (notif["type"] == "chat") {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ChatScreen(
+                                                  chatId: notif["chatId"],
+                                                  recipientId:
+                                                      notif["senderId"],
+                                                  recipientName:
+                                                      "${notif["senderFirstName"]} ${notif["senderLastName"]}",
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          int? tabIndex;
+
+                                          if (_role == "Patient") {
+                                            if (notif["type"] ==
+                                                "appointment") {
+                                              tabIndex = 3; // Appointments
+                                            } else {
+                                              tabIndex = null;
+                                            }
+                                          } else if (_role == "Specialist") {
+                                            if (notif["type"] == "article") {
+                                              tabIndex = 1;
+                                            } else if (notif["type"] ==
+                                                "appointment") {
+                                              tabIndex =
+                                                  4; // Appointments for specialist
+                                            }
+                                          }
+
+                                          if (tabIndex != null) {
+                                            Navigator.pop(context,
+                                                tabIndex); // Return tab index
+                                          } else {
+                                            Navigator.pop(context);
+                                          }
+                                        },
+                                      );
+                                    })),
               )
             ],
           ),

@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 class NotificationCard extends StatelessWidget {
   final Map<String, dynamic> notification;
+  final VoidCallback? onMarkAsRead;
+  final VoidCallback? onTap;
 
-  const NotificationCard({Key? key, required this.notification})
-      : super(key: key);
+  const NotificationCard({
+    Key? key,
+    required this.notification,
+    this.onMarkAsRead,
+    this.onTap,
+  }) : super(key: key);
 
   IconData _getIcon(String type) {
     switch (type) {
@@ -31,57 +37,57 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isRead = notification['isRead'] == true;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-      decoration: BoxDecoration(
-        color: theme.cardColor.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.brightness == Brightness.dark
-              ? Colors.white.withOpacity(0.3)
-              : Colors.black.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+    return InkWell(
+      onTap: onTap, // 👈 make entire card tappable
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        decoration: BoxDecoration(
+          color: theme.cardColor.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.brightness == Brightness.dark
+                ? Colors.white.withOpacity(0.3)
+                : Colors.black.withOpacity(0.2),
+            width: 1,
           ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: CircleAvatar(
-          backgroundColor: _getColor(notification['type']),
-          child: Icon(_getIcon(notification['type']), color: Colors.white),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
-        title: Text(
-          notification['message'],
-          style: TextStyle(
-            fontWeight:
-                notification['isRead'] ? FontWeight.normal : FontWeight.bold,
-            color: theme.colorScheme.onSurface,
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundColor: _getColor(notification['type']),
+            child: Icon(_getIcon(notification['type']), color: Colors.white),
           ),
-        ),
-        subtitle: Text(
-          _formatDate(notification['createdAt']),
-          style: TextStyle(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          title: Text(
+            notification['message'],
+            style: TextStyle(
+              fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
-        ),
-        trailing: notification['isRead']
-            ? null
-            : Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
+          subtitle: Text(
+            _formatDate(notification['createdAt']),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+          trailing: isRead
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.check_circle_outline,
+                      color: Colors.greenAccent),
+                  onPressed: onMarkAsRead,
                 ),
-              ),
+        ),
       ),
     );
   }

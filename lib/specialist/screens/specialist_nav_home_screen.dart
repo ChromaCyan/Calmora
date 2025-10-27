@@ -15,7 +15,8 @@ import 'dart:ui';
 import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistHomeScreen extends StatefulWidget {
-  const SpecialistHomeScreen({Key? key}) : super(key: key);
+  final int initialTabIndex;
+  const SpecialistHomeScreen({Key? key, this.initialTabIndex = 0}) : super(key: key);
 
   @override
   _SpecialistHomeScreenState createState() => _SpecialistHomeScreenState();
@@ -209,14 +210,20 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                           ),
                       ],
                     ),
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      final selectedTab = await Navigator.push<int>(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => NotificationsScreen()),
-                      ).then((_) {
-                        if (_userId != null) _fetchUnreadNotificationsCount();
-                      });
+                            builder: (_) => NotificationsScreen()),
+                      );
+
+                      if (selectedTab != null) {
+                        _onTabSelected(selectedTab);
+                      }
+
+                      // Refresh unread notifications
+                      if (_userId != null)
+                        await _fetchUnreadNotificationsCount();
                     },
                   ),
                 ],
@@ -304,5 +311,12 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
       default:
         return 'Home';
     }
+  }
+}
+
+class SpecialistNavHelper {
+  static void navigateToTab(BuildContext context, int index) {
+    final state = context.findAncestorStateOfType<_SpecialistHomeScreenState>();
+    state?._onTabSelected(index);
   }
 }

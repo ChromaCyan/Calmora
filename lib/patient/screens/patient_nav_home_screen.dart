@@ -15,7 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 
 class PatientHomeScreen extends StatefulWidget {
-  const PatientHomeScreen({Key? key}) : super(key: key);
+  final int initialTabIndex;
+  const PatientHomeScreen({Key? key, this.initialTabIndex = 0}) : super(key: key);
+
 
   @override
   _PatientHomeScreenState createState() => _PatientHomeScreenState();
@@ -263,14 +265,20 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ),
                       ],
                     ),
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      final selectedTab = await Navigator.push<int>(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => NotificationsScreen()),
-                      ).then((_) {
-                        if (_userId != null) _fetchUnreadNotificationsCount();
-                      });
+                            builder: (_) => NotificationsScreen()),
+                      );
+
+                      if (selectedTab != null) {
+                        _onTabSelected(selectedTab);
+                      }
+
+                      // Refresh unread notifications
+                      if (_userId != null)
+                        await _fetchUnreadNotificationsCount();
                     },
                   ),
                 ],
@@ -339,5 +347,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       default:
         return 'Home';
     }
+  }
+}
+
+class PatientNavHelper {
+  static void navigateToTab(BuildContext context, int index) {
+    final state = context.findAncestorStateOfType<_PatientHomeScreenState>();
+    state?._onTabSelected(index);
   }
 }
