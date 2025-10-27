@@ -151,6 +151,67 @@ class _SpecialistArticleDetailPageState
                 ),
               ),
 
+              // --- Three-dot menu button ---
+              Positioned(
+                top: 16,
+                right: 16,
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.6),
+                      child: Center(
+                        child: PopupMenuButton<String>(
+                          padding: EdgeInsets.zero, // 🔹 removes default padding
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: Colors.white,
+                            size: 20, // smaller icon
+                          ),
+                          color: Theme.of(context).colorScheme.surface,
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(23),
+                          ),
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              _navigateToEditForm(context, article);
+                            } else if (value == 'delete') {
+                              _confirmDelete(context, article.id);
+                            }
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem<String>(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_note_rounded, color: Colors.blue.shade700),
+                                  SizedBox(width: 8),
+                                  Text('Edit', style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w900),),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: Colors.red.shade700),
+                                  SizedBox(width: 8),
+                                  Text('Delete', style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w900),),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -246,9 +307,9 @@ class _SpecialistArticleDetailPageState
           ),
 
           const SizedBox(height: 24),
-          _buildEditDeleteButtons(context, article),
-                    const SizedBox(height: 20),
-          const Divider(thickness: 1, height: 24),
+          // _buildEditDeleteButtons(context, article),
+          //           const SizedBox(height: 20),
+          // const Divider(thickness: 1, height: 24),
 
           // ======= BODY CONTENT (with horizontal padding) =======
           Padding(
@@ -340,45 +401,109 @@ class _SpecialistArticleDetailPageState
   }
 
   void _confirmDelete(BuildContext context, String articleId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15), // Rounded corners
-        ),
-        title: Row(
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (context) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(35),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.warning, color: Colors.red, size: 24), // Warning icon
-            const SizedBox(width: 8),
-            const Text('Delete Article?', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to delete this article? This action cannot be undone.',
-          style: TextStyle(fontSize: 16),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.blue)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _deleteArticle(context, articleId);
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Rounded button
+            // Title
+            const Padding(
+              padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 8),
+              child: Text(
+                'Delete Article?',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
-            child: const Text('Yes, Delete', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+
+            // Message
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+              child: Text(
+                'Are you sure you want to delete this article? This action cannot be undone.',
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+            const Divider(height: 20, thickness: 0.5),
+
+            // Action buttons (Cupertino-style)
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(13),
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 0.5,
+                  height: 44,
+                  color: Colors.grey.withOpacity(0.4),
+                ),
+                Expanded(
+                  child: InkWell(
+                    splashColor: Colors.red.shade700.withOpacity(0.3),
+                    onTap: () {
+                      _deleteArticle(context, articleId);
+                      Navigator.pop(context, true);
+                    },
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(13),
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _deleteArticle(BuildContext context, String articleId) {
     context.read<ArticleBloc>().add(DeleteArticle(articleId, _specialistId!));

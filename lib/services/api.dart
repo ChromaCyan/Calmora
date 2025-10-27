@@ -601,6 +601,66 @@ class ApiRepository {
     }
   }
 
+  // Reschedule an appointment (for both Patient and Specialist)
+  Future<Map<String, dynamic>> rescheduleAppointment(
+    String appointmentId,
+    String newSlotId,
+    DateTime newDate,
+    String requestedBy, // "patient" or "specialist"
+  ) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/$appointmentId/reschedule');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'newSlotId': newSlotId,
+        'newDate': newDate.toIso8601String(),
+        'requestedBy': requestedBy,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['error'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Cancel an appointment (for both Patient and Specialist)
+  Future<Map<String, dynamic>> cancelAppointment(
+    String appointmentId,
+    String cancelledBy,
+    String reason,
+  ) async {
+    final token = await _storage.read(key: 'token');
+    final url = Uri.parse('$baseUrl/appointment/$appointmentId/cancel');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'cancelledBy': cancelledBy, // "patient" or "specialist"
+        'reason': reason,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['error'] ?? 'Unknown error occurred';
+    }
+  }
+
   /////////////////////////////////////////////////////////////////////////////////
   // Mood (API)
   // Create Mood Entry

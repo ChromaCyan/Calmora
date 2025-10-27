@@ -111,25 +111,104 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
   void _confirmDeleteSlot(String slotId) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Time Slot"),
-        content: const Text("Are you sure you want to delete this time slot?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(35),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              const Padding(
+                padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 8),
+                child: Text(
+                  'Delete Time Slot?',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              // Message
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                child: Text(
+                  'Are you sure you want to delete this time slot?',
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              const Divider(height: 20, thickness: 0.5),
+
+              // Action buttons
+              Row(
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(13)),
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Vertical divider between buttons
+                  Container(
+                    width: 0.5,
+                    height: 44,
+                    color: Colors.grey.withOpacity(0.4),
+                  ),
+
+                  // Delete button
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(13)),
+                      splashColor: Colors.red.shade700.withOpacity(0.2),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _deleteSlot(slotId);
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteSlot(slotId);
-            },
-            child: const Text(
-              "Delete",
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -331,7 +410,7 @@ class _TimeSlotListScreenState extends State<TimeSlotListScreen> {
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(25),
         border: Border.all(color: Colors.white.withOpacity(0.15)),
       ),
       child: ListTile(

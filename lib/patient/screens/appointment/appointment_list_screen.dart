@@ -82,7 +82,8 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                   .where((a) => a['status'] == 'pending')
                   .toList();
               final acceptedAppointments = allAppointments
-                  .where((a) => a['status'] == 'accepted')
+                  .where((a) =>
+                      a['status'] == 'accepted' || a['status'] == 'rescheduled')
                   .toList();
 
               final filteredAppointments = selectedCategory == 'pending'
@@ -102,21 +103,22 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                                   const AlwaysScrollableScrollPhysics(), // ensures pull works
                               children: const [
                                 SizedBox(height: 200),
-                                Center(child: Text('No appointments available.')),
+                                Center(
+                                    child: Text('No appointments available.')),
                               ],
                             )
                           : ListView.builder(
-                              physics:
-                                  const AlwaysScrollableScrollPhysics(),
+                              physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: filteredAppointments.length,
                               itemBuilder: (context, index) {
-                                final appointment =
-                                    filteredAppointments[index];
+                                final appointment = filteredAppointments[index];
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8.0),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
                                   child: AppointmentCard(
-                                      appointment: appointment),
+                                    appointment: appointment,
+                                    onUpdated: _refreshAppointments,
+                                  ),
                                 );
                               },
                             ),

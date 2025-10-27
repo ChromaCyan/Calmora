@@ -53,56 +53,53 @@ class CustomBottomNavBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                Icons.home_filled,
-                "Home",
-                0,
-                colorScheme.primary,
-                homeKey,
-                context,
-                "Dashboard with articles for understanding mental health, giving more information about the application, and recommended articles catered for you!",
-              ),
-              _buildNavItem(
-                Icons.handshake_outlined,
-                "Discover",
-                1,
-                colorScheme.primary,
-                discoverKey,
-                context,
-                "Browse for articles and specialists you can chat and book an appointment.",
-              ),
-              _buildNavItemWithBadge(
-                Icons.message_outlined,
-                "Messages",
-                2,
-                chatNotificationCount,
-                colorScheme.primary,
-                colorScheme.secondary,
-                chatKey,
-                context,
-                "View existing chats you had with a specialist, or use talk to AI chatbot Calmora!",
-              ),
-              _buildNavItemWithBadge(
-                Icons.checklist,
-                "Appointments",
-                3,
-                notificationCount,
-                colorScheme.primary,
-                colorScheme.secondary,
-                appointmentsKey,
-                context,
-                "Check your existing appointment status",
-              ),
-            ],
-          ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(
+                  Icons.home_filled,
+                  "Home",
+                  0,
+                  colorScheme.primary,
+                  homeKey,
+                  context,
+                  "Dashboard with articles for understanding mental health, giving more information about the application, and recommended articles catered for you!",
+                ),
+                _buildNavItem(
+                  Icons.handshake_outlined,
+                  "Discover",
+                  1,
+                  colorScheme.primary,
+                  discoverKey,
+                  context,
+                  "Browse for articles and specialists you can chat and book an appointment.",
+                ),
+                _buildNavItemWithBadge(
+                  Icons.message_outlined,
+                  "Messages",
+                  2,
+                  chatNotificationCount,
+                  colorScheme.primary,
+                  colorScheme.secondary,
+                  chatKey,
+                  context,
+                  "View existing chats you had with a specialist, or use talk to AI chatbot Calmora!",
+                ),
+                _buildNavItemWithBadge(
+                  Icons.checklist,
+                  "Appointments",
+                  3,
+                  notificationCount,
+                  colorScheme.primary,
+                  colorScheme.secondary,
+                  appointmentsKey,
+                  context,
+                  "Check your existing appointment status",
+                ),
+              ],
+            ),
           ),
         ),
-        
-          
-        
       ),
     );
   }
@@ -121,8 +118,14 @@ class CustomBottomNavBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        print("🩵 [TAP] Nav item tapped: $label (index=$index)");
+        print(
+            "🔍 [SHOWCASE] Current state before tap: showcaseCompleted=$showcaseCompleted");
         onItemTapped(index);
-        if (!showcaseCompleted) completeShowcase();
+        if (!showcaseCompleted) {
+          print("🧩 [SHOWCASE] Triggering completeShowcase() from $label");
+          completeShowcase();
+        }
       },
       child: Showcase(
         key: key,

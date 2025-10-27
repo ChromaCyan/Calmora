@@ -51,6 +51,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
         setState(() {
           _unreadCount++;
         });
+        print('🔔 [SOCKET] Notification received. Unread: $_unreadCount');
       };
 
       await _fetchUnreadNotificationsCount();
@@ -59,6 +60,7 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
 
   Future<void> _loadUserId() async {
     final userId = await _storage.read(key: 'userId');
+    print('📦 [LOAD] Loaded userId: $userId');
 
     setState(() {
       _userId = userId;

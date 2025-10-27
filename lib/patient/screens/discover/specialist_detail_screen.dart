@@ -50,7 +50,6 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
           child: AppointmentBookingForm(
             specialistId: specialistId,
             onBooked: () {
-              Navigator.of(context).pop(); 
             },
           ),
         );
@@ -237,14 +236,12 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                               /// Schedule Button
                               Expanded(
                                 child: ElevatedButton.icon(
-                                  onPressed: () => _bookAppointment(context, widget.specialistId),
-                                  icon: Icon(
-                                    color: theme.colorScheme.primaryContainer,
-                                    Icons.calendar_today, 
-                                    size: 22,
-                                  ),
-                                  label:  Text(
-                                    "Schedule",
+                                  onPressed: () => _bookAppointment(
+                                      context, widget.specialistId),
+                                  icon: const Icon(Icons.calendar_today,
+                                      size: 22),
+                                  label: const Text(
+                                    "Schedule Appointment",
                                     style: TextStyle(
                                       color: theme.colorScheme.primaryContainer,
                                       fontSize: 13,

@@ -3,6 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageHelper {
   static const _storage = FlutterSecureStorage();
+  static const _showcaseKey = 'showcase_completed_global';
+
+  
+  static Future<bool> getShowcaseCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_showcaseKey) ?? false;
+  }
+
+  static Future<void> saveShowcaseCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_showcaseKey, true);
+  }
 
   // ===========================
   // USER INFO
@@ -79,16 +91,6 @@ class StorageHelper {
     final value =
         await _storage.read(key: 'survey_onboarding_completed_$userId');
     return value == 'true';
-  }
-
-  static Future<void> saveShowcaseCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('showcase_completed', true);
-  }
-
-  static Future<bool> getShowcaseCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('showcase_completed') ?? false;
   }
 
   static Future<void> resetShowcase() async {

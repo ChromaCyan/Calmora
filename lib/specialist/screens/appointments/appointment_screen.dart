@@ -148,7 +148,9 @@ class _SpecialistAppointmentListScreenState
     if (selectedCategory == 'upcoming') {
       var now = DateTime.now();
       var upcomingAppointments = appointments
-          .where((appointment) => appointment['status'] == 'accepted')
+          .where((appointment) =>
+              appointment['status'] == 'accepted' ||
+              appointment['status'] == 'rescheduled')
           .map((appointment) {
         var appointmentDate = DateTime.parse(appointment['appointmentDate']);
         var startTime =
@@ -175,13 +177,15 @@ class _SpecialistAppointmentListScreenState
       if (upcomingAppointments.isNotEmpty) {
         filteredAppointments.add(upcomingAppointments.first['appointment']);
       }
+    } else if (selectedCategory == 'accepted') {
+      filteredAppointments = appointments
+          .where((appointment) =>
+              appointment['status'] == 'accepted' ||
+              appointment['status'] == 'rescheduled')
+          .toList();
     } else if (selectedCategory == 'pending') {
       filteredAppointments = appointments
           .where((appointment) => appointment['status'] == 'pending')
-          .toList();
-    } else if (selectedCategory == 'accepted') {
-      filteredAppointments = appointments
-          .where((appointment) => appointment['status'] == 'accepted')
           .toList();
     }
 

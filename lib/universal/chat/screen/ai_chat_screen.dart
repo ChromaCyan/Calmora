@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:ui';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
+import 'package:armstrong/widgets/chat/typing_indicator.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -119,26 +120,43 @@ class _AIChatScreenState extends State<AIChatScreen> {
     return _messages.length - 1;
   }
 
-  void _addUserMessage(String text) {
+  int _addUserMessage(String text) {
     final msg = {
       'content': text,
       'timestamp': DateTime.now().toIso8601String(),
       'isSender': true,
+      'status': 'sending',
     };
     setState(() {
       _messages.add(msg);
       _controller.clear();
     });
     _scrollToBottom();
+    return _messages.length - 1;
   }
 
   Future<void> _sendMessage() async {
     final content = _controller.text.trim();
     if (content.isEmpty) return;
 
-    _addUserMessage(content);
+    // 1️⃣ Add message as "sending"
+    final msgIndex = _addUserMessage(content);
 
     try {
+      // 2️⃣ Simulate sending delay (network etc.)
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Mark as delivered after 1 second
+      setState(() {
+        if (msgIndex < _messages.length) {
+          _messages[msgIndex]['status'] = 'delivered';
+        }
+      });
+
+      // 3️⃣ Once delivered, show typing indicator (Calmora typing)
+      final typingIndex = _addBotMessage('', isLoading: true);
+
+      // Call Gemini after showing typing (simulate real human timing)
       final aiResponse = await _apiRepository.askGemini(
         content,
         withVoice: _voiceModeEnabled,
@@ -146,11 +164,11 @@ class _AIChatScreenState extends State<AIChatScreen> {
       );
 
       _chatId ??= aiResponse['chatId'];
-
       final aiReply = aiResponse['reply'];
       final ttsId = aiResponse['id'];
       final ttsPending = aiResponse['ttsPending'] ?? false;
 
+      // 4️⃣ Optional voice playback
       if (_voiceModeEnabled && ttsPending && ttsId != null) {
         String? audioBase64;
         int retries = 0;
@@ -165,17 +183,31 @@ class _AIChatScreenState extends State<AIChatScreen> {
           final audioBytes = base64Decode(audioBase64);
           await _audioPlayer.stop();
           await _audioPlayer.play(BytesSource(audioBytes));
-
-          _addBotMessage(aiReply);
         } else {
           print('Audio not ready after polling.');
-
-          _addBotMessage(aiReply);
         }
-      } else {
-        _addBotMessage(aiReply);
       }
+
+      // 5️⃣ Add a short natural typing delay before response appears
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Remove typing indicator
+      setState(() {
+        if (typingIndex < _messages.length) {
+          _messages.removeAt(typingIndex);
+        }
+      });
+
+      // 6️⃣ Show Calmora's reply
+      _addBotMessage(aiReply);
     } catch (e) {
+      // 7️⃣ If API failed
+      setState(() {
+        if (msgIndex < _messages.length) {
+          _messages[msgIndex]['status'] = 'failed';
+        }
+      });
+
       _addBotMessage("Oops! Something went wrong. Please try again later.");
       print("Gemini error: $e");
     }
@@ -340,14 +372,17 @@ class _AIChatScreenState extends State<AIChatScreen> {
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final msg = _messages[index];
-                    return GestureDetector(
-                      child: ChatBubble(
-                        content: msg['content'],
-                        timestamp: _formatTimestamp(msg['timestamp']),
-                        status: 'sent',
-                        isSender: msg['isSender'],
-                        senderName: msg['isSender'] ? 'You' : 'Calmora',
-                      ),
+
+                    if (msg['isLoading'] == true) {
+                      return const TypingIndicatorBubble(senderName: "Calmora");
+                    }
+
+                    return ChatBubble(
+                      content: msg['content'],
+                      timestamp: _formatTimestamp(msg['timestamp']),
+                      status: msg['status'] ?? '',
+                      isSender: msg['isSender'],
+                      senderName: msg['isSender'] ? 'You' : 'Calmora',
                     );
                   },
                 ),
