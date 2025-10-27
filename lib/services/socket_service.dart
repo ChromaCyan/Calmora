@@ -6,6 +6,7 @@ import 'package:armstrong/patient/screens/patient_nav_home_screen.dart';
 import 'package:armstrong/specialist/screens/specialist_nav_home_screen.dart';
 import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 import 'package:armstrong/services/notification_service.dart';
+import 'package:armstrong/universal/notification/notification_screen.dart';
 
 class SocketService {
   // Singleton setup
@@ -39,10 +40,12 @@ class SocketService {
         if (response.payload != null && navigatorKey != null) {
           final payloadMap =
               Map<String, dynamic>.from(jsonDecode(response.payload!));
+
           final type = payloadMap["type"];
 
-          switch (type) {
-            case "chat":
+          // Always navigate safely from anywhere
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (type == "chat") {
               navigatorKey!.currentState!.push(MaterialPageRoute(
                 builder: (_) => ChatScreen(
                   chatId: payloadMap["chatId"],
@@ -51,9 +54,7 @@ class SocketService {
                       "${payloadMap["senderFirstName"]} ${payloadMap["senderLastName"]}",
                 ),
               ));
-              break;
-
-            case "appointment":
+            } else if (type == "appointment") {
               final userRole = payloadMap["role"];
               if (userRole == "Patient") {
                 navigatorKey!.currentState!.push(MaterialPageRoute(
@@ -64,17 +65,17 @@ class SocketService {
                   builder: (_) => SpecialistHomeScreen(initialTabIndex: 4),
                 ));
               }
-              break;
-
-            case "article":
+            } else if (type == "article") {
               navigatorKey!.currentState!.push(MaterialPageRoute(
                 builder: (_) => SpecialistHomeScreen(initialTabIndex: 1),
               ));
-              break;
-
-            default:
-              break;
-          }
+            } else {
+              // Fallback: go to notifications screen
+              navigatorKey!.currentState!.push(MaterialPageRoute(
+                builder: (_) => NotificationsScreen(),
+              ));
+            }
+          });
         }
       },
     );
@@ -104,7 +105,7 @@ class SocketService {
       title,
       body,
       platformDetails,
-      payload: jsonEncode(payload), 
+      payload: jsonEncode(payload),
     );
   }
 
@@ -189,7 +190,7 @@ class SocketService {
           break;
       }
 
-      NotificationService.showNotification(title, body);
+      NotificationService.showNotification(title, body, {});
       onNotificationReceived?.call(notification);
     });
   }

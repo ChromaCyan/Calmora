@@ -12,6 +12,9 @@ import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:armstrong/universal/chat/screen/chat_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
+  final void Function(int unreadCount)? onUnreadCountChanged;
+  NotificationsScreen({this.onUnreadCountChanged});
+
   @override
   _NotificationsScreenState createState() => _NotificationsScreenState();
 }
@@ -78,8 +81,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           notification["isRead"] = true;
         }
       });
+
+      if (widget.onUnreadCountChanged != null) {
+        widget.onUnreadCountChanged!(0); // all read
+      }
     }
-    Navigator.pop(context, 0);
+
+    Navigator.pop(context, 0); // optional
   }
 
   @override
@@ -118,7 +126,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Icons.arrow_back_ios_new_rounded,
             color: Theme.of(context).colorScheme.onPrimaryContainer,
           ),
-          onPressed: () => Navigator.pop(context), // 👈 only go back
+          onPressed: () {
+            final unreadCount = notifications.where((n) => !n["isRead"]).length;
+            Navigator.pop(context); 
+          },
         ),
         actions: [
           IconButton(
@@ -192,6 +203,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                                     notif["_id"]);
                                             setState(
                                                 () => notif["isRead"] = true);
+
+                                            // Immediately update unread badge
+                                            final unreadCount = notifications
+                                                .where((n) => !n["isRead"])
+                                                .length;
+                                            if (widget.onUnreadCountChanged !=
+                                                null) {
+                                              widget.onUnreadCountChanged!(
+                                                  unreadCount);
+                                            }
                                           } catch (e) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(

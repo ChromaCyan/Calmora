@@ -16,8 +16,8 @@ import 'package:armstrong/helpers/storage_helpers.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final int initialTabIndex;
-  const PatientHomeScreen({Key? key, this.initialTabIndex = 0}) : super(key: key);
-
+  const PatientHomeScreen({Key? key, this.initialTabIndex = 0})
+      : super(key: key);
 
   @override
   _PatientHomeScreenState createState() => _PatientHomeScreenState();
@@ -265,20 +265,23 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ),
                       ],
                     ),
-                    onPressed: () async {
-                      final selectedTab = await Navigator.push<int>(
+                    onPressed: () {
+                      Navigator.push<int>(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => NotificationsScreen()),
-                      );
-
-                      if (selectedTab != null) {
-                        _onTabSelected(selectedTab);
-                      }
-
-                      // Refresh unread notifications
-                      if (_userId != null)
-                        await _fetchUnreadNotificationsCount();
+                          builder: (_) => NotificationsScreen(
+                            onUnreadCountChanged: (count) {
+                              setState(() {
+                                _unreadCount = count; // instant badge update
+                              });
+                            },
+                          ),
+                        ),
+                      ).then((selectedTab) {
+                        if (selectedTab != null) {
+                          _onTabSelected(selectedTab);
+                        }
+                      });
                     },
                   ),
                 ],

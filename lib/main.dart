@@ -21,6 +21,7 @@ import 'package:armstrong/config/global_loader.dart';
 import 'services/socket_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
+import 'package:armstrong/universal/notification/notification_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -43,14 +44,8 @@ void main() async {
   final NotificationAppLaunchDetails? notificationLaunchDetails =
       await NotificationService.flutterLocalNotifications
           .getNotificationAppLaunchDetails();
-
-  Map<String, dynamic>? initialPayload;
-  if (notificationLaunchDetails?.didNotificationLaunchApp ?? false) {
-    if (notificationLaunchDetails!.notificationResponse?.payload != null) {
-      initialPayload = Map<String, dynamic>.from(
-          jsonDecode(notificationLaunchDetails.notificationResponse!.payload!));
-    }
-  }
+  bool openedFromNotification =
+      notificationLaunchDetails?.didNotificationLaunchApp ?? false;
 
   if (token != null) {
     try {
@@ -79,7 +74,7 @@ void main() async {
   SocketService().navigatorKey = navigatorKey;
 
   runApp(MyApp(
-    initialNotificationPayload: initialPayload,
+    openedFromNotification: openedFromNotification,
     isLoggedIn: token != null,
     role: role,
     onboardingCompleted: onboardingCompleted,
@@ -109,7 +104,7 @@ class MyApp extends StatelessWidget {
   final bool onboardingCompleted;
   final bool hasCompletedSurvey;
   final bool surveyOnboardingCompleted;
-  final Map<String, dynamic>? initialNotificationPayload; 
+  final bool openedFromNotification;
 
   const MyApp({
     super.key,
@@ -118,7 +113,7 @@ class MyApp extends StatelessWidget {
     required this.onboardingCompleted,
     required this.hasCompletedSurvey,
     required this.surveyOnboardingCompleted,
-    this.initialNotificationPayload,
+    this.openedFromNotification = false,
   });
 
   @override
@@ -159,11 +154,24 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _getInitialScreen() {
-    if (!isLoggedIn) {
-      return const LoginScreen();
-    } else {
-      return _getHomeScreen(role);
+    if (!isLoggedIn) return const LoginScreen();
+    Widget home = _getHomeScreen(role);
+    if (openedFromNotification) {
+      return Navigator(
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (_) => home,
+            settings: settings,
+          );
+        },
+        observers: [],
+        pages: [
+          MaterialPage(child: home),
+          MaterialPage(child: NotificationsScreen()),
+        ],
+      );
     }
+    return home;
   }
 
   Widget _getHomeScreen(String? role) {

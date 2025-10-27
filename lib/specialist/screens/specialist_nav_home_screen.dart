@@ -16,7 +16,8 @@ import 'package:armstrong/config/global_loader.dart';
 
 class SpecialistHomeScreen extends StatefulWidget {
   final int initialTabIndex;
-  const SpecialistHomeScreen({Key? key, this.initialTabIndex = 0}) : super(key: key);
+  const SpecialistHomeScreen({Key? key, this.initialTabIndex = 0})
+      : super(key: key);
 
   @override
   _SpecialistHomeScreenState createState() => _SpecialistHomeScreenState();
@@ -210,20 +211,23 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                           ),
                       ],
                     ),
-                    onPressed: () async {
-                      final selectedTab = await Navigator.push<int>(
+                    onPressed: () {
+                      Navigator.push<int>(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => NotificationsScreen()),
-                      );
-
-                      if (selectedTab != null) {
-                        _onTabSelected(selectedTab);
-                      }
-
-                      // Refresh unread notifications
-                      if (_userId != null)
-                        await _fetchUnreadNotificationsCount();
+                          builder: (_) => NotificationsScreen(
+                            onUnreadCountChanged: (count) {
+                              setState(() {
+                                _unreadCount = count; // instant badge update
+                              });
+                            },
+                          ),
+                        ),
+                      ).then((selectedTab) {
+                        if (selectedTab != null) {
+                          _onTabSelected(selectedTab);
+                        }
+                      });
                     },
                   ),
                 ],
