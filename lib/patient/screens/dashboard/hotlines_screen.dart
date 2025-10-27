@@ -99,7 +99,7 @@ Future<void> _confirmAndLaunchPhone(
                 children: [
                   Expanded(
                     child: InkWell(
-                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(13)),
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20)),
                       onTap: () => Navigator.of(context).pop(false),
                       child: Container(
                         alignment: Alignment.center,
@@ -122,7 +122,7 @@ Future<void> _confirmAndLaunchPhone(
                   ),
                   Expanded(
                     child: InkWell(
-                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(13)),
+                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(20)),
                       splashColor: Colors.green.shade700.withOpacity(0.3),
                       onTap: () => Navigator.of(context).pop(true),
                       child: Container(

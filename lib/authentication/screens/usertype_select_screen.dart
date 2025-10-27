@@ -395,7 +395,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     minimumSize:
                                         const Size(double.infinity, 60),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(25),
                                     ),
                                     backgroundColor:
                                         colorScheme.primary,
@@ -471,7 +471,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     minimumSize:
                                         const Size(double.infinity, 60),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(25),
                                     ),
                                     backgroundColor:
                                         colorScheme.primary,
