@@ -220,6 +220,7 @@ flutter:
     - images/hotline_icon2.png
     - images/hotline_cover_image.png
     - images/ai.png
+    - images/background3.jpg
 
     # Fonts Assets
   fonts:
