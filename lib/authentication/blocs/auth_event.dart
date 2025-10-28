@@ -13,6 +13,7 @@ class RegisterEvent extends AuthEvent {
   final String phoneNumber;
   final String gender;
   final String? profileImage;
+  final String otp; 
   final Map<String, dynamic> otherDetails;
 
   RegisterEvent({
@@ -23,6 +24,7 @@ class RegisterEvent extends AuthEvent {
     required this.phoneNumber,
     required this.gender,
     this.profileImage,
+    required this.otp, 
     required this.otherDetails,
   });
 
@@ -35,6 +37,7 @@ class RegisterEvent extends AuthEvent {
         phoneNumber,
         gender,
         profileImage,
+        otp,
         otherDetails,
       ];
 }
@@ -59,4 +62,13 @@ class VerifyOtpEvent extends AuthEvent {
 
   @override
   List<Object?> get props => [email, otp];
+}
+
+class SendVerificationOtpEvent extends AuthEvent {
+  final String email;
+
+  SendVerificationOtpEvent({required this.email});
+
+  @override
+  List<Object?> get props => [email];
 }

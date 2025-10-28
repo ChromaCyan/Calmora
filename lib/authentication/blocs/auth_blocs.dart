@@ -10,6 +10,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_onRegister);
     on<LoginEvent>(_onLogin);
     on<VerifyOtpEvent>(_onVerifyOtp);
+    on<SendVerificationOtpEvent>(_onSendVerificationOtp);
   }
 
   Future<void> _onRegister(RegisterEvent event, Emitter<AuthState> emit) async {
@@ -23,6 +24,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.phoneNumber,
         event.gender,
         event.profileImage ?? "",
+        event.otp,
         event.otherDetails,
       );
       emit(AuthSuccess(userData: userData));
@@ -53,6 +55,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(OtpVerified(verificationDetails: verificationDetails));
     } catch (e) {
       print("Login failed with error: $e");
+      emit(AuthError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onSendVerificationOtp(
+      SendVerificationOtpEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final response = await apiRepository.sendVerificationOTP(event.email);
+      emit(OtpSent(message: response['message'] ?? 'OTP sent successfully.'));
+    } catch (e) {
       emit(AuthError(message: e.toString()));
     }
   }

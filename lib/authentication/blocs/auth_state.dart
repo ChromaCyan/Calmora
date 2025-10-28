@@ -35,3 +35,12 @@ class OtpVerified extends AuthState {
   @override
   List<Object?> get props => [verificationDetails];
 }
+
+class OtpSent extends AuthState {
+  final String message;
+
+  OtpSent({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -32,6 +32,7 @@ class ApiRepository {
     String phoneNumber,
     String gender,
     String profileImage,
+    String otp,
     Map<String, dynamic> otherDetails,
   ) async {
     final url = Uri.parse('$baseUrl/auth/register');
@@ -46,6 +47,7 @@ class ApiRepository {
         'phoneNumber': phoneNumber,
         'gender': gender,
         'profileImage': profileImage,
+        'otp': otp,
         ...otherDetails,
       }),
     );
@@ -55,6 +57,25 @@ class ApiRepository {
     } else {
       final errorData = jsonDecode(response.body);
       throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Send Verification OTP (Before Registration)
+  Future<Map<String, dynamic>> sendVerificationOTP(String email) async {
+    final url = Uri.parse('$baseUrl/auth/send-verification-otp');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email.toLowerCase()}),
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Failed to send verification OTP';
     }
   }
 

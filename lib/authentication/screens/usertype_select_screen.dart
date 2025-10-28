@@ -243,47 +243,47 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
 
     // Will go to registration if all shit are good..
-    final event = isPatient
-        ? RegisterEvent(
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            email: _emailController.text,
-            phoneNumber: _phoneNumberController.text,
-            gender: _genderController.text,
-            password: password,
-            otherDetails: {
-              "dateOfBirth": _dateOfBirthController.text,
-              if (_emergencyContactNameController.text.isNotEmpty)
-                "emergencyContactName": _emergencyContactNameController.text,
-              if (_emergencyContactPhoneController.text.isNotEmpty)
-                "emergencyContactPhone": _emergencyContactPhoneController.text,
-              if (_emergencyContactRelationController.text.isNotEmpty)
-                "emergencyContactRelation":
-                    _emergencyContactRelationController.text,
-              if (_medicalHistoryController.text.isNotEmpty)
-                "medicalHistory": _medicalHistoryController.text,
-              if (_therapyGoalsController.text.isNotEmpty)
-                "therapyGoals": _therapyGoalsController.text,
-            },
-            profileImage: '',
-          )
-        : RegisterEvent(
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            email: _emailController.text,
-            phoneNumber: _phoneNumberController.text,
-            gender: _genderController.text,
-            password: password,
-            otherDetails: {
-              "specialization": _specializationController.text,
-              "location": _locationController.text,
-              "clinic": _clinicController.text,
-              "licenseNumber": _licenseNumberController.text,
-            },
-            profileImage: '',
-          );
+    // final event = isPatient
+    //     ? RegisterEvent(
+    //         firstName: _firstNameController.text,
+    //         lastName: _lastNameController.text,
+    //         email: _emailController.text,
+    //         phoneNumber: _phoneNumberController.text,
+    //         gender: _genderController.text,
+    //         password: password,
+    //         otherDetails: {
+    //           "dateOfBirth": _dateOfBirthController.text,
+    //           if (_emergencyContactNameController.text.isNotEmpty)
+    //             "emergencyContactName": _emergencyContactNameController.text,
+    //           if (_emergencyContactPhoneController.text.isNotEmpty)
+    //             "emergencyContactPhone": _emergencyContactPhoneController.text,
+    //           if (_emergencyContactRelationController.text.isNotEmpty)
+    //             "emergencyContactRelation":
+    //                 _emergencyContactRelationController.text,
+    //           if (_medicalHistoryController.text.isNotEmpty)
+    //             "medicalHistory": _medicalHistoryController.text,
+    //           if (_therapyGoalsController.text.isNotEmpty)
+    //             "therapyGoals": _therapyGoalsController.text,
+    //         },
+    //         profileImage: '',
+    //       )
+    //     : RegisterEvent(
+    //         firstName: _firstNameController.text,
+    //         lastName: _lastNameController.text,
+    //         email: _emailController.text,
+    //         phoneNumber: _phoneNumberController.text,
+    //         gender: _genderController.text,
+    //         password: password,
+    //         otherDetails: {
+    //           "specialization": _specializationController.text,
+    //           "location": _locationController.text,
+    //           "clinic": _clinicController.text,
+    //           "licenseNumber": _licenseNumberController.text,
+    //         },
+    //         profileImage: '',
+    //       );
 
-    BlocProvider.of<AuthBloc>(context).add(event);
+    // BlocProvider.of<AuthBloc>(context).add(event);
   }
 
 // <---Frontend part--->
@@ -292,24 +292,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-      //     color: colorScheme.onSurface, // adjust color for visibility
-      //     onPressed: () {
-      //       Navigator.of(context).pop();
-      //     },
-      //   ),
-      // ),
-      // extendBodyBehindAppBar: true,
       body: Stack(
         fit: StackFit.expand,
         children: [
           /// Background image
           Image.asset(
-            "images/login_bg_image.png", // <-- replace with your asset path
+            "images/login_bg_image.png", 
             fit: BoxFit.cover,
           ),
 

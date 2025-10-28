@@ -10,6 +10,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:armstrong/services/supabase.dart';
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:armstrong/widgets/cards/map_picker.dart';
 import 'package:geocoding/geocoding.dart';
@@ -36,8 +37,11 @@ class _SpecialistRegistrationScreenState
   final _genderController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _otpSent = false;
+  final TextEditingController _otpController = TextEditingController();
 
   // Specialist-specific fields
+  final _dateOfBirthController = TextEditingController();
   final _specializationController = TextEditingController();
   final _locationController = TextEditingController();
   final _clinicController = TextEditingController();
@@ -68,84 +72,64 @@ class _SpecialistRegistrationScreenState
   // Register button state
   final ValueNotifier<bool> isRegisterButtonEnabled = ValueNotifier(false);
 
-  // InputDecoration customInputDecoration(String label, BuildContext context) {
-  //   final theme = Theme.of(context);
-  //   return InputDecoration(
-  //     labelText: label,
-  //     labelStyle: TextStyle(color: theme.colorScheme.onSurface),
-  //     filled: false,
-  //     fillColor: Colors.transparent,
-  //     enabledBorder: UnderlineInputBorder(
-  //       borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
-  //     ),
-  //     focusedBorder: UnderlineInputBorder(
-  //       borderSide: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-  //     ),
-  //     contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-  //   );
-  // }
+  InputDecoration customInputDecoration(
+    String label,
+    BuildContext context, {
+    Widget? suffixIcon,
+    bool showError = false,
+  }) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
-InputDecoration customInputDecoration(
-  String label,
-  BuildContext context, {
-  Widget? suffixIcon,
-  bool showError = false,
-}) {
-  final theme = Theme.of(context);
-  final isDarkMode = theme.brightness == Brightness.dark;
-
-  return InputDecoration(
-    labelText: label,
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-    labelStyle: TextStyle(
-      color: isDarkMode
-          ? Colors.white.withOpacity(0.6)
-          : Colors.black.withOpacity(0.6),
-    ),
-    floatingLabelStyle: TextStyle(
-      color: isDarkMode ? Colors.white70 : Colors.black87,
-    ),
-
-    filled: true,
-    fillColor: theme.colorScheme.background.withOpacity(0.6),
-
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(25),
-      borderSide: const BorderSide(
-        color: Colors.transparent,
-        width: 1,
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      labelStyle: TextStyle(
+        color: isDarkMode
+            ? Colors.white.withOpacity(0.6)
+            : Colors.black.withOpacity(0.6),
       ),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(25),
-      borderSide: BorderSide(
-        color: showError ? Colors.red : Colors.transparent,
-        width: 1,
+      floatingLabelStyle: TextStyle(
+        color: isDarkMode ? Colors.white70 : Colors.black87,
       ),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(25),
-      borderSide: const BorderSide(
-        color: Colors.red,
-        width: 1,
+      filled: true,
+      fillColor: theme.colorScheme.background.withOpacity(0.6),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: const BorderSide(
+          color: Colors.transparent,
+          width: 1,
+        ),
       ),
-    ),
-    focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(25),
-      borderSide: const BorderSide(
-        color: Colors.red,
-        width: 1,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: BorderSide(
+          color: showError ? Colors.red : Colors.transparent,
+          width: 1,
+        ),
       ),
-    ),
-
-    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-    suffixIcon: suffixIcon,
-    suffixIconConstraints: const BoxConstraints(
-      minWidth: 40,
-      minHeight: 40,
-    ),
-  );
-}
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: const BorderSide(
+          color: Colors.red,
+          width: 1,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: const BorderSide(
+          color: Colors.red,
+          width: 1,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      suffixIcon: suffixIcon,
+      suffixIconConstraints: const BoxConstraints(
+        minWidth: 40,
+        minHeight: 40,
+      ),
+    );
+  }
 
   void _checkFields() {
     final isValidEmail = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
@@ -156,13 +140,14 @@ InputDecoration customInputDecoration(
         _phoneNumberController.text.isNotEmpty &&
         _genderController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty;
+        _confirmPasswordController.text.isNotEmpty &&
+        _otpController.text.isNotEmpty;
 
-    final isSpecialistFieldsFilled =
+    final isSpecialistFieldsFilled = _dateOfBirthController.text.isNotEmpty &&
         _specializationController.text.isNotEmpty &&
-            _locationController.text.isNotEmpty &&
-            _clinicLocation != null &&
-            _licenseImage != null;
+        _locationController.text.isNotEmpty &&
+        _clinicLocation != null &&
+        _licenseImage != null;
 
     isRegisterButtonEnabled.value =
         isCommonFieldsFilled && isSpecialistFieldsFilled && _isAgreed;
@@ -328,6 +313,25 @@ Welcome to Calmora! By using this app, you agree to the following:
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime minAllowedDate = DateTime(1900);
+    final DateTime maxAllowedDate = DateTime(now.year - 16, now.month, now.day);
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: maxAllowedDate,
+      firstDate: minAllowedDate,
+      lastDate: maxAllowedDate,
+    );
+
+    if (pickedDate != null) {
+      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+      _dateOfBirthController.text = formattedDate;
+      _checkFields();
+    }
+  }
+
   Future<void> _pickLicenseImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -465,12 +469,14 @@ Welcome to Calmora! By using this app, you agree to the following:
       gender: _genderController.text,
       password: password,
       otherDetails: {
+        "dateOfBirth": _dateOfBirthController.text,
         "specialization": _specializationController.text,
         "location": _locationController.text,
         "clinic": "${_clinicLocation!.latitude},${_clinicLocation!.longitude}",
         "licenseNumber": _uploadedLicenseUrl!,
       },
       profileImage: '',
+      otp: _otpController.text,
     );
 
     BlocProvider.of<AuthBloc>(context).add(event);
@@ -480,7 +486,7 @@ Welcome to Calmora! By using this app, you agree to the following:
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -579,7 +585,8 @@ Welcome to Calmora! By using this app, you agree to the following:
 
                             // Fixed bottom buttons
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 20, top: 10),
+                              padding:
+                                  const EdgeInsets.only(bottom: 20, top: 10),
                               child: _buildStepperNavigationButtons(),
                             ),
                           ],
@@ -601,7 +608,8 @@ Welcome to Calmora! By using this app, you agree to the following:
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
-        final buttonWidth = screenWidth > 400 ? 180.0 : screenWidth * 0.38; // adaptive
+        final buttonWidth =
+            screenWidth > 400 ? 180.0 : screenWidth * 0.38; // adaptive
         final buttonHeight = 50.0;
 
         return Row(
@@ -626,8 +634,8 @@ Welcome to Calmora! By using this app, you agree to the following:
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                   ),
                   icon: Icon(Icons.arrow_back_ios_new_rounded,
                       size: 18, color: colorScheme.onSurfaceVariant),
@@ -653,7 +661,8 @@ Welcome to Calmora! By using this app, you agree to the following:
               child: ValueListenableBuilder<bool>(
                 valueListenable: isRegisterButtonEnabled,
                 builder: (context, isEnabled, child) {
-                  final isEnabledNow = isLastStep ? isEnabled && _isAgreed : true;
+                  final isEnabledNow =
+                      isLastStep ? isEnabled && _isAgreed : true;
                   return ElevatedButton(
                     onPressed: isEnabledNow
                         ? () {
@@ -675,7 +684,8 @@ Welcome to Calmora! By using this app, you agree to the following:
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -690,7 +700,8 @@ Welcome to Calmora! By using this app, you agree to the following:
                             color: colorScheme.onPrimary,
                           ),
                         ),
-                        const SizedBox(width: 8), // spacing between text and icon
+                        const SizedBox(
+                            width: 8), // spacing between text and icon
                         Icon(
                           isLastStep
                               ? Icons.check_circle_outline_rounded
@@ -748,6 +759,17 @@ Welcome to Calmora! By using this app, you agree to the following:
               keyboardtype: TextInputType.phone,
               onChanged: (_) => _checkFields(),
             ),
+            GestureDetector(
+              onTap: () => _selectDate(context),
+              child: AbsorbPointer(
+                child: CustomTextField(
+                  label: "Date of Birth",
+                  controller: _dateOfBirthController,
+                  readOnly: true,
+                  onChanged: (_) => _checkFields(),
+                ),
+              ),
+            ),
             // const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               value: _genderController.text.isNotEmpty
@@ -759,7 +781,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(25),
               items: genderOptions.map((option) {
                 return DropdownMenuItem<String>(
                   value: option["value"],
@@ -791,7 +813,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(25),
               items: specializationOptions.map((value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -814,7 +836,7 @@ Welcome to Calmora! By using this app, you agree to the following:
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(25),
               items: locationOptions.map((value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -834,10 +856,9 @@ Welcome to Calmora! By using this app, you agree to the following:
                     ? "Location Picked: $_clinicLocationString"
                     : "Pick Clinic Location on Map",
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary
-                    ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary),
               ),
               onPressed: () async {
                 final LatLng? pickedLocation = await Navigator.push(
@@ -974,116 +995,220 @@ Welcome to Calmora! By using this app, you agree to the following:
         );
 
       case 3:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Step 4: Password",
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 20),
-            CustomTextField(
-              label: "Password",
-              controller: _passwordController,
-              obscureText: _obscurePassword,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+        return BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is OtpSent) {
+              setState(() {
+                _otpSent = true;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
                 ),
-                onPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
-              ),
-              onChanged: (value) {
-                _checkPasswordStrength(value);
-                _checkPasswordMatch();
-                _checkFields();
-              },
-            ),
-            Text(
-              _passwordStrength,
-              style: TextStyle(
-                color: _passwordStrength == "Strong Password ✅"
-                    ? Colors.green
-                    : Colors.red,
-              ),
-            ),
-            const SizedBox(height: 20),
-            CustomTextField(
-              label: "Confirm Password",
-              controller: _confirmPasswordController,
-              obscureText: _obscureConfirmPassword,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureConfirmPassword
-                      ? Icons.visibility
-                      : Icons.visibility_off,
+              );
+            } else if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
                 ),
-                onPressed: () => setState(
-                    () => _obscureConfirmPassword = !_obscureConfirmPassword),
-              ),
-              onChanged: (_) {
-                _checkPasswordMatch();
-                _checkFields();
-              },
-            ),
-            Text(_passwordMatchMessage,
-                style: TextStyle(color: _passwordMatchColor)),
+              );
+            }
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text("Step 4: Password",
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            // "Read Terms and Conditions" as button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _showTermsDialog,
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  shadowColor: Colors.transparent,
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              // Password field
+              CustomTextField(
+                label: "Password",
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
-                icon: Icon(Icons.description_outlined, size: 20, color: colorScheme.onPrimary),
-                label: Text(
-                  "Read Terms and Conditions",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: colorScheme.onPrimary
-                  ),
+                onChanged: (value) {
+                  _checkPasswordStrength(value);
+                  _checkPasswordMatch();
+                  _checkFields();
+                },
+              ),
+              Text(
+                _passwordStrength,
+                style: TextStyle(
+                  color: _passwordStrength == "Strong Password ✅"
+                      ? Colors.green
+                      : Colors.red,
                 ),
               ),
-            ),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 12),
+              // Confirm Password
+              CustomTextField(
+                label: "Confirm Password",
+                controller: _confirmPasswordController,
+                obscureText: _obscureConfirmPassword,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureConfirmPassword
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () => setState(
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword),
+                ),
+                onChanged: (_) {
+                  _checkPasswordMatch();
+                  _checkFields();
+                },
+              ),
+              Text(_passwordMatchMessage,
+                  style: TextStyle(color: _passwordMatchColor)),
 
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Transform.scale(
-                  scale: 1.2,
-                  child: Checkbox(
-                    value: _isAgreed,
-                    onChanged: (val) {
-                      setState(() {
-                        _isAgreed = val ?? false;
-                      });
-                      _checkFields();
-                    },
+              const SizedBox(height: 20),
+
+              // "Read Terms and Conditions" as button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _showTermsDialog,
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 16),
+                  ),
+                  icon: Icon(Icons.description_outlined,
+                      size: 20, color: colorScheme.onPrimary),
+                  label: Text(
+                    "Read Terms and Conditions",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: colorScheme.onPrimary),
                   ),
                 ),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Text(
-                    "I have read and agree to the Terms and Conditions",
-                    style: TextStyle(fontSize: 15, height: 1.3),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Checkbox and OTP section
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Transform.scale(
+                    scale: 1.2,
+                    child: Checkbox(
+                      value: _isAgreed,
+                      onChanged: (val) {
+                        setState(() {
+                          _isAgreed = val ?? false;
+                        });
+                        _checkFields();
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      "I have read and agree to the Terms and Conditions",
+                      style: TextStyle(fontSize: 15, height: 1.3),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+              CustomTextField(
+                label: "Enter OTP",
+                controller: _otpController,
+                keyboardtype: TextInputType.phone,
+                onChanged: (_) => _checkFields(),
+              ),
+              const SizedBox(height: 16),
+
+              // Send OTP Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (_emailController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                              'Please enter your email before requesting OTP.'),
+                          backgroundColor: Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Show snackbar immediately when pressed
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: const [
+                            Icon(Icons.send_outlined, color: Colors.white),
+                            SizedBox(width: 10),
+                            Expanded(
+                                child:
+                                    Text("Sending OTP \n Check your email...")),
+                          ],
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.all(12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+
+                    // ✅ Then trigger Bloc event to send OTP
+                    context.read<AuthBloc>().add(
+                          SendVerificationOtpEvent(
+                            email: _emailController.text,
+                          ),
+                        );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 16),
+                  ),
+                  icon: const Icon(Icons.email_outlined, color: Colors.white),
+                  label: const Text(
+                    "Send Email Verification OTP",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         );
 
       default:
