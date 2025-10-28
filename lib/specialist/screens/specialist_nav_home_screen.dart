@@ -212,21 +212,32 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                       ],
                     ),
                     onPressed: () {
-                      Navigator.push<int>(
+                      Navigator.push<Map<String, dynamic>>(
                         context,
                         MaterialPageRoute(
                           builder: (_) => NotificationsScreen(
                             onUnreadCountChanged: (count) {
                               setState(() {
-                                _unreadCount = count; // instant badge update
+                                _unreadCount =
+                                    count;
                               });
                             },
                           ),
                         ),
-                      ).then((selectedTab) {
-                        if (selectedTab != null) {
-                          _onTabSelected(selectedTab);
+                      ).then((result) async {
+                        if (result != null) {
+                          // Handle unread count update
+                          if (result["unreadCount"] != null) {
+                            setState(
+                                () => _unreadCount = result["unreadCount"]);
+                          }
+
+                          if (result["selectedTab"] != null) {
+                            _onTabSelected(result["selectedTab"]);
+                          }
                         }
+
+                        await _fetchUnreadNotificationsCount();
                       });
                     },
                   ),

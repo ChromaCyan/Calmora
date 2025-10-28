@@ -128,7 +128,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           onPressed: () {
             final unreadCount = notifications.where((n) => !n["isRead"]).length;
-            Navigator.pop(context); 
+            Navigator.pop(context, unreadCount);
           },
         ),
         actions: [
@@ -225,13 +225,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                         onTap: () async {
                                           // Mark as read if unread
                                           if (notif["isRead"] == false) {
-                                            await apiService
-                                                .markNotificationAsRead(
-                                                    notif["_id"]);
-                                            setState(
-                                                () => notif["isRead"] = true);
-                                          }
+                                            try {
+                                              await apiService
+                                                  .markNotificationAsRead(
+                                                      notif["_id"]);
+                                              setState(
+                                                  () => notif["isRead"] = true);
 
+                                              // Update unread badge instantly
+                                              final unreadCount = notifications
+                                                  .where((n) => !n["isRead"])
+                                                  .length;
+                                              widget.onUnreadCountChanged
+                                                  ?.call(unreadCount);
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        "Failed to mark as read")),
+                                              );
+                                            }
+                                          }
                                           if (notif["type"] == "chat") {
                                             Navigator.push(
                                               context,
@@ -253,7 +268,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                           if (_role == "Patient") {
                                             if (notif["type"] ==
                                                 "appointment") {
-                                              tabIndex = 3; // Appointments
+                                              tabIndex = 3;
                                             } else {
                                               tabIndex = null;
                                             }
@@ -262,14 +277,35 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                               tabIndex = 1;
                                             } else if (notif["type"] ==
                                                 "appointment") {
-                                              tabIndex =
-                                                  4; // Appointments for specialist
+                                              tabIndex = 4;
                                             }
                                           }
 
                                           if (tabIndex != null) {
-                                            Navigator.pop(context,
-                                                tabIndex); // Return tab index
+                                            try {
+                                              if (notif["isRead"] == false) {
+                                                await apiService
+                                                    .markNotificationAsRead(
+                                                        notif["_id"]);
+                                                setState(() =>
+                                                    notif["isRead"] = true);
+                                              }
+
+                                              final unreadCount = notifications
+                                                  .where((n) => !n["isRead"])
+                                                  .length;
+
+                                              if (widget.onUnreadCountChanged !=
+                                                  null) {
+                                                widget.onUnreadCountChanged!(
+                                                    unreadCount);
+                                              }
+
+                                              Navigator.pop(context, tabIndex);
+                                            } catch (e) {
+                                              print(
+                                                  "Failed to mark notification as read: $e");
+                                            }
                                           } else {
                                             Navigator.pop(context);
                                           }

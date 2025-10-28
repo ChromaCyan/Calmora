@@ -17,7 +17,7 @@ class SpecialistAppointmentListScreen extends StatefulWidget {
 
 class _SpecialistAppointmentListScreenState
     extends State<SpecialistAppointmentListScreen> {
-  String selectedCategory = 'upcoming';
+  String selectedCategory = 'pending';
   List<dynamic> appointments = [];
   bool isLoading = true;
   String errorMessage = '';
