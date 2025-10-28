@@ -152,6 +152,14 @@ class SocketService {
               .trim();
       final messageContent = data["content"] ?? "You have a new message";
 
+      if (data["chatId"] != null && data["_id"] != null) {
+        socket!.emit("messageDelivered", {
+          "chatId": data["chatId"],
+          "messageId": data["_id"],
+        });
+        print("📬 Sent delivery acknowledgment for message ${data["_id"]}");
+      }
+
       // 🧠 Only show system notification if the message is for a different chat
       if (_activeChatId == null || _activeChatId != chatId) {
         if (_activeChatId == null || _activeChatId != chatId) {

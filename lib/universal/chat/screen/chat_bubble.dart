@@ -93,19 +93,21 @@ class ChatBubble extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(width: 8),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    _statusText(status),
-                    key: ValueKey(status),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                      color: statusColor,
+                if (isSender && status.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      _statusText(status),
+                      key: ValueKey(status),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: statusColor,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ],

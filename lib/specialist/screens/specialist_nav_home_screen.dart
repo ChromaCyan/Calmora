@@ -212,32 +212,20 @@ class _SpecialistHomeScreenState extends State<SpecialistHomeScreen> {
                       ],
                     ),
                     onPressed: () {
-                      Navigator.push<Map<String, dynamic>>(
+                      Navigator.push<int>(
                         context,
                         MaterialPageRoute(
                           builder: (_) => NotificationsScreen(
                             onUnreadCountChanged: (count) {
-                              setState(() {
-                                _unreadCount =
-                                    count;
-                              });
+                              setState(() =>
+                                  _unreadCount = count); 
                             },
                           ),
                         ),
-                      ).then((result) async {
-                        if (result != null) {
-                          // Handle unread count update
-                          if (result["unreadCount"] != null) {
-                            setState(
-                                () => _unreadCount = result["unreadCount"]);
-                          }
-
-                          if (result["selectedTab"] != null) {
-                            _onTabSelected(result["selectedTab"]);
-                          }
+                      ).then((selectedTab) {
+                        if (selectedTab != null) {
+                          _onTabSelected(selectedTab);
                         }
-
-                        await _fetchUnreadNotificationsCount();
                       });
                     },
                   ),

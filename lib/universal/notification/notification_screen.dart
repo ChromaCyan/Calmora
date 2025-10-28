@@ -83,11 +83,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       });
 
       if (widget.onUnreadCountChanged != null) {
-        widget.onUnreadCountChanged!(0); // all read
+        widget.onUnreadCountChanged!(0);
       }
     }
 
-    Navigator.pop(context, 0); // optional
+    Navigator.pop(context); // optional
   }
 
   @override
@@ -128,7 +128,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           onPressed: () {
             final unreadCount = notifications.where((n) => !n["isRead"]).length;
-            Navigator.pop(context, unreadCount);
+            Navigator.pop(context);
           },
         ),
         actions: [

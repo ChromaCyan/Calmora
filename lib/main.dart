@@ -156,21 +156,16 @@ class MyApp extends StatelessWidget {
   Widget _getInitialScreen() {
     if (!isLoggedIn) return const LoginScreen();
     Widget home = _getHomeScreen(role);
+
     if (openedFromNotification) {
-      return Navigator(
-        onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (_) => home,
-            settings: settings,
-          );
-        },
-        observers: [],
-        pages: [
-          MaterialPage(child: home),
-          MaterialPage(child: NotificationsScreen()),
-        ],
-      );
+      // Launch after first frame, so MaterialApp and navigatorKey exist
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(builder: (_) => NotificationsScreen()),
+        );
+      });
     }
+
     return home;
   }
 

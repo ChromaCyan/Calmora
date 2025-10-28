@@ -5,6 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:armstrong/helpers/storage_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:armstrong/models/user/specialist.dart';
+import 'package:armstrong/models/user/user.dart';
 
 class ApiRepository2 {
   final String baseUrl = 'https://calmora-chat-real-time.onrender.com/api';
@@ -261,6 +263,182 @@ class ApiRepository2 {
     } else {
       final errorData = jsonDecode(response.body);
       throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Register User
+  Future<Map<String, dynamic>> registerUser(
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+    String phoneNumber,
+    String gender,
+    String profileImage,
+    String otp,
+    Map<String, dynamic> otherDetails,
+  ) async {
+    final url = Uri.parse('$baseUrl/auth/register');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'password': password,
+        'phoneNumber': phoneNumber,
+        'gender': gender,
+        'profileImage': profileImage,
+        'otp': otp,
+        ...otherDetails,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Send Verification OTP (Before Registration)
+  Future<Map<String, dynamic>> sendVerificationOTP(String email) async {
+    final url = Uri.parse('$baseUrl/auth/send-verification-otp');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email.toLowerCase()}),
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Failed to send verification OTP';
+    }
+  }
+
+  // Login User
+  Future<Map<String, dynamic>> loginUser(String email, String password) async {
+    final url = Uri.parse('$baseUrl/auth/login');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email.toLowerCase(), 'password': password}),
+    );
+
+    final data = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      final token = data['token'];
+      final userId = data['userId'];
+      final surveyCompleted = data['surveyCompleted'] ?? false;
+
+      // Save token
+      await _storage.write(key: 'token', value: token);
+
+      // Save userId
+      await _storage.write(key: 'userId', value: userId);
+
+      // Save survey completion flag (scoped to userId)
+      await StorageHelper.saveSurveyCompleted(userId, surveyCompleted);
+
+      return data;
+    } else {
+      final errorMessage = data['message'] ?? 'Failed to login';
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Verify OTP
+  Future<Map<String, dynamic>> verifyOTP(
+    String email,
+    String otp,
+  ) async {
+    final url = Uri.parse('$baseUrl/auth/verify-otp');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email, 'otp': otp}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Send OTP (Reset Password)
+  Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    final url = Uri.parse('$baseUrl/auth/forgot-password');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email.toLowerCase()}),
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Verify OTP (Reset Password)
+  Future<Map<String, dynamic>> verifyResetOTP(String email, String otp) async {
+    final url = Uri.parse('$baseUrl/auth/verify-reset-otp');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email.toLowerCase(), 'otp': otp}),
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else if (responseBody['message'] == "OTP has expired") {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
+    } else if (responseBody['message'] ==
+        "OTP expired after 3 failed attempts. Request a new one.") {
+      throw Exception("Too many failed attempts. Request a new OTP.");
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw errorData['message'] ?? 'Unknown error occurred';
+    }
+  }
+
+  // Reset Password (Only if OTP was verified)
+  Future<Map<String, dynamic>> resetPassword(
+      String email, String newPassword) async {
+    final url = Uri.parse('$baseUrl/auth/reset-password');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json
+          .encode({'email': email.toLowerCase(), 'newPassword': newPassword}),
+    );
+
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else if (responseBody['message'] ==
+        "OTP verification required before resetting password") {
+      throw Exception("Please verify OTP before resetting your password.");
+    } else {
+      throw Exception(responseBody['message'] ?? 'Failed to reset password');
     }
   }
 }
