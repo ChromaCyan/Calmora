@@ -124,7 +124,7 @@ class _ArticleListState extends State<ArticleList> {
 
     // 📰 Display articles
     return SizedBox(
-      height: 230, 
+      height: 230,
       child: RefreshIndicator(
         onRefresh: _refreshArticles,
         child: ListView.builder(
