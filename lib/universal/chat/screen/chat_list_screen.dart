@@ -26,12 +26,23 @@ class _ChatListScreenState extends State<ChatListScreen> {
   bool _isLoading = true;
   String _errorMessage = '';
   String? _role;
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
     _loadChats();
     _loadUserRole();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+
+    if (_userId != null) {}
   }
 
   Future<void> _loadUserRole() async {

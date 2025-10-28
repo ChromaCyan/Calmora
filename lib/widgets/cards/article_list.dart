@@ -1,11 +1,9 @@
-import 'package:armstrong/patient/screens/survey/questions_screen.dart';
-import 'package:armstrong/widgets/cards/article_card3.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:armstrong/universal/blocs/articles/article_bloc.dart';
+import 'package:armstrong/services/api.dart';
 import 'package:armstrong/models/article/article.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'package:armstrong/widgets/cards/article_card3.dart';
 import 'package:armstrong/patient/screens/survey/questions_screen.dart';
 
 class ArticleList extends StatefulWidget {
@@ -18,134 +16,136 @@ class ArticleList extends StatefulWidget {
 }
 
 class _ArticleListState extends State<ArticleList> {
+  final ApiRepository _apiRepository = ApiRepository();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  bool _isLoading = true;
+  String _errorMessage = '';
   String? _patientId;
+  List<Article> _articles = [];
 
   @override
   void initState() {
     super.initState();
-    _loadUserId();
+    _loadUserIdAndArticles();
   }
 
-  // Future<void> _loadUserId() async {
-  //   final storage = FlutterSecureStorage();
-  //   final userId = await storage.read(key: 'userId');
-  //   print("🔵 User ID Loaded: $userId");
+  Future<void> _loadUserIdAndArticles() async {
+    try {
+      final userId = await _storage.read(key: 'userId');
+      if (userId == null) throw 'No user found';
 
-  //   if (userId != null) {
-  //     setState(() {
-  //       _patientId = userId;
-  //     });
+      setState(() {
+        _patientId = userId;
+        _isLoading = true;
+        _errorMessage = '';
+      });
 
-  //     print("🟡 Dispatching FetchRecommendedArticles event...");
-  //     context.read<ArticleBloc>().add(FetchRecommendedArticles(userId));
-  //   }
-  // }
+      final articles = await _apiRepository.getRecommendedArticles(userId);
 
-  Future<void> _loadUserId() async {
-    final storage = FlutterSecureStorage();
-    final userId = await storage.read(key: 'userId');
-    if (!mounted) return; // ✅
-    setState(() {
-      _patientId = userId;
-    });
-    if (userId != null && mounted) {
-      context.read<ArticleBloc>().add(FetchRecommendedArticles(userId));
+      if (!mounted) return;
+      setState(() {
+        _articles = articles;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _refreshArticles() async {
+    if (_patientId != null) {
+      await _loadUserIdAndArticles();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_patientId == null) {
+    if (_isLoading) {
       return GlobalLoader.loader;
     }
 
+    // 🧠 Handle “no survey” error
+    if (_errorMessage.contains("No survey responses found")) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "You haven’t taken the mental health survey yet.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const _QuickTestButton(),
+          ],
+        ),
+      );
+    }
+
+    // 🧱 Other errors
+    if (_errorMessage.isNotEmpty) {
+      return RefreshIndicator(
+        onRefresh: _refreshArticles,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: 230,
+            child: Center(
+              child: Text(
+                "Something went wrong.\nPull down to retry.",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 🔎 Filter by search
+    final filteredArticles = _articles.where((article) {
+      return article.title
+          .toLowerCase()
+          .contains(widget.searchQuery.toLowerCase());
+    }).toList();
+
+    if (filteredArticles.isEmpty) {
+      return const Center(child: Text('No matching articles found.'));
+    }
+
+    // 📰 Display articles
     return SizedBox(
-      height: 230,
-      child: BlocBuilder<ArticleBloc, ArticleState>(
-        builder: (context, state) {
-          if (state is ArticleLoading) {
-            return GlobalLoader.loader;
-          } else if (state is ArticleError) {
-            final message = state.message;
-
-            // ✅ Check if no survey responses were found
-            if (message.contains("No survey responses found")) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "You haven’t taken the mental health survey yet.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _QuickTestButton(),
-                  ],
-                ),
-              );
-            }
-
-            // Fallback for other errors
-            return RefreshIndicator(
-              onRefresh: () async {
-                if (_patientId != null) {
-                  context
-                      .read<ArticleBloc>()
-                      .add(FetchRecommendedArticles(_patientId!));
-                }
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: SizedBox(
-                  height: 230,
-                  child: Center(
-                    child: Text(
-                      "Something went wrong. Pull down to retry.",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
+      height: 230, 
+      child: RefreshIndicator(
+        onRefresh: _refreshArticles,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: filteredArticles.length,
+          itemBuilder: (context, index) {
+            final article = filteredArticles[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: SizedBox(
+                width: 245,
+                child: ArticleCard(
+                  articleId: article.id,
+                  imageUrl: article.heroImage,
+                  title: article.title,
+                  publisher: 'By ${article.specialistName}',
                 ),
               ),
             );
-          } else if (state is ArticleLoaded) {
-            final filteredArticles = state.articles.where((article) {
-              return article.title
-                  .toLowerCase()
-                  .contains(widget.searchQuery.toLowerCase());
-            }).toList();
-
-            if (filteredArticles.isEmpty) {
-              return const Center(child: Text('No matching articles found.'));
-            }
-
-            return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: filteredArticles.length,
-              itemBuilder: (context, index) {
-                final article = filteredArticles[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: SizedBox(
-                    width: 245,
-                    child: ArticleCard(
-                      articleId: article.id,
-                      imageUrl: article.heroImage,
-                      title: article.title,
-                      publisher: 'By ${article.specialistName}',
-                    ),
-                  ),
-                );
-              },
-            );
-          } else {
-            return const Center(child: Text('No articles found.'));
-          }
-        },
+          },
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:armstrong/universal/blocs/appointment/appointment_event.dart';
 import 'package:armstrong/universal/blocs/appointment/appointment_state.dart';
 import 'package:armstrong/widgets/cards/appointment_card.dart';
 import 'package:armstrong/config/global_loader.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AppointmentListScreen extends StatefulWidget {
   final String patientId;
@@ -18,6 +19,9 @@ class AppointmentListScreen extends StatefulWidget {
 
 class _AppointmentListScreenState extends State<AppointmentListScreen> {
   String selectedCategory = 'pending';
+  String? _userId;
+
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<void> _refreshAppointments() async {
     context
@@ -29,6 +33,16 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   void initState() {
     super.initState();
     _refreshAppointments();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final userId = await _storage.read(key: 'userId');
+    setState(() {
+      _userId = userId;
+    });
+
+    if (_userId != null) {}
   }
 
   @override
