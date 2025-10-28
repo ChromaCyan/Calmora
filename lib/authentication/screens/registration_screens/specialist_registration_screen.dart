@@ -728,22 +728,10 @@ Welcome to Calmora! By using this app, you agree to the following:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("Step 1: Personal Info",
+            Text("Step 1: Your Email address and number here",
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 20),
-            CustomTextField(
-              label: "First Name",
-              controller: _firstNameController,
-              focusNode: _firstNameFocus,
-              onChanged: (_) => _checkFields(),
-            ),
-            // const SizedBox(height: 20),
-            CustomTextField(
-              label: "Last Name",
-              controller: _lastNameController,
-              focusNode: _lastNameFocus,
-              onChanged: (_) => _checkFields(),
-            ),
+            
             // const SizedBox(height: 20),
             CustomTextField(
               label: "Email",
@@ -757,6 +745,113 @@ Welcome to Calmora! By using this app, you agree to the following:
               controller: _phoneNumberController,
               focusNode: _phoneFocus,
               keyboardtype: TextInputType.phone,
+              onChanged: (_) => _checkFields(),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Tap the button to receive OTP and get verfied",
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 5),
+              
+              // Send OTP Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (_emailController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                              'Please enter your email before requesting OTP.'),
+                          backgroundColor: Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Show snackbar immediately when pressed
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.send_outlined, color: colorScheme.primaryContainer),
+                            SizedBox(width: 10),
+                            Expanded(
+                                child:
+                                    Text("Sending OTP \n Check your email...")),
+                          ],
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        elevation: 0,
+                        margin: const EdgeInsets.all(12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+
+                    // ✅ Then trigger Bloc event to send OTP
+                    context.read<AuthBloc>().add(
+                          SendVerificationOtpEvent(
+                            email: _emailController.text,
+                          ),
+                        );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    backgroundColor: colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 16),
+                  ),
+                  icon: Icon(Icons.email_outlined, color: colorScheme.primaryContainer),
+                  label: Text(
+                    "Send Email Verification OTP",
+                    style: TextStyle(
+                      color: colorScheme.primaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                label: "Enter OTP",
+                controller: _otpController,
+                keyboardtype: TextInputType.phone,
+                onChanged: (_) => _checkFields(),
+              ),
+          ],
+        );
+
+      case 1:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text("Step 2: Your Personal Information here",
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 20),
+            CustomTextField(
+              label: "First Name",
+              controller: _firstNameController,
+              focusNode: _firstNameFocus,
+              onChanged: (_) => _checkFields(),
+            ),
+            // const SizedBox(height: 20),
+            CustomTextField(
+              label: "Last Name",
+              controller: _lastNameController,
+              focusNode: _lastNameFocus,
               onChanged: (_) => _checkFields(),
             ),
             GestureDetector(
@@ -793,14 +888,15 @@ Welcome to Calmora! By using this app, you agree to the following:
                 _checkFields();
               },
             ),
+            
           ],
         );
 
-      case 1:
+      case 2:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("Step 2: Specialization & Clinic",
+            Text("Step 3: Your Specialization and Clinic Location",
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
@@ -825,95 +921,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                 _checkFields();
               },
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              value: _locationController.text.isNotEmpty
-                  ? _locationController.text
-                  : null,
-              decoration: customInputDecoration("Location", context),
-              icon: const Icon(Icons.arrow_drop_down_rounded),
-              dropdownColor: Theme.of(context).colorScheme.surface,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              borderRadius: BorderRadius.circular(25),
-              items: locationOptions.map((value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() => _locationController.text = value!);
-                _checkFields();
-              },
-            ),
-            const SizedBox(height: 55),
-            ElevatedButton.icon(
-              icon: Icon(Icons.location_pin, color: colorScheme.primary),
-              label: Text(
-                _clinicLocationString != null
-                    ? "Location Picked: $_clinicLocationString"
-                    : "Pick Clinic Location on Map",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary),
-              ),
-              onPressed: () async {
-                final LatLng? pickedLocation = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MapPickerScreen()),
-                );
 
-                if (pickedLocation != null) {
-                  String readableAddress =
-                      "${pickedLocation.latitude},${pickedLocation.longitude}";
-
-                  try {
-                    final placemarks = await placemarkFromCoordinates(
-                      pickedLocation.latitude,
-                      pickedLocation.longitude,
-                    );
-                    if (placemarks.isNotEmpty) {
-                      final place = placemarks.first;
-                      readableAddress =
-                          "${place.name ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
-                    }
-                  } catch (e) {
-                    debugPrint("Error in reverse geocoding: $e");
-                  }
-
-                  setState(() {
-                    _clinicLocation = pickedLocation;
-                    _clinicLocationString = readableAddress;
-                  });
-
-                  _checkFields();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                backgroundColor: colorScheme.primary.withOpacity(0.1),
-                foregroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              ),
-            ),
-          ],
-        );
-
-      case 2:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Step 3: Upload License",
-                style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 20),
             Text("Add your license picture (Certificate, License ID)",
                 style: TextStyle(
@@ -989,6 +997,86 @@ Welcome to Calmora! By using this app, you agree to the following:
                       ),
                     ),
                 ],
+              ),
+            ),
+                        const SizedBox(height: 20),
+            DropdownButtonFormField<String>(
+              value: _locationController.text.isNotEmpty
+                  ? _locationController.text
+                  : null,
+              decoration: customInputDecoration("Location", context),
+              icon: const Icon(Icons.arrow_drop_down_rounded),
+              dropdownColor: Theme.of(context).colorScheme.surface,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+              borderRadius: BorderRadius.circular(25),
+              items: locationOptions.map((value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() => _locationController.text = value!);
+                _checkFields();
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: Icon(Icons.location_pin, color: colorScheme.primary),
+              label: Text(
+                _clinicLocationString != null
+                    ? "Location Picked: $_clinicLocationString"
+                    : "Pick Clinic Location on Map",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary),
+              ),
+              onPressed: () async {
+                final LatLng? pickedLocation = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MapPickerScreen()),
+                );
+
+                if (pickedLocation != null) {
+                  String readableAddress =
+                      "${pickedLocation.latitude},${pickedLocation.longitude}";
+
+                  try {
+                    final placemarks = await placemarkFromCoordinates(
+                      pickedLocation.latitude,
+                      pickedLocation.longitude,
+                    );
+                    if (placemarks.isNotEmpty) {
+                      final place = placemarks.first;
+                      readableAddress =
+                          "${place.name ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
+                    }
+                  } catch (e) {
+                    debugPrint("Error in reverse geocoding: $e");
+                  }
+
+                  setState(() {
+                    _clinicLocation = pickedLocation;
+                    _clinicLocationString = readableAddress;
+                  });
+
+                  _checkFields();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                backgroundColor: colorScheme.primary.withOpacity(0.1),
+                foregroundColor: colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
             ),
           ],
@@ -1131,82 +1219,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                 ],
               ),
 
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: "Enter OTP",
-                controller: _otpController,
-                keyboardtype: TextInputType.phone,
-                onChanged: (_) => _checkFields(),
-              ),
-              const SizedBox(height: 16),
-
-              // Send OTP Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    if (_emailController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                              'Please enter your email before requesting OTP.'),
-                          backgroundColor: Colors.red,
-                          behavior: SnackBarBehavior.floating,
-                          margin: const EdgeInsets.all(12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      );
-                      return;
-                    }
-
-                    // ✅ Show snackbar immediately when pressed
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: const [
-                            Icon(Icons.send_outlined, color: Colors.white),
-                            SizedBox(width: 10),
-                            Expanded(
-                                child:
-                                    Text("Sending OTP \n Check your email...")),
-                          ],
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                        margin: const EdgeInsets.all(12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-
-                    // ✅ Then trigger Bloc event to send OTP
-                    context.read<AuthBloc>().add(
-                          SendVerificationOtpEvent(
-                            email: _emailController.text,
-                          ),
-                        );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 16),
-                  ),
-                  icon: const Icon(Icons.email_outlined, color: Colors.white),
-                  label: const Text(
-                    "Send Email Verification OTP",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+              
             ],
           ),
         );

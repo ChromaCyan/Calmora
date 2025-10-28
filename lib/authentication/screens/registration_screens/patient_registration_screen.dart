@@ -662,6 +662,116 @@ Welcome to Calmora! By using this app, you agree to the following:
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 20),
             CustomTextField(
+              label: "Email",
+              controller: _emailController,
+              focusNode: _emailFocus,
+              onChanged: (_) => _checkFields(),
+            ),
+            // const SizedBox(height: 20),
+            CustomTextField(
+              label: "Phone Number",
+              controller: _phoneNumberController,
+              focusNode: _phoneFocus,
+              keyboardtype: TextInputType.phone,
+              onChanged: (_) => _checkFields(),
+            ),
+
+            const SizedBox(height: 10),
+            Text(
+              "Tap the button to receive OTP and get verfied",
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 5),
+
+            // Send OTP Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  if (_emailController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'Please enter your email before requesting OTP.'),
+                          backgroundColor: Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.all(12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Show snackbar immediately when pressed
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.send_outlined, color: colorScheme.primaryContainer),
+                            SizedBox(width: 10),
+                            Expanded(
+                                child:
+                                    Text("Sending OTP \n Check your email...")),
+                          ],
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        elevation: 0,
+                        margin: const EdgeInsets.all(12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+
+                    // ✅ Then trigger Bloc event to send OTP
+                    context.read<AuthBloc>().add(
+                          SendVerificationOtpEvent(
+                            email: _emailController.text,
+                          ),
+                        );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    backgroundColor: colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 16),
+                  ),
+                  icon: Icon(Icons.email_outlined, color: colorScheme.primaryContainer),
+                  label: Text(
+                    "Send Email Verification OTP",
+                    style: TextStyle(
+                      color: colorScheme.primaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                label: "Enter OTP",
+                controller: _otpController,
+                keyboardtype: TextInputType.phone,
+                onChanged: (_) => _checkFields(),
+              ),
+          ],
+        );
+
+      case 1:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text("Step 2: Contact Information",
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 20),
+            
+            CustomTextField(
               label: "First Name",
               controller: _firstNameController,
               focusNode: _firstNameFocus,
@@ -708,30 +818,6 @@ Welcome to Calmora! By using this app, you agree to the following:
                   onChanged: (_) => _checkFields(),
                 ),
               ),
-            ),
-          ],
-        );
-
-      case 1:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Step 2: Contact Information",
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 20),
-            CustomTextField(
-              label: "Email",
-              controller: _emailController,
-              focusNode: _emailFocus,
-              onChanged: (_) => _checkFields(),
-            ),
-            // const SizedBox(height: 20),
-            CustomTextField(
-              label: "Phone Number",
-              controller: _phoneNumberController,
-              focusNode: _phoneFocus,
-              keyboardtype: TextInputType.phone,
-              onChanged: (_) => _checkFields(),
             ),
           ],
         );
@@ -871,84 +957,7 @@ Welcome to Calmora! By using this app, you agree to the following:
                     ),
                   ),
                 ],
-              ),
-
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: "Enter OTP",
-                controller: _otpController,
-                keyboardtype: TextInputType.phone,
-                onChanged: (_) => _checkFields(),
-              ),
-              const SizedBox(height: 16),
-
-              // Send OTP Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    if (_emailController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                              'Please enter your email before requesting OTP.'),
-                          backgroundColor: Colors.red,
-                          behavior: SnackBarBehavior.floating,
-                          margin: const EdgeInsets.all(12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      );
-                      return;
-                    }
-
-                    // ✅ Show snackbar immediately when pressed
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: const [
-                            Icon(Icons.send_outlined, color: Colors.white),
-                            SizedBox(width: 10),
-                            Expanded(
-                                child:
-                                    Text("Sending OTP \n Check your email...")),
-                          ],
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                        margin: const EdgeInsets.all(12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-
-                    // ✅ Then trigger Bloc event to send OTP
-                    context.read<AuthBloc>().add(
-                          SendVerificationOtpEvent(
-                            email: _emailController.text,
-                          ),
-                        );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 16),
-                  ),
-                  icon: const Icon(Icons.email_outlined, color: Colors.white),
-                  label: const Text(
-                    "Send Email Verification OTP",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+              ),              
             ],
           ),
         );
