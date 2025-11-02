@@ -84,6 +84,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           readOnly: widget.readOnly,
           onTap: widget.onTap,
           focusNode: _focusNode,
+          keyboardType: widget.keyboardtype,
           onChanged: (value) {
             _validateField();
             if (widget.onChanged != null) widget.onChanged!(value);
