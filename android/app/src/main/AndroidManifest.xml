@@ -38,6 +38,8 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBkOkeLLzzjneBUpi8o36ujiaD-Yahu9O8"/>
+            <!-- Just replace the value above with your own Google Maps API Key
+             Example usage: AIzaSyBkOkeLLzz**************-******* -->
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

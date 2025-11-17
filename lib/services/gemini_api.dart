@@ -9,7 +9,7 @@ import 'package:armstrong/models/user/specialist.dart';
 import 'package:armstrong/models/user/user.dart';
 
 class ApiRepository2 {
-  final String baseUrl = 'https://calmora-chat-real-time.onrender.com/api';
+  final String baseUrl = 'http://localhost:3000/api'; //Replace with your own API, or API in my repository but locally modified to suit your app.
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   Future<Map<String, dynamic>> askGemini(
     String message, {

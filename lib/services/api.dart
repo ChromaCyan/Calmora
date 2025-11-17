@@ -15,9 +15,7 @@ import 'package:armstrong/models/mood/mood.dart';
 import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
-  final String baseUrl =
-      'https://armstrong-api.vercel.app/api'; //For real Vercel hosted API
-  //final String baseUrl = 'http://localhost:3000/api'; //For Vercel Dev testing
+  final String baseUrl = 'http://localhost:3000/api'; //Replace with your own API, or API in my repository but locally modified to suit your app.
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /////////////////////////////////////////////////////////////////////////////////

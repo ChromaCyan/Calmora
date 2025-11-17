@@ -238,8 +238,8 @@ class _SpecialistDetailScreenState extends State<SpecialistDetailScreen> {
                                 child: ElevatedButton.icon(
                                   onPressed: () => _bookAppointment(
                                       context, widget.specialistId),
-                                  icon: const Icon(Icons.calendar_today,
-                                      size: 22),
+                                  icon: Icon(Icons.calendar_today,
+                                      size: 22, color: theme.colorScheme.primaryContainer,),
                                   label: Text(
                                     "Schedule Appointment",
                                     style: TextStyle(
