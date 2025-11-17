@@ -5,28 +5,6 @@ class SupabaseService {
   static SupabaseClient? _client;
   static bool _isInitialized = false;
 
-  // Old
-  // static Future<void> initialize() async {
-  //   if (_isInitialized) return;
-
-  //   await Supabase.initialize(
-  //     url: 'https://xipqovlvavpygfnzjtpg.supabase.co',
-  //     anonKey:
-  //         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpcHFvdmx2YXZweWdmbnpqdHBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjUwMjUsImV4cCI6MjA2ODE0MTAyNX0.bkCpFtAocbVAPlLir7IOp_MwpeXWvjJc5CTMmwzgQss',
-  //   );
-
-  //   _client = Supabase.instance.client;
-  //   _isInitialized = true;
-  // }
-
-  // static Future<SupabaseClient> get client async {
-  //   if (!_isInitialized) {
-  //     print("Supabase is not initialized! Initializing now...");
-  //     await initialize();
-  //   }
-  //   return _client!;
-  // }
-
   static Future<void> initialize() async {
     if (_isInitialized) {
       print("⚠️ Supabase already initialized, skipping second init.");
@@ -35,8 +13,9 @@ class SupabaseService {
 
     print("🔄 Initializing Supabase...");
     await Supabase.initialize(
-      url: 'https://xipqovlvavpygfnzjtpg.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpcHFvdmx2YXZweWdmbnpqdHBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjUwMjUsImV4cCI6MjA2ODE0MTAyNX0.bkCpFtAocbVAPlLir7IOp_MwpeXWvjJc5CTMmwzgQss',
+      // Replace with your own Supabase storage url and key (For Image storing; profile, articles, specialists, specialists id)
+      url: '',
+      anonKey: '',
     );
     _client = Supabase.instance.client;
     _isInitialized = true;

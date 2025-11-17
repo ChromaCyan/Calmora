@@ -122,7 +122,8 @@ class SocketService {
     if (socket != null && socket!.connected) return;
 
     socket = IO.io(
-      'https://calmora-chat-real-time.onrender.com',
+       //Replace with your own Socket service if you have something hosted, this is for real-time chat and notification
+      '',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

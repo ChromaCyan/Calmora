@@ -11,7 +11,7 @@ class NotificationService {
   static FlutterLocalNotificationsPlugin get flutterLocalNotifications =>
       _localNotifications;
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-  final String baseUrl = 'http://192.168.18.253:5000/api';
+  final String baseUrl = '';
 
   Timer? _timer;
 
