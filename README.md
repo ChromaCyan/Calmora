@@ -14,6 +14,24 @@ One of its core features is an **AI-driven chatbot** named *Calmora* that offers
 
 ---
 
+## 🔗 Related Repositories
+
+Calmora is split across multiple repositories for easier management:
+
+### Backend API
+- Handles user & specialist authentication, appointments, surveys, articles, and AI chatbot.
+- [Calmora API](https://github.com/ChromaCyan/Calmora-API)
+
+### Admin Web Panel
+- Web interface for admins to approve/reject specialists and articles, manage published content, and moderate the system.
+- [Calmora Admin Web](https://github.com/ChromaCyan/Calmora-Admin-Web)
+
+### Real-Time Socket Server
+- Powers real-time chat and notifications between patients, specialists, and AI chatbot.
+- [Calmora Socket](https://github.com/ChromaCyan/Calmora_Socket)
+
+---
+
 ## Key Features
 
 ### 🧠 **Specialist & Patient Accounts**
