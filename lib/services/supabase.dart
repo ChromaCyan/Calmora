@@ -14,8 +14,8 @@ class SupabaseService {
     print("🔄 Initializing Supabase...");
     await Supabase.initialize(
       // Replace with your own Supabase storage url and key (For Image storing; profile, articles, specialists, specialists id)
-      url: '',
-      anonKey: '',
+      url: 'https://xipqovlvavpygfnzjtpg.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpcHFvdmx2YXZweWdmbnpqdHBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NjUwMjUsImV4cCI6MjA2ODE0MTAyNX0.bkCpFtAocbVAPlLir7IOp_MwpeXWvjJc5CTMmwzgQss',
     );
     _client = Supabase.instance.client;
     _isInitialized = true;

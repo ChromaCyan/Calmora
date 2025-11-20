@@ -15,7 +15,7 @@ import 'package:armstrong/models/mood/mood.dart';
 import 'package:armstrong/models/user/specialist.dart';
 
 class ApiRepository {
-  final String baseUrl = 'http://localhost:3000/api'; //Replace with your own API, or API in my repository but locally modified to suit your app.
+  final String baseUrl = 'https://calmora-api.vercel.app/api'; //Replace with your own API, or API in my repository but locally modified to suit your app.
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /////////////////////////////////////////////////////////////////////////////////

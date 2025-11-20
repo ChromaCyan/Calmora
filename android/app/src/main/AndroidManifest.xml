@@ -37,7 +37,7 @@
             android:value="2" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=""/>
+            android:value="AIzaSyBkOkeLLzzjneBUpi8o36ujiaD-Yahu9O8"/>
             <!-- Just replace the value above with your own Google Maps API Key
              Example usage: AIzaSyBkOkeLLzz**************-******* -->
     </application>

@@ -123,7 +123,7 @@ class SocketService {
 
     socket = IO.io(
        //Replace with your own Socket service if you have something hosted, this is for real-time chat and notification
-      '',
+      'https://calmora-api.onrender.com',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
