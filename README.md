@@ -14,6 +14,15 @@ One of its core features is an **AI-driven chatbot** named *Calmora* that offers
 
 ---
 
+## 🎉 Milestone & Contribution Notice
+
+We’ve just hit **300 commits** on Calmora! 🎊  
+This project has been steadily developed to provide a meaningful mental health platform for Filipinos, and reaching this milestone is a reflection of all the effort and care that has gone into it.
+
+If you’re interested in exploring or contributing to Calmora, please **reach out for permission** before using or forking the project. Responsible collaboration is important to us, and we’re happy to guide contributors who want to join in building and improving the app. You can contact the me via via email: **https://joshbrianbugarin27@gmail.com** or open an issue in the repository for inquiries.
+
+---
+
 ## 🔗 Related Repositories
 
 Calmora is split across multiple repositories for easier management:
